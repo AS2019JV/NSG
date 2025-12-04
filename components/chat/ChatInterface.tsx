@@ -1,28 +1,56 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useAppStore } from '@/store/useAppStore';
-import { Send, Paperclip, Loader2 } from 'lucide-react';
+import { CONTEXT, RoleType } from '@/data/context';
+import { 
+  Send, 
+  Paperclip, 
+  Mic, 
+  ArrowUp, 
+  Sparkles, 
+  Loader2, 
+  BrainCircuit 
+} from 'lucide-react';
+import DynamicIsland from '@/components/layout/DynamicIsland';
+import ProcessingState from '@/components/chat/ProcessingState';
+import clsx from 'clsx';
 
-interface Message {
+// Extended Message Type to support your Analysis Cards AND standard text
+export interface Message {
   id: string;
   role: 'user' | 'assistant';
+  type?: 'text' | 'analysis'; 
   content: string;
+  metadata?: {
+    title?: string;
+    tag?: string;
+    roleContext?: string;
+  };
 }
 
 export default function ChatInterface() {
+  // 1. GLOBAL STATE
   const { currentRole, isContextCached, setContextCached } = useAppStore();
+  
+  // 2. LOCAL STATE
   const [cacheName, setCacheName] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [mode, setMode] = useState('standard'); // For Dynamic Island switching
+  
+  // Refs for scrolling
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Initialize Context Cache when role changes
+  const { messages, isProcessing } = useChatStore(); // Ensure isProcessing is exposed from store
+
+  // 3. INITIALIZE CONTEXT (Your Backend Logic)
   useEffect(() => {
     const initContext = async () => {
       setContextCached(false);
       setCacheName(null);
-      setMessages([]); // Clear messages when role changes
+      setMessages([]); // Clear messages on role switch
       
       try {
         const res = await fetch('/api/context', {
@@ -34,9 +62,8 @@ export default function ChatInterface() {
           setCacheName(data.cacheName);
           setContextCached(true);
         } else {
-            // Fallback if cache creation failed (e.g. API key missing)
-            // We still allow chat but without cache
-            setContextCached(true);
+          // Fallback if cache creation failed
+          setContextCached(true);
         }
       } catch (error) {
         console.error("Failed to init context:", error);
@@ -44,16 +71,49 @@ export default function ChatInterface() {
       }
     };
 
-    initContext();
+    if (currentRole) {
+      initContext();
+    }
   }, [currentRole, setContextCached]);
 
+  // Scroll to bottom on new messages
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isLoading]);
+
+  // 4. HEADER CONTENT LOGIC (From Visuals)
+  const getHeaderContent = () => {
+    let title = "NSG Neural Core v14.6";
+    let subtitle = "Asistente general activo.";
+    let colorClass = "text-navy-900";
+
+    if (mode !== 'standard') {
+      const roleKey = (currentRole as RoleType) || 'consultor';
+      // Safety check for CONTEXT access
+      const roleData = CONTEXT[roleKey];
+      const item = roleData?.menu.find((i) => i.id === mode);
+      
+      if (item) {
+        title = `Módulo: ${item.label}`;
+        subtitle = `Contexto cargado: ${roleKey.toUpperCase()} > ${item.label}. Listo para análisis.`;
+        colorClass = "text-blue-700";
+      }
+    }
+    return { title, subtitle, colorClass };
+  };
+
+  const { title, subtitle, colorClass } = getHeaderContent();
+
+  // 5. HANDLER (Merged Logic: UI Updates + API Stream)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
+    // Add User Message immediately
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
+      type: 'text',
       content: input.trim(),
     };
 
@@ -66,7 +126,7 @@ export default function ChatInterface() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [...messages, userMessage],
+          messages: [...messages, userMessage], // Send history
           cacheName,
         }),
       });
@@ -77,9 +137,11 @@ export default function ChatInterface() {
       const decoder = new TextDecoder();
       let assistantContent = '';
 
+      // Create placeholder for AI response
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
+        type: 'text',
         content: '',
       };
 
@@ -93,6 +155,7 @@ export default function ChatInterface() {
           const chunk = decoder.decode(value);
           assistantContent += chunk;
 
+          // Update the specific message in state
           setMessages(prev => 
             prev.map(m => 
               m.id === assistantMessage.id 
@@ -104,58 +167,150 @@ export default function ChatInterface() {
       }
     } catch (error) {
       console.error('Chat error:', error);
+      // Optional: Add error message to chat
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col h-full relative">
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scroll">
-        {messages.map((m: Message) => (
-          <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[85%] p-4 rounded-2xl ${
-              m.role === 'user' 
-                ? 'bg-blue-600 text-white rounded-tr-none shadow-lg' 
-                : 'bg-white border border-slate-200 shadow-sm rounded-tl-none text-slate-800'
-            }`}>
-              {m.content}
-            </div>
-          </div>
-        ))}
-        {isLoading && (
-          <div className="flex justify-start">
-             <div className="bg-white p-4 rounded-2xl rounded-tl-none border border-slate-200 shadow-sm flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
-                <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">Thinking...</span>
-             </div>
-          </div>
-        )}
+    <div className="flex flex-col h-full w-full relative">
+      
+      {/* --- LAYER 1: DYNAMIC ISLAND (Visuals) --- */}
+      <div className="absolute top-0 left-0 w-full flex justify-center pt-6 lg:pt-8 z-40 pointer-events-none">
+        <div className="pointer-events-auto">
+            <DynamicIsland currentMode={mode} setMode={setMode} />
+        </div>
       </div>
 
-      {/* Input Area */}
-      <div className="p-4 bg-white/80 backdrop-blur-xl border-t border-slate-200 shrink-0">
-        {!isContextCached ? (
-           <div className="flex items-center justify-center gap-2 text-sm text-blue-600 font-medium py-2 animate-pulse">
-             <Loader2 className="w-4 h-4 animate-spin" />
-             Establishing Neural Link...
+      {/* --- LAYER 2: CHAT BODY --- */}
+      <div className="flex-1 overflow-y-auto custom-scroll p-6 lg:p-12 pt-32 lg:pt-40 space-y-8">
+        
+        {/* Context Header Card */}
+        <div className="bg-white p-6 lg:p-8 rounded-[2rem] shadow-sovereign max-w-[95%] lg:max-w-[85%] border border-slate-100 flex gap-6 items-start animate-fade-in-up mx-auto">
+           <div className="w-10 h-10 relative shrink-0 atom-container">
+               <div className="w-full h-full atom-breathe">
+                   <svg viewBox="0 0 100 100" className="w-full h-full text-navy-900">
+                       <circle cx="50" cy="50" r="42" className="morph-orbit orbit-1 ui-orbit" stroke="currentColor"/>
+                       <circle cx="50" cy="50" r="42" className="morph-orbit orbit-2 ui-orbit" stroke="currentColor"/>
+                       <circle cx="50" cy="50" r="14" fill="#3B82F6"/>
+                   </svg>
+               </div>
            </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="relative flex items-center gap-2 max-w-4xl mx-auto">
-            <button type="button" className="p-3 text-slate-400 hover:text-blue-600 hover:bg-slate-100 rounded-xl transition">
-              <Paperclip className="w-5 h-5" />
-            </button>
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition text-slate-800 placeholder-slate-400"
-              placeholder={`Ask ${currentRole}...`}
-            />
-            <button type="submit" disabled={isLoading || !input.trim()} className="p-3 bg-slate-900 text-white rounded-xl hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-blue-500/30">
-              <Send className="w-5 h-5" />
-            </button>
-          </form>
+           <div>
+               <p className={`text-sm font-bold ${colorClass} mb-2`}>{title}</p>
+               <p className="text-sm text-slate-600 leading-relaxed">
+                 {isContextCached ? subtitle : "Estableciendo conexión neuronal con base de datos..."}
+               </p>
+           </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto ...">
+         {/* Message History */}
+         {messages.map(...)}
+
+         {/* CONDITIONALLY RENDER THE COMPONENT */}
+         {isProcessing && <ProcessingState />}
+         
+         <div ref={chatEndRef} />
+        </div>
+
+        {/* Messages List */}
+        {messages.map((msg) => (
+          <div key={msg.id} className={clsx("flex w-full animate-fade-in-up", msg.role === 'user' ? "justify-end" : "justify-start")}>
+            
+            {msg.role === 'user' ? (
+              // USER MESSAGE STYLE
+              <div className="bg-blue-600 text-white px-6 py-4 rounded-[1.5rem] rounded-tr-none text-sm font-medium max-w-[85%] shadow-lg leading-relaxed">
+                {msg.content}
+              </div>
+            ) : (
+              // AI MESSAGE STYLE
+              <div className="flex gap-4 group max-w-[90%]">
+                 <div className="w-9 h-9 bg-navy-950 rounded-2xl flex items-center justify-center shrink-0 shadow-lg text-white mt-auto mb-1">
+                    <Sparkles className="w-4 h-4" />
+                 </div>
+                 
+                 {/* Logic to choose between Text Bubble or Special Analysis Card */}
+                 {msg.type === 'analysis' ? (
+                    /* If you have the NewsAnalysisResult component, render it here. 
+                       Otherwise, render formatted content */
+                    <div className="bg-white p-6 rounded-[2rem] rounded-tl-none border border-slate-100 shadow-card">
+                       {/* Render custom analysis content if needed */}
+                       <div dangerouslySetInnerHTML={{ __html: msg.content }} />
+                    </div>
+                 ) : (
+                    <div className="bg-white p-6 rounded-[1.5rem] rounded-tl-none text-sm text-slate-700 shadow-card border border-slate-100">
+                        {/* Using whitespace-pre-wrap to handle line breaks from AI */}
+                        <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                    </div>
+                 )}
+              </div>
+            )}
+          </div>
+        ))}
+
+        {/* Loading State (Thinking...) */}
+        {isLoading && !messages[messages.length - 1]?.content && (
+             <div className="flex flex-col items-center justify-center mt-8 animate-fade-in-up gap-6 w-full">
+                 <div className="w-16 h-16 relative atom-container">
+                      <div className="w-full h-full animate-spin-process">
+                         <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible">
+                             <defs>
+                                <linearGradient id="processGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stopColor="#3B82F6" />
+                                    <stop offset="100%" stopColor="#60A5FA" />
+                                </linearGradient>
+                             </defs>
+                             <circle cx="50" cy="50" r="42" className="morph-orbit" stroke="url(#processGrad)" strokeWidth="2" fill="none" />
+                             <circle cx="50" cy="50" r="8" fill="#3B82F6" />
+                         </svg>
+                      </div>
+                 </div>
+                 <p className="text-xs font-bold text-blue-500 tracking-widest uppercase animate-text-glow">Procesando...</p>
+             </div>
         )}
+        
+        <div ref={chatEndRef} />
+      </div>
+
+      {/* --- LAYER 3: INPUT AREA --- */}
+      <div className="shrink-0 relative z-20 safe-pb-modal bg-white/80 backdrop-blur-xl border-t border-slate-200">
+        <div className="p-4 sm:p-6 lg:p-8">
+            {!isContextCached ? (
+                <div className="flex items-center justify-center gap-2 text-sm text-blue-600 font-medium py-4 animate-pulse">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Sincronizando Contexto de {currentRole?.toUpperCase()}...
+                </div>
+            ) : (
+                <form onSubmit={handleSubmit} className="relative max-w-4xl mx-auto group">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-lg opacity-0 group-focus-within:opacity-100 transition-opacity duration-500 pointer-events-none transform scale-95"></div>
+                    <div className="relative flex items-center bg-white border border-slate-200 rounded-3xl shadow-sm focus-within:shadow-md transition-all duration-300">
+                        <div className="flex gap-1 pl-3 text-slate-400">
+                            <button type="button" className="p-2.5 hover:bg-slate-100 rounded-xl hover:text-blue-600 transition"><Mic className="w-5 h-5"/></button>
+                            <button type="button" className="p-2.5 hover:bg-slate-100 rounded-xl hover:text-blue-600 transition"><Paperclip className="w-5 h-5"/></button>
+                        </div>
+                        <input 
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            disabled={isLoading}
+                            className="flex-1 bg-transparent border-none py-4 px-3 font-medium text-navy-900 focus:ring-0 placeholder-slate-400 text-base focus:outline-none disabled:opacity-50" 
+                            placeholder={`Escribe tu consulta o comando para ${currentRole}...`}
+                            autoComplete="off" 
+                        />
+                        <div className="pr-2">
+                            <button 
+                                type="submit" 
+                                disabled={isLoading || !input.trim()}
+                                className="p-3 bg-navy-900 text-white rounded-2xl hover:bg-blue-600 transition shadow-lg flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <ArrowUp className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            )}
+        </div>
       </div>
     </div>
   );

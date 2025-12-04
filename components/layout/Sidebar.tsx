@@ -1,86 +1,127 @@
 "use client";
 
 import { useAppStore } from "@/store/useAppStore";
+import { useUIStore } from "@/store/useUIStore"; // Imported for mobile toggling
 import { CONTEXT } from "@/data/context";
-import { LogOut, Activity } from "lucide-react";
+import { LogOut, Activity, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import clsx from "clsx";
 
 export default function Sidebar() {
-  const { currentRole, isSidebarOpen } = useAppStore();
-  const config = CONTEXT[currentRole];
+  // 1. Merge State Management
+  const { currentRole } = useAppStore();
+  const { isSidebarOpen, toggleSidebar } = useUIStore(); // Controls mobile state
   const pathname = usePathname();
-
-  // Mobile drawer logic would go here (using isSidebarOpen to toggle class)
+  
+  // Safety check: fallback to 'paciente' or handle null if store is empty initially
+  const roleKey = currentRole || 'paciente';
+  const config = CONTEXT[roleKey];
 
   return (
-    <aside className={`fixed lg:static inset-y-0 left-0 w-72 bg-slate-950 flex flex-col text-slate-400 border-r border-slate-900 shadow-2xl z-[90] transition-transform duration-300 ease-in-out transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
-      {/* Header */}
-      <div className="h-24 flex items-center px-6 border-b border-slate-900 justify-between bg-slate-950/50 backdrop-blur-md sticky top-0 z-10 shrink-0">
-         <div className="flex items-center gap-4">
-             <div className="w-9 h-9 relative shrink-0">
-                 <div className="w-full h-full animate-breathing bg-blue-500 rounded-full blur-md absolute opacity-50"></div>
-                 <div className="w-full h-full rounded-full border border-blue-400 flex items-center justify-center relative z-10 bg-slate-900">
-                    <div className="w-2 h-2 bg-white rounded-full"></div>
-                 </div>
+    <>
+      {/* 2. Mobile Overlay (From my design) */}
+      {/* Clicking the backdrop closes the sidebar on mobile */}
+      <div 
+        className={clsx(
+          "fixed inset-0 bg-navy-950/80 z-[80] backdrop-blur-sm transition-opacity duration-300 lg:hidden",
+          isSidebarOpen ? "opacity-100 block" : "opacity-0 hidden pointer-events-none"
+        )}
+        onClick={toggleSidebar}
+      />
+
+      {/* 3. Main Sidebar Container */}
+      <aside className={clsx(
+        "fixed lg:static inset-y-0 left-0 w-72 bg-navy-950 flex flex-col text-slate-400 border-r border-navy-900 shadow-2xl z-[90] transition-transform duration-300 ease-in-out transform h-full",
+        isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      )}>
+        
+        {/* HEADER: High-End Atom Animation + Brand */}
+        <div className="h-24 flex items-center px-6 border-b border-navy-900 justify-between bg-navy-950/50 backdrop-blur-md sticky top-0 z-10 shrink-0">
+          <div className="flex items-center gap-4 flex-nowrap overflow-hidden min-w-max">
+             {/* The Complex SVG Atom */}
+             <div className="w-9 h-9 relative shrink-0 atom-container">
+                <div className="w-full h-full atom-breathe">
+                   <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible">
+                      <defs><linearGradient id="sidebarGrad" x1="0" y1="0" x2="100" y2="100"><stop offset="0" stopColor="#60A5FA"/><stop offset="1" stopColor="#FFFFFF"/></linearGradient></defs>
+                      <circle cx="50" cy="50" r="42" className="morph-orbit orbit-1 sidebar-orbit" stroke="url(#sidebarGrad)" />
+                      <circle cx="50" cy="50" r="42" className="morph-orbit orbit-2 sidebar-orbit" stroke="url(#sidebarGrad)" style={{transform: 'rotate(60deg) scaleY(0.45)'}} />
+                      <circle cx="50" cy="50" r="42" className="morph-orbit orbit-3 sidebar-orbit" stroke="url(#sidebarGrad)" style={{transform: 'rotate(120deg) scaleY(0.45)'}} />
+                      <circle cx="50" cy="50" r="10" fill="#FFFFFF"/>
+                   </svg>
+                </div>
              </div>
              <div className="flex flex-col justify-center">
-                <span className="font-display font-bold text-white text-lg tracking-tight whitespace-nowrap leading-none">NSG <span className="font-normal text-blue-400">Intelligence</span></span>
+                 <span className="font-display font-bold text-white text-lg tracking-tight whitespace-nowrap leading-none">NSG <span className="font-normal text-blue-400">Intelligence</span></span>
              </div>
-         </div>
-      </div>
-
-      {/* User Profile */}
-      <div className="p-6 shrink-0">
-        <div className="flex items-center gap-3 bg-slate-900 p-4 rounded-2xl border border-white/5 shadow-inner group transition-all hover:bg-slate-800 cursor-pointer">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-lg border border-white/10 group-hover:scale-105 transition-transform">
-                {config.avatar}
-            </div>
-            <div className="overflow-hidden">
-                <p className="text-sm font-bold text-white truncate leading-tight">{config.name}</p>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <p className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest truncate">{config.roleDesc}</p>
-                </div>
-            </div>
+          </div>
+          
+          {/* Close Button (Visible only on Mobile) */}
+          <button className="lg:hidden p-2 text-slate-400 hover:text-white transition" onClick={toggleSidebar}>
+            <X className="w-5 h-5"/>
+          </button>
         </div>
-      </div>
 
-      {/* Menu */}
-      <nav className="flex-1 px-4 space-y-2 overflow-y-auto custom-scroll pb-10">
-        {config.menu.map((item) => {
-            const Icon = item.icon;
-            const isActive = pathname === `/${item.id}` || (item.id === 'nsg_ios' && pathname === '/');
-            
-            return (
-                <Link 
-                    key={item.id} 
-                    href={item.id === 'nsg_ios' ? '/' : `/${item.id}`}
-                    className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium transition-all mb-1 ${
+        {/* USER PROFILE: Merging your data with my styling */}
+        <div className="p-6 shrink-0">
+          <div className="flex items-center gap-3 bg-navy-850 p-4 rounded-2xl border border-white/5 shadow-inner group transition-all hover:bg-navy-800 cursor-pointer">
+             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-sm shadow-lg border border-white/10 group-hover:scale-105 transition-transform">
+               {/* Use the avatar from CONTEXT */}
+               {config?.avatar || 'US'} 
+             </div>
+             <div className="overflow-hidden">
+                <p className="text-sm font-bold text-white truncate leading-tight">{config?.name || 'Usuario'}</p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                   <p className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest truncate">{config?.roleDesc || 'GUEST'}</p>
+                </div>
+             </div>
+          </div>
+        </div>
+
+        {/* MENU: Merging your Logic (Map) with my Styles (Gradient/Glass) */}
+        <nav className="flex-1 px-4 space-y-2 overflow-y-auto custom-scroll pb-10">
+          {config?.menu.map((item) => {
+              const Icon = item.icon;
+              // Your routing logic
+              const isActive = pathname === `/${item.id}` || (item.id === 'nsg_ios' && pathname === '/');
+              
+              return (
+                  <Link 
+                      key={item.id} 
+                      href={item.id === 'nsg_ios' ? '/' : `/${item.id}`} // Keeps your routing logic
+                      onClick={() => {
+                        // Close sidebar on mobile when a link is clicked
+                        if (window.innerWidth < 1024) toggleSidebar(); 
+                      }}
+                      className={clsx(
+                        "w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium transition-all mb-1",
+                        // Special styling for Highlighted items vs Standard items
                         item.special 
-                        ? 'bg-gradient-to-r from-blue-900/40 to-slate-900/40 border border-blue-500/30 text-blue-300 shadow-glass' 
-                        : isActive 
-                            ? 'bg-white/10 text-white shadow-md' 
-                            : 'text-slate-400 hover:bg-white/5 hover:text-white hover:translate-x-1'
-                    }`}
-                >
-                    <Icon className="w-5 h-5" />
-                    {item.label}
-                </Link>
-            );
-        })}
-      </nav>
+                          ? "bg-gradient-to-r from-blue-900/40 to-navy-900/40 border border-blue-500/30 text-blue-300 shadow-glass hover:text-white" 
+                          : isActive 
+                              ? "bg-white/10 text-white shadow-md border border-white/5" 
+                              : "text-slate-400 hover:bg-white/5 hover:text-white hover:translate-x-1"
+                      )}
+                  >
+                      <Icon className={clsx("w-5 h-5", isActive || item.special ? "text-blue-400" : "text-slate-500 group-hover:text-white")} />
+                      {item.label}
+                  </Link>
+              );
+          })}
+        </nav>
 
-      {/* Footer */}
-      <div className="p-6 border-t border-slate-900 space-y-3 bg-slate-950 shrink-0">
-         <div className="flex items-center justify-between px-3.5 py-2.5 text-[0.65rem] font-bold text-slate-500 uppercase tracking-widest bg-slate-900/50 rounded-lg border border-white/5">
-            <span>Precision Status</span>
-            <span className="text-emerald-500 font-bold flex items-center gap-1"><Activity className="w-3 h-3" /> Optimal</span>
-         </div>
-         <button className="flex items-center gap-3 text-sm font-medium hover:text-white transition w-full p-2.5 rounded-lg hover:bg-white/5 text-slate-400 group">
-            <LogOut className="w-4 h-4 group-hover:text-red-400 transition" /> Cerrar Sesión
-         </button>
-      </div>
-    </aside>
+        {/* FOOTER: High-end styling with your Logout logic */}
+        <div className="p-6 border-t border-navy-900 space-y-3 bg-navy-950 shrink-0 safe-bottom-scroll">
+           <div className="flex items-center justify-between px-3.5 py-2.5 text-[0.65rem] font-bold text-slate-500 uppercase tracking-widest bg-navy-900/50 rounded-lg border border-white/5">
+              <span>Precision Status</span>
+              <span className="text-emerald-500 font-bold flex items-center gap-1"><Activity className="w-3 h-3" /> Optimal</span>
+           </div>
+           <button className="flex items-center gap-3 text-sm font-medium hover:text-white transition w-full p-2.5 rounded-lg hover:bg-white/5 text-slate-400 group">
+              <LogOut className="w-4 h-4 group-hover:text-red-400 transition" /> Cerrar Sesión
+           </button>
+        </div>
+      </aside>
+    </>
   );
 }
