@@ -6,7 +6,7 @@ Modern, production-ready Next.js application migrated from the legacy NSG.html p
 
 - **Gemini-Native AI**: Powered by Google Gemini 1.5 Flash via Vercel AI SDK
 - **Context Caching**: Intelligent caching for system instructions to reduce latency
-- **Multi-Role Support**: Consultant, Psychologist, Sales, Manager personas
+- **Multi-Role Support**: Consultant, Psychologist, Patient, Manager personas
 - **Real-time Streaming**: Edge runtime chat with streaming responses
 - **Glassmorphism UI**: Premium design with backdrop-blur and neon effects
 - **State Persistence**: Zustand with localStorage for seamless role switching

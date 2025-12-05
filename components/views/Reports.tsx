@@ -1,4 +1,5 @@
 "use client";
+import React from 'react';
 import { FileText, Table, Shield, Presentation, DownloadCloud } from "lucide-react";
 
 export default function Reports() {
@@ -22,8 +23,15 @@ export default function Reports() {
   );
 }
 
-function ReportCard({ name, meta, icon: Icon, color }: any) {
-  const colors: any = {
+interface ReportCardProps {
+  name: string;
+  meta: string;
+  icon: React.ElementType;
+  color: 'red' | 'emerald' | 'blue' | 'orange';
+}
+
+function ReportCard({ name, meta, icon: Icon, color }: ReportCardProps) {
+  const colors: Record<string, string> = {
     red: "bg-red-50 text-red-600 hover:bg-red-100",
     emerald: "bg-emerald-50 text-emerald-600 hover:bg-emerald-100",
     blue: "bg-blue-50 text-blue-600 hover:bg-blue-100",
@@ -46,7 +54,14 @@ function ReportCard({ name, meta, icon: Icon, color }: any) {
   );
 }
 
-function FileCard({ title, type, ext, size }: any) {
+interface FileCardProps {
+  title: string;
+  type: string;
+  ext: string;
+  size: string;
+}
+
+function FileCard({ title, type, ext, size }: FileCardProps) {
     return (
         <div className="bg-white p-6 rounded-[2rem] border border-slate-200 hover:border-blue-200 transition group cursor-pointer hover:-translate-y-1">
             <div className="flex items-center gap-4 mb-4">

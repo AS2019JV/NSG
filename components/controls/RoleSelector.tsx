@@ -35,9 +35,9 @@ const ROLE_OPTIONS: RoleOption[] = [
     borderColor: "border-sky-200 hover:border-sky-400",
   },
   {
-    id: "sales",
-    label: "Director Comercial",
-    description: "Revenue & Pipeline Management",
+    id: "patient",
+    label: "Paciente",
+    description: "Bienestar & Análisis de Conducta",
     icon: TrendingUp,
     color: "text-emerald-600",
     bgColor: "bg-emerald-50",

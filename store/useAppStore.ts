@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type Role = 'consultor' | 'psicologo' | 'directivo' | 'paciente';
+export type Role = 'consultant' | 'psychologist' | 'manager' | 'patient';
 
 export interface Message {
   id: string;
@@ -28,15 +28,15 @@ interface AppState {
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      currentRole: 'consultor',
+      currentRole: 'consultant',
       theme: 'light',
       isSidebarOpen: true,
       isContextCached: false,
       conversations: {
-        consultor: [],
-        psicologo: [],
-        directivo: [],
-        paciente: [],
+        consultant: [],
+        psychologist: [],
+        manager: [],
+        patient: [],
       },
 
       setRole: (role) => set({ currentRole: role }),

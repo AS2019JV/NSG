@@ -1,4 +1,5 @@
 "use client";
+import React from 'react';
 import { Bell, Shield, Moon, Download, Trash2, Edit2 } from "lucide-react";
 import { useToast } from "@/components/ui/ToastProvider";
 import clsx from "clsx";
@@ -100,7 +101,7 @@ export default function Settings() {
 
 // --- SUB-COMPONENT: Toggle Item ---
 interface ToggleItemProps {
-    icon: any;
+    icon: React.ElementType;
     title: string;
     desc: string;
     color: 'blue' | 'purple' | 'orange';

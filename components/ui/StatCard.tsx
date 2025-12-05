@@ -10,7 +10,7 @@ interface StatCardProps {
   borderClass?: string; // Optional for the red alert card
 }
 
-export function StatCard({ title, value, icon: Icon, colorClass, bgClass }: StatCardProps) {
+export function StatCard({ title, value, icon: Icon, colorClass, bgClass, borderClass }: StatCardProps) {
   return (
       <div className={clsx(
         bgClass, 

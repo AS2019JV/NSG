@@ -57,7 +57,7 @@ export default function NewsAnalysisResult({ tag, roleContext }: NewsAnalysisRes
               </div>
               <div className="flex items-start gap-3">
                 <div className="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</div>
-                <p className="text-sm text-slate-600">Agendar sesión de "Deep Dive" con el equipo técnico mañana a las 10 AM.</p>
+                <p className="text-sm text-slate-600">Agendar sesión de &quot;Deep Dive&quot; con el equipo técnico mañana a las 10 AM.</p>
               </div>
             </div>
           </div>

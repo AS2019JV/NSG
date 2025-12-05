@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Heart, Activity, Flame, Footprints } from "lucide-react";
 import Chart from "chart.js/auto";
 
@@ -82,7 +82,7 @@ export default function Wellness() {
   );
 }
 
-function SmallCard({ title, value, icon: Icon, bgClass }: { title: string, value: string, icon: any, bgClass: string }) {
+function SmallCard({ title, value, icon: Icon, bgClass }: { title: string, value: string, icon: React.ElementType, bgClass: string }) {
   return (
     <div className="bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 flex items-center justify-between">
       <div className="flex flex-col">

@@ -1,4 +1,5 @@
 "use client";
+import React from 'react';
 import { Search, FileText, Headphones, Book, Layout } from "lucide-react";
 
 export default function Library() {
@@ -25,8 +26,15 @@ export default function Library() {
   );
 }
 
-function ResourceCard({ title, desc, icon: Icon, color }: any) {
-  const colors: any = {
+interface ResourceCardProps {
+  title: string;
+  desc: string;
+  icon: React.ElementType;
+  color: 'blue' | 'purple' | 'emerald' | 'orange';
+}
+
+function ResourceCard({ title, desc, icon: Icon, color }: ResourceCardProps) {
+  const colors: Record<string, string> = {
     blue: "bg-blue-50 text-blue-600 hover:border-blue-200",
     purple: "bg-purple-50 text-purple-600 hover:border-purple-200",
     emerald: "bg-emerald-50 text-emerald-600 hover:border-emerald-200",

@@ -6,15 +6,12 @@ import { useUIStore } from "@/store/useUIStore";
 import DayDetailPanel from "@/components/features/DayDetailPanel";
 import clsx from "clsx";
 
-// Optional: Import DayDetailPanel if you componentize it
-// import DayDetailPanel from "@/components/features/DayDetailPanel";
-
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { isDayPanelOpen, toggleDayPanel } = useUIStore();
+  const { isDayDetailOpen, closeDayDetail } = useUIStore();
 
   return (
     <div className="flex h-screen bg-[#F8FAFC] overflow-hidden">
@@ -38,23 +35,17 @@ export default function DashboardLayout({
       {/* 3. Global Modals (Overlaying everything) */}
       <AIModal />
       
-      {/* 4. Day Detail Panel (Slide Over) - Inline implementation for brevity */}
+      {/* 4. Day Detail Panel (Slide Over) */}
       <DayDetailPanel />
-         <div 
-           className={clsx(
-             "fixed inset-0 bg-navy-950/20 z-[105] backdrop-blur-sm transition-opacity",
-             isDayPanelOpen ? "opacity-100 block" : "opacity-0 hidden pointer-events-none"
-           )} 
-           onClick={toggleDayPanel}
-         />
-         <div className={clsx(
-            "fixed inset-y-0 right-0 w-full sm:w-[450px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-[110] border-l border-slate-200 flex flex-col h-full",
-            isDayPanelOpen ? "translate-x-0" : "translate-x-full"
-         )}>
-             {/* ... Content from your #day-detail-panel HTML ... */}
-         </div>
-      </>
-
+      
+      {/* Backdrop for Day Detail Panel */}
+      <div 
+        className={clsx(
+          "fixed inset-0 bg-navy-950/20 z-105 backdrop-blur-sm transition-opacity",
+          isDayDetailOpen ? "opacity-100 block" : "opacity-0 hidden pointer-events-none"
+        )} 
+        onClick={closeDayDetail}
+      />
     </div>
   );
 }

@@ -12,6 +12,7 @@
     "@ai-sdk/google": "^2.0.44",
     "@google/generative-ai": "^0.24.1",
     "ai": "^5.0.106",
+    "axios": "^1.13.2",
     "chart.js": "^4.5.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.555.0",

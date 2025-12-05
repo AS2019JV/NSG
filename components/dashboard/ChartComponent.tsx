@@ -32,25 +32,25 @@ export default function ChartComponent({ role }: ChartComponentProps) {
     let dataset1, dataset2, label1, label2;
 
     switch (role) {
-      case "consultor":
+      case "consultant":
         label1 = "Portfolio Value";
         label2 = "ROI";
         dataset1 = [65, 72, 78, 85];
         dataset2 = [45, 52, 58, 65];
         break;
-      case "psicologo":
+      case "psychologist":
         label1 = "Patient Sessions";
         label2 = "Progress Score";
         dataset1 = [12, 15, 18, 22];
         dataset2 = [70, 75, 80, 85];
         break;
-      case "directivo":
+      case "patient":
         label1 = "Deals Closed";
         label2 = "Pipeline Value";
         dataset1 = [8, 12, 15, 18];
         dataset2 = [120, 145, 160, 180];
         break;
-      case "paciente":
+      case "manager":
         label1 = "Team Efficiency";
         label2 = "Revenue";
         dataset1 = [75, 80, 85, 90];

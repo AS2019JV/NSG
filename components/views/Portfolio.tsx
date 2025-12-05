@@ -28,7 +28,15 @@ export default function Portfolio() {
   );
 }
 
-function PortfolioRow({ name, sector, share, val, perf }: any) {
+interface PortfolioRowProps {
+  name: string;
+  sector: string;
+  share: string;
+  val: string;
+  perf: string;
+}
+
+function PortfolioRow({ name, sector, share, val, perf }: PortfolioRowProps) {
   return (
     <tr className="border-b border-slate-50 hover:bg-slate-50/50 transition group">
       <td className="p-6 font-bold text-navy-900">{name}</td>

@@ -4,17 +4,16 @@ import { useEffect, useState, useRef } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import { CONTEXT, RoleType } from '@/data/context';
 import { 
-  Send, 
   Paperclip, 
   Mic, 
   ArrowUp, 
   Sparkles, 
-  Loader2, 
-  BrainCircuit 
+  Loader2
 } from 'lucide-react';
 import DynamicIsland from '@/components/layout/DynamicIsland';
-import ProcessingState from '@/components/chat/ProcessingState';
 import clsx from 'clsx';
+import NewsAnalysisResult from './NewsAnalysisResult';
+import axiosInstance from '@/api/axios';
 
 // Extended Message Type to support your Analysis Cards AND standard text
 export interface Message {
@@ -42,8 +41,6 @@ export default function ChatInterface() {
   
   // Refs for scrolling
   const chatEndRef = useRef<HTMLDivElement>(null);
-
-  const { messages, isProcessing } = useChatStore(); // Ensure isProcessing is exposed from store
 
   // 3. INITIALIZE CONTEXT (Your Backend Logic)
   useEffect(() => {
@@ -88,7 +85,7 @@ export default function ChatInterface() {
     let colorClass = "text-navy-900";
 
     if (mode !== 'standard') {
-      const roleKey = (currentRole as RoleType) || 'consultor';
+      const roleKey = (currentRole as RoleType) || 'consultant';
       // Safety check for CONTEXT access
       const roleData = CONTEXT[roleKey];
       const item = roleData?.menu.find((i) => i.id === mode);
@@ -122,21 +119,6 @@ export default function ChatInterface() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [...messages, userMessage], // Send history
-          cacheName,
-        }),
-      });
-
-      if (!response.ok) throw new Error('Failed to get response');
-
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let assistantContent = '';
-
       // Create placeholder for AI response
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -144,30 +126,32 @@ export default function ChatInterface() {
         type: 'text',
         content: '',
       };
-
       setMessages(prev => [...prev, assistantMessage]);
 
-      if (reader) {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
+      // Use the axios instance to send data to N8N
+      const response = await axiosInstance.post('https://personal-n8n.suwsiw.easypanel.host/webhook/ngs-intelligence', {
+        messages: [...messages, userMessage], // Send history
+        cacheName,
+      });
 
-          const chunk = decoder.decode(value);
-          assistantContent += chunk;
+      // Assuming N8N returns { output: "response text" } or similar. 
+      const assistantContent = response.data.output || response.data.content || response.data.text || (typeof response.data === 'string' ? response.data : JSON.stringify(response.data));
 
-          // Update the specific message in state
-          setMessages(prev => 
-            prev.map(m => 
-              m.id === assistantMessage.id 
-                ? { ...m, content: assistantContent }
-                : m
-            )
-          );
-        }
-      }
+      // Update the specific message in state
+      setMessages(prev => 
+        prev.map(m => 
+          m.id === assistantMessage.id 
+            ? { ...m, content: assistantContent }
+            : m
+        )
+      );
+
     } catch (error) {
       console.error('Chat error:', error);
-      // Optional: Add error message to chat
+      setMessages(prev => prev.map(m => 
+        m.id === (Date.now() + 1).toString() 
+        ? { ...m, content: "Error connecting to NSG Intelligence." } : m
+      ));
     } finally {
       setIsLoading(false);
     }
@@ -187,7 +171,7 @@ export default function ChatInterface() {
       <div className="flex-1 overflow-y-auto custom-scroll p-6 lg:p-12 pt-32 lg:pt-40 space-y-8">
         
         {/* Context Header Card */}
-        <div className="bg-white p-6 lg:p-8 rounded-[2rem] shadow-sovereign max-w-[95%] lg:max-w-[85%] border border-slate-100 flex gap-6 items-start animate-fade-in-up mx-auto">
+        <div className="bg-white p-6 lg:p-8 rounded-4xl shadow-sovereign max-w-[95%] lg:max-w-[85%] border border-slate-100 flex gap-6 items-start animate-fade-in-up mx-auto">
            <div className="w-10 h-10 relative shrink-0 atom-container">
                <div className="w-full h-full atom-breathe">
                    <svg viewBox="0 0 100 100" className="w-full h-full text-navy-900">
@@ -205,23 +189,13 @@ export default function ChatInterface() {
            </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto ...">
-         {/* Message History */}
-         {messages.map(...)}
-
-         {/* CONDITIONALLY RENDER THE COMPONENT */}
-         {isProcessing && <ProcessingState />}
-         
-         <div ref={chatEndRef} />
-        </div>
-
         {/* Messages List */}
         {messages.map((msg) => (
           <div key={msg.id} className={clsx("flex w-full animate-fade-in-up", msg.role === 'user' ? "justify-end" : "justify-start")}>
             
             {msg.role === 'user' ? (
               // USER MESSAGE STYLE
-              <div className="bg-blue-600 text-white px-6 py-4 rounded-[1.5rem] rounded-tr-none text-sm font-medium max-w-[85%] shadow-lg leading-relaxed">
+              <div className="bg-blue-600 text-white px-6 py-4 rounded-3xl rounded-tr-none text-sm font-medium max-w-[85%] shadow-lg leading-relaxed">
                 {msg.content}
               </div>
             ) : (
@@ -233,14 +207,12 @@ export default function ChatInterface() {
                  
                  {/* Logic to choose between Text Bubble or Special Analysis Card */}
                  {msg.type === 'analysis' ? (
-                    /* If you have the NewsAnalysisResult component, render it here. 
-                       Otherwise, render formatted content */
-                    <div className="bg-white p-6 rounded-[2rem] rounded-tl-none border border-slate-100 shadow-card">
-                       {/* Render custom analysis content if needed */}
-                       <div dangerouslySetInnerHTML={{ __html: msg.content }} />
-                    </div>
+                    <NewsAnalysisResult 
+                      tag={msg.metadata?.tag}
+                      roleContext={msg.metadata?.roleContext}
+                    />
                  ) : (
-                    <div className="bg-white p-6 rounded-[1.5rem] rounded-tl-none text-sm text-slate-700 shadow-card border border-slate-100">
+                    <div className="bg-white p-6 rounded-3xl rounded-tl-none text-sm text-slate-700 shadow-card border border-slate-100">
                         {/* Using whitespace-pre-wrap to handle line breaks from AI */}
                         <p className="leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                     </div>
@@ -284,11 +256,11 @@ export default function ChatInterface() {
                 </div>
             ) : (
                 <form onSubmit={handleSubmit} className="relative max-w-4xl mx-auto group">
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-lg opacity-0 group-focus-within:opacity-100 transition-opacity duration-500 pointer-events-none transform scale-95"></div>
+                    <div className="absolute inset-0 bg-linear-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-lg opacity-0 group-focus-within:opacity-100 transition-opacity duration-500 pointer-events-none transform scale-95"></div>
                     <div className="relative flex items-center bg-white border border-slate-200 rounded-3xl shadow-sm focus-within:shadow-md transition-all duration-300">
                         <div className="flex gap-1 pl-3 text-slate-400">
                             <button type="button" className="p-2.5 hover:bg-slate-100 rounded-xl hover:text-blue-600 transition"><Mic className="w-5 h-5"/></button>
-                            <button type="button" className="p-2.5 hover:bg-slate-100 rounded-xl hover:text-blue-600 transition"><Paperclip className="w-5 h-5"/></button>
+                            <button type="button" className="p-2.5 hover:bg-slate-100 rounded-xl hover:text-blue-600 transition"><Paperclip className="w-5 h-5"/></button>  
                         </div>
                         <input 
                             value={input}

@@ -3,6 +3,8 @@
 import dynamic from "next/dynamic";
 import { notFound } from "next/navigation";
 import { use } from "react"; 
+import { useAppStore } from "@/store/useAppStore";
+import { CONTEXT, RoleType } from "@/data/context";
 
 // Lazy load components map
 const Views: Record<string, any> = {
@@ -13,6 +15,7 @@ const Views: Record<string, any> = {
   nsg_news: dynamic(() => import("@/components/views/NSGNews")),
   nsg_clarity: dynamic(() => import("@/components/views/NSGClarity")),
   nsg_horizon: dynamic(() => import("@/components/views/NSGHorizon")),
+
   
   // Features
   calendar: dynamic(() => import("@/components/views/CalendarView")),
@@ -29,13 +32,44 @@ const Views: Record<string, any> = {
   settings: dynamic(() => import("@/components/views/Settings")),
 };
 
+// Define which views are available for each role
+const RoleViewAccess: Record<RoleType, string[]> = {
+  consultant: ['nsg_ios', 'nsg_news', 'nsg_clarity', 'nsg_horizon', 'portfolio', 'calendar', 'reports', 'settings'],
+  psychologist: ['nsg_ios', 'nsg_news', 'nsg_clarity', 'nsg_horizon', 'clinical_radar', 'calendar', 'patients', 'library', 'settings'],
+  manager: ['nsg_ios', 'nsg_news', 'nsg_clarity', 'nsg_horizon', 'calendar', 'metrics', 'strategy', 'reports', 'portfolio', 'settings'],
+  patient: ['nsg_ios', 'nsg_clarity', 'wellness', 'calendar', 'settings'],
+};
+
 interface PageProps {
   params: Promise<{ view: string }>;
 }
 
 export default function ViewPage({ params }: PageProps) {
-  // Unwrap params using React.use() or await (Next.js 15+ pattern)
+  const { currentRole } = useAppStore();
   const resolvedParams = use(params);
+  
+  // Check if user has access to this view
+  const roleKey = (currentRole as RoleType) || 'consultant';
+  const allowedViews = RoleViewAccess[roleKey] || [];
+  
+  if (!allowedViews.includes(resolvedParams.view)) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center p-8 bg-white rounded-3xl shadow-lg max-w-md">
+          <h2 className="text-2xl font-bold text-navy-900 mb-4">Acceso Denegado</h2>
+          <p className="text-slate-600 mb-6">
+            Este view no esta disponible para tu rol: <strong>{currentRole}</strong>
+          </p>
+          <button
+            onClick={() => window.history.back()}
+            className="px-6 py-3 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-500 transition"
+          >
+            Regresar
+          </button>
+        </div>
+      </div>
+    );
+  }
   
   const Component = Views[resolvedParams.view];
 

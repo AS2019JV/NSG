@@ -18,12 +18,12 @@ export default function DashboardDispatcher() {
 
     // 2. Logic: Define the "Home View" for each role
     // Currently, everyone starts at the Main System (nsg_ios), 
-    // but you can change this (e.g., directivo -> 'metrics')
+    // but you can change this (e.g., manager -> 'metrics')
     const defaultViews: Record<string, string> = {
-      directivo: "nsg_ios", 
-      consultor: "nsg_ios", 
-      psicologo: "nsg_ios", 
-      paciente:  "nsg_ios",  
+      manager: "nsg_ios", 
+      consultant: "nsg_ios", 
+      psychologist: "nsg_ios", 
+      patient:  "nsg_ios",
     };
 
     const view = defaultViews[currentRole] || "nsg_ios";

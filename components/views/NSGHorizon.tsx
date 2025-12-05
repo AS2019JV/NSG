@@ -14,7 +14,7 @@ export default function NSGHorizon() {
   const { showToast } = useToast();
   
   // Logic from your snippet
-  const subject = currentRole === 'consultor' ? 'Cliente Corporativo' : 'Paciente';
+  const subject = currentRole === 'consultant' ? 'Cliente Corporativo' : 'Paciente';
 
   // State for the interactive checklist (replaces toggleCheck)
   const [checkedItems, setCheckedItems] = useState<number[]>([]);

@@ -23,7 +23,7 @@ export default function NSGSystem() {
   const router = useRouter();
 
   // Logic to get First Name (Legacy Line: const userFirstName = ...)
-  const roleKey = (currentRole as RoleType) || 'consultor';
+  const roleKey = (currentRole as RoleType) || 'consultant';
   const userData = CONTEXT[roleKey];
   const userFirstName = userData?.name.split(' ')[0] || "Usuario";
 
