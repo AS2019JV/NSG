@@ -83,13 +83,14 @@ export default function Sidebar() {
         <nav className="flex-1 px-4 space-y-2 overflow-y-auto custom-scroll pb-10">
           {config?.menu.map((item) => {
               const Icon = item.icon;
-              // Your routing logic
-              const isActive = pathname === `/${item.id}` || (item.id === 'nsg_ios' && pathname === '/');
+              // Correct routing logic for /dashboard/[view]
+              const targetPath = `/dashboard/${item.id}`;
+              const isActive = pathname === targetPath;
               
               return (
                   <Link 
                       key={item.id} 
-                      href={item.id === 'nsg_ios' ? '/' : `/${item.id}`} // Keeps your routing logic
+                      href={targetPath}
                       onClick={() => {
                         // Close sidebar on mobile when a link is clicked
                         if (window.innerWidth < 1024) toggleSidebar(); 

@@ -37,7 +37,7 @@ const RoleViewAccess: Record<RoleType, string[]> = {
   consultant: ['nsg_ios', 'nsg_news', 'nsg_clarity', 'nsg_horizon', 'portfolio', 'calendar', 'reports', 'settings'],
   psychologist: ['nsg_ios', 'nsg_news', 'nsg_clarity', 'nsg_horizon', 'clinical_radar', 'calendar', 'patients', 'library', 'settings'],
   manager: ['nsg_ios', 'nsg_news', 'nsg_clarity', 'nsg_horizon', 'calendar', 'metrics', 'strategy', 'reports', 'portfolio', 'settings'],
-  patient: ['nsg_ios', 'nsg_clarity', 'wellness', 'calendar', 'settings'],
+  patient: ['nsg_ios', 'nsg_clarity', 'nsg_news', 'wellness', 'calendar', 'settings'],
 };
 
 interface PageProps {

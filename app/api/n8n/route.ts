@@ -12,6 +12,11 @@ export async function POST(req: Request) {
       );
     }
 
+    // Log the configuration and payload for debugging
+    console.log('--- N8N Proxy Request ---');
+    console.log('Target URL:', webhookUrl.replace(/([a-zA-Z0-9]{5})[a-zA-Z0-9]+([a-zA-Z0-9]{5})/, '$1***$2')); // Mask middle of URL
+    console.log('Payload:', JSON.stringify(body, null, 2));
+
     // Forward the request to N8N
     const response = await fetch(webhookUrl, {
       method: 'POST',

@@ -132,9 +132,17 @@ export default function ChatInterface() {
 
       // Process the response
       const responseData = response.data;
-      const assistantContent = responseData.response || responseData.output || 
-                             responseData.content || responseData.text || 
-                             (typeof responseData === 'string' ? responseData : JSON.stringify(responseData));
+      
+      let assistantContent;
+      
+      if (responseData.message === "Workflow was started") {
+        assistantContent = "⚠️ **Configuration Issue:** The N8N workflow started successfully, but returned the default message. \n\nTo fix this, add a **Respond to Webhook** node at the end of your N8N workflow to return the AI's response.";
+      } else {
+        assistantContent = responseData.response || responseData.output || 
+                               responseData.content || responseData.text || 
+                               responseData.message ||
+                               (typeof responseData === 'string' ? responseData : JSON.stringify(responseData));
+      }
 
       // Update the assistant's message with the response
       setMessages(prev => 
