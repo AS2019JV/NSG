@@ -40,71 +40,47 @@ export default function Settings() {
     setUploadMessage('');
 
     try {
-      const reader = new FileReader();
-      reader.readAsDataURL(selectedFile);
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      formData.append('type', 'pdf_upload');
+      formData.append('fileName', selectedFile.name);
+      formData.append('fileSize', selectedFile.size.toString());
+      formData.append('timestamp', new Date().toISOString());
+
+      console.log('Uploading PDF (multipart):', selectedFile.name);
+
+      const response = await axios.post('/api/chat', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      console.log('Upload response:', response.data);
+
+      setUploadStatus('success');
+      setUploadMessage(`${selectedFile.name} subido exitosamente`);
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      showToast('Documento subido correctamente', 'success');
+
+    } catch (error: any) {
+      console.error('Error uploading PDF:', error);
       
-      reader.onload = async () => {
-        try {
-          const base64Data = reader.result as string;
-          
-          const requestData = {
-            type: 'pdf_upload',
-            fileName: selectedFile.name,
-            fileSize: selectedFile.size,
-            fileData: base64Data,
-            timestamp: new Date().toISOString()
-          };
+      let errorMessage = 'Error al subir el PDF';
+      
+      if (error.response && error.response.status === 404) {
+        errorMessage = 'Servicio no disponible. Intenta más tarde.';
+      } else if (error.response && error.response.data) {
+        errorMessage = error.response.data.error || errorMessage;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
 
-          console.log('Uploading PDF:', selectedFile.name);
-
-          const response = await axios.post('/api/chat', requestData, {
-            headers: { 'Content-Type': 'application/json' },
-          });
-
-          console.log('Upload response:', response.data);
-
-          setUploadStatus('success');
-          setUploadMessage(`${selectedFile.name} subido exitosamente`);
-          setSelectedFile(null);
-          if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-          }
-          showToast('Documento subido correctamente', 'success');
-
-        } catch (error: any) {
-          console.error('Error uploading PDF:', error);
-          
-          let errorMessage = 'Error al subir el PDF';
-          
-          if (error.response && error.response.status === 404) {
-            errorMessage = 'Servicio no disponible. Intenta más tarde.';
-          } else if (error.response && error.response.data) {
-            errorMessage = error.response.data.error || errorMessage;
-          } else if (error.message) {
-            errorMessage = error.message;
-          }
-
-          setUploadStatus('error');
-          setUploadMessage(errorMessage);
-          showToast(errorMessage, 'error');
-        } finally {
-          setIsUploading(false);
-        }
-      };
-
-      reader.onerror = () => {
-        setUploadStatus('error');
-        setUploadMessage('Error al leer el archivo');
-        setIsUploading(false);
-        showToast('Error al leer el archivo', 'error');
-      };
-
-    } catch (error) {
-      console.error('Upload error:', error);
       setUploadStatus('error');
-      setUploadMessage('Ocurrió un error inesperado');
+      setUploadMessage(errorMessage);
+      showToast(errorMessage, 'error');
+    } finally {
       setIsUploading(false);
-      showToast('Error inesperado', 'error');
     }
   };
 

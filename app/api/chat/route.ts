@@ -3,14 +3,14 @@ import axios from 'axios';
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    // const body = await req.json(); // Moved parsing logic down
     
     // URL Configuration
     const BASE_URL = 'https://personal-n8n.suwsiw.easypanel.host';
     const PATH = 'ngs-intelligence';
     
     // Check if we want to use the TEST webhook (for debugging in N8N editor)
-    // Forced to TRUE as requested by user
+    // Switched to FALSE for PRODUCTION usage (Requires Workflow to be Active)
     const isTestMode = true; 
     
     const n8nUrl = isTestMode 
@@ -26,13 +26,39 @@ export async function POST(req: Request) {
        return NextResponse.json({ error: 'Invalid Webhook URL configuration' }, { status: 500 });
     }
 
+    // Determine Content-Type and Parse Body accordingly
+    const contentType = req.headers.get('content-type') || '';
+    let requestBody: any;
+    let requestHeaders: any = {};
+
+    if (contentType.includes('multipart/form-data')) {
+        console.log('📦 Processing Multipart/Form-Data Request');
+        const formData = await req.formData();
+        
+        // Re-construct FormData for Axios (using built-in FormData or form-data package logic if needed)
+        // In standard Fetch/Next.js environment, we can pass valid FormData directly if compatible,
+        // BUT Axios often prefers the 'form-data' package in Node.js environment to set headers correctly.
+        // However, since Node 18+, global FormData is available. We'll try constructing a new one.
+        
+        const newFormData = new FormData();
+        for (const [key, value] of formData.entries()) {
+            newFormData.append(key, value);
+        }
+        
+        requestBody = newFormData;
+        // Let axios/browser set the boundary automatically for FormData
+        // But in Node with custom FormData, we might need to rely on axios serialization
+    } else {
+        console.log('📝 Processing JSON Request');
+        requestBody = await req.json();
+        requestHeaders['Content-Type'] = 'application/json';
+    }
+
     // Axios Request
-    const response = await axios.post(n8nUrl, body, {
-       headers: {
-         'Content-Type': 'application/json'
-       },
+    const response = await axios.post(n8nUrl, requestBody, {
+       headers: requestHeaders,
        validateStatus: () => true, // Allow any status code without throwing automatically
-       timeout: 20000 // 20s timeout
+       timeout: 60000 // Increased timeout for file uploads
     });
 
     if (response.status >= 400) {
