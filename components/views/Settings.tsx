@@ -1,11 +1,112 @@
 "use client";
-import React from 'react';
-import { Bell, Shield, Moon, Download, Trash2, Edit2 } from "lucide-react";
+import React, { useState, useRef } from 'react';
+import { Bell, Shield, Moon, Download, Trash2, Edit2, FileUp, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { useToast } from "@/components/ui/ToastProvider";
 import clsx from "clsx";
+import axios from "axios";
 
 export default function Settings() {
   const { showToast } = useToast();
+  
+  // PDF Upload State
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [uploadMessage, setUploadMessage] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type === 'application/pdf') {
+      setSelectedFile(file);
+      setUploadStatus('idle');
+      setUploadMessage('');
+    } else {
+      setUploadStatus('error');
+      setUploadMessage('Por favor selecciona un archivo PDF válido');
+      setSelectedFile(null);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      setUploadStatus('error');
+      setUploadMessage('No hay archivo seleccionado');
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadStatus('idle');
+    setUploadMessage('');
+
+    try {
+      const reader = new FileReader();
+      reader.readAsDataURL(selectedFile);
+      
+      reader.onload = async () => {
+        try {
+          const base64Data = reader.result as string;
+          
+          const requestData = {
+            type: 'pdf_upload',
+            fileName: selectedFile.name,
+            fileSize: selectedFile.size,
+            fileData: base64Data,
+            timestamp: new Date().toISOString()
+          };
+
+          console.log('Uploading PDF:', selectedFile.name);
+
+          const response = await axios.post('/api/chat', requestData, {
+            headers: { 'Content-Type': 'application/json' },
+          });
+
+          console.log('Upload response:', response.data);
+
+          setUploadStatus('success');
+          setUploadMessage(`${selectedFile.name} subido exitosamente`);
+          setSelectedFile(null);
+          if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+          }
+          showToast('Documento subido correctamente', 'success');
+
+        } catch (error: any) {
+          console.error('Error uploading PDF:', error);
+          
+          let errorMessage = 'Error al subir el PDF';
+          
+          if (error.response && error.response.status === 404) {
+            errorMessage = 'Servicio no disponible. Intenta más tarde.';
+          } else if (error.response && error.response.data) {
+            errorMessage = error.response.data.error || errorMessage;
+          } else if (error.message) {
+            errorMessage = error.message;
+          }
+
+          setUploadStatus('error');
+          setUploadMessage(errorMessage);
+          showToast(errorMessage, 'error');
+        } finally {
+          setIsUploading(false);
+        }
+      };
+
+      reader.onerror = () => {
+        setUploadStatus('error');
+        setUploadMessage('Error al leer el archivo');
+        setIsUploading(false);
+        showToast('Error al leer el archivo', 'error');
+      };
+
+    } catch (error) {
+      console.error('Upload error:', error);
+      setUploadStatus('error');
+      setUploadMessage('Ocurrió un error inesperado');
+      setIsUploading(false);
+      showToast('Error inesperado', 'error');
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-fade-in-up pb-10">
@@ -75,7 +176,75 @@ export default function Settings() {
         </div>
       </div>
 
-      {/* 2. Data Zone Card */}
+      {/* 2. PDF Upload Card */}
+      <div className="bg-white p-8 rounded-[2.5rem] shadow-card border border-slate-200">
+        <h3 className="font-display font-bold text-xl text-navy-900 mb-6">Subir Documentos</h3>
+        <p className="text-slate-500 text-sm mb-6">Sube archivos PDF para procesamiento y análisis</p>
+        
+        <div className="space-y-4">
+          {/* File Input */}
+          <div className="flex items-center gap-3">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf"
+              onChange={handleFileSelect}
+              disabled={isUploading}
+              className="flex-1 text-sm text-slate-600 file:mr-4 file:py-3 file:px-6 file:rounded-2xl file:border-0 file:text-sm file:font-bold file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100 file:cursor-pointer cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed file:transition-all"
+            />
+          </div>
+
+          {/* Selected File Display */}
+          {selectedFile && (
+            <div className="flex items-center gap-3 p-4 bg-blue-50 border border-blue-100 rounded-2xl animate-fade-in-up">
+              <FileUp className="w-5 h-5 text-blue-600" />
+              <span className="text-sm text-blue-900 font-medium flex-1">{selectedFile.name}</span>
+              <span className="text-xs text-blue-600 font-bold">{(selectedFile.size / 1024).toFixed(2)} KB</span>
+            </div>
+          )}
+
+          {/* Upload Button */}
+          <button
+            onClick={handleUpload}
+            disabled={!selectedFile || isUploading}
+            className={clsx(
+              "w-full py-4 px-6 rounded-2xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-3 shadow-md",
+              selectedFile && !isUploading
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-lg hover:scale-[1.02]'
+                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+            )}
+          >
+            {isUploading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Subiendo...
+              </>
+            ) : (
+              <>
+                <FileUp className="w-5 h-5" />
+                Subir Documento
+              </>
+            )}
+          </button>
+
+          {/* Status Messages */}
+          {uploadStatus === 'success' && (
+            <div className="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl animate-fade-in-up">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+              <span className="text-sm text-emerald-900 font-medium">{uploadMessage}</span>
+            </div>
+          )}
+
+          {uploadStatus === 'error' && (
+            <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-2xl animate-fade-in-up">
+              <AlertCircle className="w-5 h-5 text-red-600" />
+              <span className="text-sm text-red-900 font-medium">{uploadMessage}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* 3. Data Zone Card */}
       <div className="bg-white p-8 rounded-[2.5rem] shadow-card border border-slate-200">
         <h3 className="font-display font-bold text-xl text-navy-900 mb-6">Zona de Datos</h3>
         <div className="flex flex-col sm:flex-row gap-4">
