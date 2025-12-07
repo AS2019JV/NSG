@@ -8,7 +8,8 @@ import {
   Mic, 
   ArrowUp, 
   Sparkles, 
-  Loader2
+  Loader2,
+  Atom
 } from 'lucide-react';
 // Refresh import to clear stale cache
 import DynamicIsland from '@/components/layout/DynamicIsland';
@@ -200,104 +201,102 @@ export default function ChatInterface() {
       <div className="flex-1 overflow-y-auto custom-scroll p-6 lg:p-12 pt-24 lg:pt-32 space-y-8">
         
         {/* Messages List - Material 3 Style */}
-        {messages.map((msg) => (
-          <div key={msg.id} className={clsx("flex w-full animate-fade-in-up", msg.role === 'user' ? "justify-end" : "justify-start")}>
-            
-            {msg.role === 'user' ? (
-              // USER MESSAGE - Standard Blue
-              <div className="bg-blue-600 text-white px-6 py-3.5 rounded-[24px] text-[15px] max-w-[85%] shadow-sm leading-relaxed font-normal selection:bg-white/30">
-                {msg.content}
-              </div>
-            ) : (
-              // AI MESSAGE - Clean Surface
-              <div className="flex gap-4 group max-w-[90%]">
-                 <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shrink-0 shadow-sm text-white mt-1">
-                    <Sparkles className="w-4 h-4 text-white/90" />
-                 </div>
-                 
-                 {msg.type === 'analysis' ? (
-                    <NewsAnalysisResult 
-                      tag={msg.metadata?.tag}
-                      roleContext={msg.metadata?.roleContext}
-                    />
-                 ) : (
-                    <div className="bg-white px-6 py-4 rounded-[24px] text-[15px] text-slate-800 leading-7 shadow-sm border border-slate-100">
-                        <p className="whitespace-pre-wrap">{msg.content}</p>
+        {/* Messages List - Gemini Style */}
+        <div className="flex flex-col gap-8 max-w-3xl mx-auto w-full">
+            {messages.map((msg) => (
+            <div key={msg.id} className={clsx("flex w-full animate-fade-in-up", msg.role === 'user' ? "justify-end" : "justify-start")}>
+                
+                {msg.role === 'user' ? (
+                // USER MESSAGE - Right Aligned Bubble
+                <div className="bg-[#f0f4f9] text-[#1f1f1f] px-6 py-4 rounded-[32px] rounded-br-[4px] text-[16px] max-w-[80%] leading-relaxed font-normal selection:bg-blue-100">
+                    {msg.content}
+                </div>
+                ) : (
+                // AI MESSAGE - Plain Text with Atom Icon
+                <div className="flex gap-5 group w-full">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1">
+                        <Atom className="w-6 h-6 text-[#1f1f1f] animate-spin-slow" />
                     </div>
-                 )}
-              </div>
-            )}
-          </div>
-        ))}
+                    
+                    <div className="flex-1 min-w-0 pt-1.5">
+                        {msg.type === 'analysis' ? (
+                            <NewsAnalysisResult 
+                            tag={msg.metadata?.tag}
+                            roleContext={msg.metadata?.roleContext}
+                            />
+                        ) : (
+                            <div className="text-[16px] text-[#1f1f1f] leading-8 font-normal tracking-normal">
+                                <p className="whitespace-pre-wrap">{msg.content}</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+                )}
+            </div>
+            ))}
+        </div>
 
         {/* Loading State (Thinking...) */}
+        {/* Loading State (Atom) */}
         {isLoading && !messages[messages.length - 1]?.content && (
-             <div className="flex flex-col items-center justify-center mt-8 animate-fade-in-up gap-6 w-full">
-                 <div className="w-16 h-16 relative atom-container">
-                      <div className="w-full h-full animate-spin-process">
-                         <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible">
-                             <defs>
-                                <linearGradient id="processGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stopColor="#3B82F6" />
-                                    <stop offset="100%" stopColor="#60A5FA" />
-                                </linearGradient>
-                             </defs>
-                             <circle cx="50" cy="50" r="42" className="morph-orbit" stroke="url(#processGrad)" strokeWidth="2" fill="none" />
-                             <circle cx="50" cy="50" r="8" fill="#3B82F6" />
-                         </svg>
-                      </div>
-                 </div>
-                 <p className="text-[11px] font-bold text-blue-600/60 tracking-widest uppercase animate-pulse">Procesando...</p>
-             </div>
+            <div className="flex flex-col items-center justify-center mt-4 animate-fade-in-up w-full max-w-3xl mx-auto">
+                <div className="flex items-center gap-3 self-start pl-6">
+                    <Atom className="w-6 h-6 text-[#1f1f1f] animate-spin" />
+                    <span className="text-sm font-medium text-slate-500 animate-pulse">Pensando...</span>
+                </div>
+            </div>
         )}
         
         <div ref={chatEndRef} />
       </div>
 
-      {/* --- LAYER 3: INPUT AREA (Floating Pill) --- */}
-      <div className="shrink-0 relative z-20 bg-gradient-to-t from-white via-white/95 to-transparent pt-10 pb-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
+      {/* --- LAYER 3: INPUT AREA (Stacked Gemini Style) --- */}
+      <div className="shrink-0 relative z-20 pt-6 pb-6 px-4">
+        <div className="max-w-3xl mx-auto">
             {!isContextCached ? (
-                <div className="flex items-center justify-center gap-3 text-sm text-blue-600 font-medium py-4 bg-white rounded-full animate-pulse border border-blue-100 shadow-sm">
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                <div className="flex items-center justify-center gap-4 text-[15px] text-[#0b57d0] font-medium py-5 bg-[#f0f4f9] rounded-[24px] animate-pulse">
+                    <Loader2 className="w-5 h-5 animate-spin" />
                     <span>Sincronizando Contexto de {currentRole?.toUpperCase()}...</span>
                 </div>
             ) : (
                 <form onSubmit={handleSubmit} className="relative group">
-                    <div className="relative flex items-center bg-white border border-slate-200 p-2 pr-2.5 rounded-full transition-all duration-300 focus-within:shadow-md focus-within:border-blue-300/50 hover:shadow-sm">
-                        
-                        {/* Action Buttons */}
-                        <div className="flex gap-2 pl-2">
-                            <button type="button" className="p-2.5 text-slate-400 hover:bg-slate-100 hover:text-blue-600 rounded-full transition-colors flex items-center justify-center">
-                                <Mic className="w-[22px] h-[22px]" />
-                            </button>
-                            <button type="button" className="p-2.5 text-slate-400 hover:bg-slate-100 hover:text-blue-600 rounded-full transition-colors flex items-center justify-center">
-                                <Paperclip className="w-[22px] h-[22px]" />
-                            </button>
-                        </div>
-
-                        {/* Input Field */}
+                    <div className="relative flex flex-col bg-[#f0f4f9] rounded-[28px] hover:bg-[#e9eef6] transition-colors duration-200 border border-transparent focus-within:bg-white focus-within:shadow-md focus-within:border-slate-200">
+                        {/* Top: Input */}
                         <input 
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             disabled={isLoading}
-                            className="flex-1 bg-transparent border-none py-3 px-4 font-normal text-slate-800 placeholder:text-slate-400 text-[16px] focus:ring-0 focus:outline-none disabled:opacity-50" 
+                            className="w-full bg-transparent border-none pt-4 pb-2 px-6 font-normal text-[#1f1f1f] placeholder:text-slate-500 text-[16px] focus:ring-0 focus:outline-none disabled:opacity-50" 
                             placeholder={`Pregunta a ${currentRole || 'NSG'}...`}
                             autoComplete="off" 
                         />
-                        
-                        {/* Send Button */}
-                        <button 
-                            type="submit" 
-                            disabled={isLoading || !input.trim()}
-                            onClick={() => console.log('Send button clicked!')}
-                            className={`
-                                w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300
-                                ${input.trim() ? 'bg-navy-900 text-white shadow-md hover:scale-105 hover:bg-blue-600' : 'bg-slate-100 text-slate-300 cursor-default'}
-                            `}
-                        >
-                            <ArrowUp className="w-5 h-5" />
-                        </button>
+
+                        {/* Bottom: Icons & Send */}
+                        <div className="flex justify-between items-center px-4 pb-3">
+                            <div className="flex gap-1">
+                                <button type="button" className="p-2.5 text-slate-500 hover:bg-[#dce3f1] rounded-full transition-colors">
+                                    <Paperclip className="w-5 h-5" />
+                                </button>
+                                <button type="button" className="p-2.5 text-slate-500 hover:bg-[#dce3f1] rounded-full transition-colors">
+                                    <Mic className="w-5 h-5" />
+                                </button>
+                            </div>
+
+                            <button 
+                                type="submit" 
+                                disabled={isLoading || !input.trim()}
+                                onClick={() => console.log('Send button clicked!')}
+                                className={`
+                                    w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300
+                                    ${input.trim() ? 'bg-[#0b57d0] text-white hover:bg-blue-700' : 'bg-transparent text-slate-400 cursor-default'}
+                                `}
+                            >
+                                <ArrowUp className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+                    <div className="text-center mt-2">
+                        <p className="text-[11px] text-slate-400">NSG Intelligence puede cometer errores. Considera verificar la información importante.</p>
                     </div>
                 </form>
             )}

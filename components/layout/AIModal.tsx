@@ -15,7 +15,7 @@ export default function AIModal() {
         <div className="absolute inset-0 bg-navy-950/60 backdrop-blur-xl transition-opacity" onClick={toggleAI}></div>
         
         {/* Wrapper for positioning button outside */}
-        <div className="relative w-full h-dvh lg:h-auto lg:max-w-5xl animate-fade-in-up flex flex-col">
+        <div className="relative w-full h-dvh lg:h-[90vh] lg:max-w-7xl animate-fade-in-up flex flex-col">
             
             {/* Close Button - Enhanced */}
             <button 
@@ -29,7 +29,7 @@ export default function AIModal() {
             </button>
 
             {/* Modal Container */}
-            <div className="bg-slate-50 w-full h-full lg:h-[85vh] lg:rounded-[2.5rem] shadow-2xl flex flex-col relative overflow-hidden lg:border lg:border-white/40 lg:ring-1 lg:ring-white/50">
+            <div className="bg-slate-50 w-full h-full lg:h-full lg:rounded-[2.5rem] shadow-2xl flex flex-col relative overflow-hidden lg:border lg:border-white/40 lg:ring-1 lg:ring-white/50">
                 {/* Chat Interface Integration */}
                 <div className="flex-1 w-full h-full overflow-hidden relative">
                     <ChatInterface />
