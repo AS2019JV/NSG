@@ -1,11 +1,45 @@
 "use client";
 import { useUIStore } from "@/store/useUIStore";
+import { useAppStore } from "@/store/useAppStore";
+import { CONTEXT } from "@/data/context";
 import { Menu, Bell, FileText } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { usePathname } from "next/navigation";
 
 export default function TopNav() {
   const { toggleSidebar, toggleAI } = useUIStore();
+  const { currentRole } = useAppStore();
+  const pathname = usePathname();
   const [showNotifs, setShowNotifs] = useState(false);
+
+  // Derive the dynamic title and subtitle
+  const { title, subtitle } = useMemo(() => {
+     // Default fallback
+     const defaults = { title: "Dashboard", subtitle: "Resumen Ejecutivo" };
+     
+     if (!currentRole || !pathname) return defaults;
+
+     const roleKey = currentRole || 'paciente';
+     const config = CONTEXT[roleKey];
+     
+     // Assume path is /dashboard/[viewId]
+     const segments = pathname.split('/').filter(Boolean);
+     const currentViewId = segments[1]; // index 0 is 'dashboard'
+
+     if (!currentViewId) return defaults;
+
+     const activeItem = config?.menu.find(item => item.id === currentViewId);
+
+     if (activeItem) {
+        return { 
+           title: activeItem.label, 
+           // @ts-ignore - Subtitle added recently to context
+           subtitle: activeItem.subtitle || defaults.subtitle 
+        };
+     }
+
+     return defaults;
+  }, [currentRole, pathname]);
 
   return (
     <header className="h-20 lg:h-24 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 flex items-center justify-between px-4 sm:px-6 lg:px-10 sticky top-0 z-40 shrink-0 shadow-sm transition-all duration-300">
@@ -14,8 +48,8 @@ export default function TopNav() {
           <Menu className="w-6 h-6" />
         </button>
         <div>
-           <h2 className="font-display text-lg lg:text-2xl font-bold text-navy-900 truncate max-w-[180px] lg:max-w-none tracking-tight">Dashboard</h2>
-           <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-0.5 hidden sm:block">Resumen Ejecutivo</p>
+           <h2 className="font-display text-lg lg:text-2xl font-bold text-navy-900 truncate max-w-[180px] lg:max-w-none tracking-tight">{title}</h2>
+           <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-0.5 hidden sm:block">{subtitle}</p>
         </div>
       </div>
 

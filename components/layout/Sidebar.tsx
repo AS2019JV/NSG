@@ -100,16 +100,24 @@ export default function Sidebar() {
                         "w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium transition-all mb-1",
                         // Remove default focus outline and white flash
                         "focus:outline-none focus-visible:outline-none active:scale-[0.98]",
-                        // Apply blue gradient styling ONLY to active items (not special by default)
-                        isActive
-                          ? "bg-gradient-to-r from-blue-900/40 to-navy-900/40 border border-blue-500/30 text-blue-300 shadow-glass hover:text-white" 
-                          : "text-slate-400 hover:bg-white/5 hover:text-white hover:translate-x-1 border border-transparent"
+                        
+                        // 1. NSG Intelligence Style (Always applies to this specific ID)
+                        item.id === 'nsg_ios'
+                          ? "bg-gradient-to-r from-blue-900/40 to-navy-900/40 border border-blue-500/30 text-blue-300 shadow-glass hover:text-white"
+                          : isActive
+                              // 2. Active Style for other items (Transparent + Soft White Left Light + Thin Vivid Blue Right)
+                              ? "text-white shadow-[inset_-2px_0_0_0_#60A5FA,inset_3px_0_12px_-2px_rgba(255,255,255,0.15)] border border-transparent"
+                              // 3. Inactive Style
+                              : "text-slate-400 hover:bg-white/5 hover:text-white hover:translate-x-1 border border-transparent"
                       )}
                   >
-                      {isActive ? (
+                      {item.id === 'nsg_ios' ? (
                         <BrandAtom className="w-5 h-5" />
                       ) : (
-                        <Icon className="w-5 h-5 text-slate-500 group-hover:text-white" />
+                        <Icon className={clsx(
+                             "w-5 h-5 transition-colors", 
+                             isActive ? "text-blue-400" : "text-slate-500 group-hover:text-white"
+                        )} />
                       )}
                       {item.label}
                   </Link>
