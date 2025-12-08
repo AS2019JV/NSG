@@ -15,6 +15,7 @@ import {
   LayoutGrid
 } from "lucide-react";
 import { RoleType } from "@/data/context";
+import BrandAtom from "@/components/ui/BrandAtom";
 
 export default function NSGSystem() {
   const { currentRole } = useAppStore();
@@ -62,7 +63,7 @@ export default function NSGSystem() {
                   onClick={() => handleAITrigger('research')}
                   className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2.5 rounded-full font-medium shadow-md hover:shadow-lg hover:brightness-105 transition-all flex items-center gap-2"
                 >
-                    <Sparkles className="w-4 h-4" />
+                    <BrandAtom className="w-5 h-5 grayscale brightness-200" />
                     <span className="hidden sm:inline">Generar</span>
                 </button>
             </div>

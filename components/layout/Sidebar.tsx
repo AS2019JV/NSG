@@ -7,6 +7,7 @@ import { LogOut, Activity, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
+import BrandAtom from "@/components/ui/BrandAtom";
 
 export default function Sidebar() {
   // 1. Merge State Management
@@ -105,7 +106,11 @@ export default function Sidebar() {
                           : "text-slate-400 hover:bg-white/5 hover:text-white hover:translate-x-1 border border-transparent"
                       )}
                   >
-                      <Icon className={clsx("w-5 h-5", isActive ? "text-blue-400" : "text-slate-500 group-hover:text-white")} />
+                      {isActive ? (
+                        <BrandAtom className="w-5 h-5" />
+                      ) : (
+                        <Icon className="w-5 h-5 text-slate-500 group-hover:text-white" />
+                      )}
                       {item.label}
                   </Link>
               );

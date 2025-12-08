@@ -19,16 +19,16 @@ export default function DynamicIsland({ currentMode, setMode }: DynamicIslandPro
   const roleKey = (currentRole as RoleType) || 'consultant';
   const menuItems = CONTEXT[roleKey]?.menu || [];
   
-  // Combine Standard + Menu Items
+  // Combine Standard + Menu Items (excluding NSG Intelligence)
   const allItems = [
     { id: 'standard', label: 'Standard', icon: Activity },
-    ...menuItems
+    ...menuItems.filter(item => item.id !== 'nsg_ios')
   ];
 
   return (
     <div className="relative z-50 flex flex-col items-center justify-center p-4 transition-all duration-500 ease-in-out" ref={containerRef}>
       
-      <div className="relative flex items-center justify-center w-full max-w-3xl mx-auto">
+      <div className="relative flex items-center justify-center w-full max-w-[calc(100vw-6rem)] md:max-w-3xl mx-auto">
         <div className={clsx(
             "flex flex-nowrap items-center p-2 gap-2 w-full",
             "bg-[#0F172A] backdrop-blur-xl border border-white/10",

@@ -8,12 +8,13 @@ import {
   Mic, 
   ArrowUp, 
   Sparkles, 
-  Loader2,
-  Atom
+  Loader2
 } from 'lucide-react';
 // Refresh import to clear stale cache
 import DynamicIsland from '@/components/layout/DynamicIsland';
 import clsx from 'clsx';
+import BrandAtom from '@/components/ui/BrandAtom';
+import AtomEffect from '@/components/ui/AtomEffect';
 import NewsAnalysisResult from './NewsAnalysisResult';
 import axios from 'axios';
 
@@ -36,10 +37,30 @@ export default function ChatInterface() {
   
   // 2. LOCAL STATE
   const [cacheName, setCacheName] = useState<string | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  
+  // Refactored State: Store conversations and loading states by mode
+  const [conversations, setConversations] = useState<Record<string, Message[]>>({});
+  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
+  const [mode, setMode] = useState('standard'); 
+  
+  // Derived state for current view
+  const messages = conversations[mode] || [];
+  const isLoading = loadingStates[mode] || false;
+
+  // Helpers for Safe Updates (targeting specific modes)
+  const updateMessages = (targetMode: string, action: Message[] | ((prev: Message[]) => Message[])) => {
+      setConversations(prev => {
+          const current = prev[targetMode] || [];
+          const updated = typeof action === 'function' ? action(current) : action;
+          return { ...prev, [targetMode]: updated };
+      });
+  };
+
+  const setLoading = (targetMode: string, status: boolean) => {
+      setLoadingStates(prev => ({ ...prev, [targetMode]: status }));
+  };
+
   const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [mode, setMode] = useState('standard'); // For Dynamic Island switching
   
   // Refs for scrolling
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -62,12 +83,14 @@ export default function ChatInterface() {
   const handleSubmit = async (e: React.FormEvent) => {
     console.log('handleSubmit called!');
     e.preventDefault();
-    console.log('Form prevented default');
+    
+    // Capture the mode at the start of the request to prevent race conditions if user switches tabs
+    const activeMode = mode;
+    const activeMessages = messages; // Snapshot of current messages for context
+
     if (!input.trim() || isLoading) {
-      console.log('Early return - input:', input.trim(), 'isLoading:', isLoading);
       return;
     }
-    console.log('Proceeding with submission...');
 
     // Add User Message immediately
     const userMessage: Message = {
@@ -77,9 +100,9 @@ export default function ChatInterface() {
       content: input.trim(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    updateMessages(activeMode, prev => [...prev, userMessage]);
     setInput('');
-    setIsLoading(true);
+    setLoading(activeMode, true);
 
     try {
       // Create placeholder for AI response
@@ -89,20 +112,20 @@ export default function ChatInterface() {
         type: 'text',
         content: '',
       };
-      setMessages(prev => [...prev, assistantMessage]);
+      updateMessages(activeMode, prev => [...prev, assistantMessage]);
 
-      // Use local API proxy to avoid CORS and hide upstream URL
+      // Use local API proxy
       const webhookUrl = '/api/chat';
-      console.log('Using API Proxy:', webhookUrl);
       
       // Prepare the request data
       const requestData = {
         message: input.trim(),
         context: {
           role: currentRole,
-          mode: mode,
+          mode: activeMode, // Send the captured mode
           cacheName: cacheName,
-          messageHistory: [...messages, userMessage].map(m => ({
+          // Use the snapshot + new message
+          messageHistory: [...activeMessages, userMessage].map(m => ({
             role: m.role,
             content: m.content,
             type: m.type,
@@ -111,16 +134,9 @@ export default function ChatInterface() {
         }
       };
 
-      // Make the POST request to N8N webhook
-      console.log('Request data:', JSON.stringify(requestData, null, 2));
-      console.log('About to make POST request to:', webhookUrl);
-      
       const response = await axios.post(webhookUrl, requestData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       });
-      console.log('Response received:', response.status, response.data);
 
       // Process the response
       const responseData = response.data;
@@ -130,9 +146,8 @@ export default function ChatInterface() {
       let messageMetadata = {};
       
       if (responseData.message === "Workflow was started") {
-        assistantContent = "⚠️ **Configuration Issue:** The N8N workflow started successfully, but returned the default message. \n\nTo fix this, add a **Respond to Webhook** node at the end of your N8N workflow to return the AI's response.";
+        assistantContent = "⚠️ **Configuration Issue:** The N8N workflow started successfully, but returned the default message.";
       } else {
-        // Support structured responses from N8N (allowing the flowchart to control UI mode)
         if (responseData.type === 'analysis' || responseData.type === 'text') {
             messageType = responseData.type;
         }
@@ -140,7 +155,6 @@ export default function ChatInterface() {
             messageMetadata = responseData.metadata;
         }
 
-        // Flexible content extraction
         assistantContent = responseData.response || responseData.output || 
                                responseData.content || responseData.text || 
                                responseData.message ||
@@ -148,7 +162,7 @@ export default function ChatInterface() {
       }
 
       // Update the assistant's message with the response
-      setMessages(prev => 
+      updateMessages(activeMode, prev => 
         prev.map(m => 
           m.id === assistantMessage.id 
             ? { ...m, content: assistantContent, type: messageType, metadata: messageMetadata }
@@ -161,29 +175,19 @@ export default function ChatInterface() {
       
       let errorMessage = "Error: Could not connect to NSG Intelligence.";
       
-      // Handle N8N 404 specifically (Workflow not listening)
       if (error.response && error.response.status === 404) {
-           errorMessage = "⚠️ **Workflow Not Active:** The N8N test URL is not listening.\n\nPlease go to N8N and click **'Listen for Event'** (or Execute), then try again.";
-      } 
-      // Handle other server errors
-      else if (error.response && error.response.data) {
-           const logData = error.response.data;
-           console.error('Server detailed error:', JSON.stringify(logData, null, 2));
-           
-           if (logData.error) {
-               errorMessage = `Server Error: ${logData.error}`;
-           }
+           errorMessage = "⚠️ **Workflow Not Active:** The N8N test URL is not listening.";
       } else if (error.message) {
            errorMessage = `Connection Error: ${error.message}`;
       }
 
-      setMessages(prev => prev.map(m => 
+      updateMessages(activeMode, prev => prev.map(m => 
         m.id === (Date.now() + 1).toString() 
           ? { ...m, content: errorMessage } 
           : m
       ));
     } finally {
-      setIsLoading(false);
+      setLoading(activeMode, false);
     }
   };
 
@@ -215,7 +219,7 @@ export default function ChatInterface() {
                 // AI MESSAGE - Plain Text with Atom Icon
                 <div className="flex gap-5 group w-full">
                     <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1">
-                        <Atom className="w-6 h-6 text-[#1f1f1f] animate-spin-slow" />
+                        <BrandAtom className="w-8 h-8" />
                     </div>
                     
                     <div className="flex-1 min-w-0 pt-1.5">
@@ -241,8 +245,7 @@ export default function ChatInterface() {
         {isLoading && !messages[messages.length - 1]?.content && (
             <div className="flex flex-col items-center justify-center mt-8 animate-fade-in-up w-full max-w-3xl mx-auto gap-4">
                 <div className="relative flex items-center justify-center">
-                    <Atom className="w-12 h-12 text-[#1f1f1f] animate-[spin_1s_linear_infinite]" />
-                    {/* Inner detail for atom look if needed, or just the icon */}
+                    <AtomEffect className="w-20 h-20" />
                 </div>
                 <span className="text-sm font-medium text-slate-500 animate-pulse tracking-wide">PENSANDO...</span>
             </div>
