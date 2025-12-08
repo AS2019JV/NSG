@@ -46,7 +46,7 @@ export default function DynamicIsland({ currentMode, setMode }: DynamicIslandPro
                  key={item.id}
                  onClick={() => setMode(item.id)}
                  className={clsx(
-                    "flex items-center gap-2.5 px-5 py-2.5 rounded-full transition-all duration-300 ease-out whitespace-nowrap group relative flex-shrink-0",
+                    "flex items-center gap-2.5 px-5 py-2.5 rounded-full transition-all duration-300 ease-out whitespace-nowrap group relative flex-shrink-0 cursor-pointer",
                     isActive 
                         ? (isSpecial ? "bg-blue-600/10 text-blue-400" : "bg-blue-600/20 text-blue-400 ring-1 ring-blue-500/30") 
                         : "text-slate-400 hover:text-slate-200 hover:bg-white/5",

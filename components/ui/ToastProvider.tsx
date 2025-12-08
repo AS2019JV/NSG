@@ -49,7 +49,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             {toast.type === 'info' && <Bell className="w-5 h-5 text-blue-400" />}
             {toast.type === 'error' && <AlertCircle className="w-5 h-5 text-red-400" />}
             <span className="text-sm font-semibold flex-1">{toast.message}</span>
-            <button onClick={() => removeToast(toast.id)} className="text-slate-500 hover:text-white transition">
+            <button onClick={() => removeToast(toast.id)} className="text-slate-500 hover:text-white transition cursor-pointer">
                 <X className="w-4 h-4" />
             </button>
           </div>

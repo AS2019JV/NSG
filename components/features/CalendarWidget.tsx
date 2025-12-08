@@ -30,15 +30,15 @@ export default function CalendarWidget() {
           </h3>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => changeMonth(-1)} className="p-2 bg-white rounded-lg border hover:bg-slate-50 active:scale-95 transition">
+          <button onClick={() => changeMonth(-1)} className="p-2 bg-white rounded-lg border hover:bg-slate-50 active:scale-95 transition cursor-pointer">
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <button onClick={() => changeMonth(1)} className="p-2 bg-white rounded-lg border hover:bg-slate-50 active:scale-95 transition">
+          <button onClick={() => changeMonth(1)} className="p-2 bg-white rounded-lg border hover:bg-slate-50 active:scale-95 transition cursor-pointer">
             <ChevronRight className="w-4 h-4" />
           </button>
           <button 
             onClick={() => showToast('Nuevo Evento', 'info')} 
-            className="px-4 bg-blue-600 text-white text-xs font-bold rounded-lg active:scale-95 transition hover:bg-blue-500 flex items-center gap-1"
+            className="px-4 bg-blue-600 text-white text-xs font-bold rounded-lg active:scale-95 transition hover:bg-blue-500 flex items-center gap-1 cursor-pointer"
           >
             <Plus className="w-3 h-3" /> Evento
           </button>

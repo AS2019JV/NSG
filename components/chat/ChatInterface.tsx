@@ -278,10 +278,10 @@ export default function ChatInterface() {
                         {/* Bottom: Icons & Send */}
                         <div className="flex justify-between items-center px-4 pb-3">
                             <div className="flex gap-1">
-                                <button type="button" className="p-2.5 text-slate-500 hover:bg-[#dce3f1] rounded-full transition-colors">
+                                <button type="button" className="p-2.5 text-slate-500 hover:bg-[#dce3f1] rounded-full transition-colors cursor-pointer">
                                     <Paperclip className="w-5 h-5" />
                                 </button>
-                                <button type="button" className="p-2.5 text-slate-500 hover:bg-[#dce3f1] rounded-full transition-colors">
+                                <button type="button" className="p-2.5 text-slate-500 hover:bg-[#dce3f1] rounded-full transition-colors cursor-pointer">
                                     <Mic className="w-5 h-5" />
                                 </button>
                             </div>
@@ -292,7 +292,7 @@ export default function ChatInterface() {
                                 onClick={() => console.log('Send button clicked!')}
                                 className={`
                                     w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300
-                                    ${input.trim() ? 'bg-[#0b57d0] text-white hover:bg-blue-700' : 'bg-transparent text-slate-400 cursor-default'}
+                                    ${input.trim() ? 'bg-[#0b57d0] text-white hover:bg-blue-700 cursor-pointer' : 'bg-transparent text-slate-400 cursor-default'}
                                 `}
                             >
                                 <ArrowUp className="w-5 h-5" />

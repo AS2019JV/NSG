@@ -89,7 +89,7 @@ export default function RoleSelector() {
             <button
               key={option.id}
               onClick={() => handleRoleChange(option.id)}
-              className={`group relative p-6 rounded-2xl text-left border-2 transition-all duration-300 transform hover:-translate-y-1 will-change-transform ${
+              className={`group relative p-6 rounded-2xl text-left border-2 transition-all duration-300 transform hover:-translate-y-1 will-change-transform cursor-pointer ${
                 isActive
                   ? `${option.borderColor.split(" ")[0]} shadow-md ring-2 ring-offset-2 ${option.color.replace("text", "ring")}`
                   : `border-slate-100 hover:shadow-md ${option.borderColor}`

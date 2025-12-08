@@ -129,7 +129,7 @@ export default function LandingPage() {
             <div className="w-full animate-fade-in-up mt-16" style={{ animationDelay: '0.15s' }}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 w-full">
                     {/* Consultor */}
-                    <button onClick={() => selectProfile('consultant')} className="group bg-white p-7 rounded-[2rem] text-left border border-slate-100 hover:border-blue-200 hover:shadow-precision transition-all duration-500 transform hover:-translate-y-1">
+                    <button onClick={() => selectProfile('consultant')} className="group bg-white p-7 rounded-[2rem] text-left border border-slate-100 hover:border-blue-200 hover:shadow-precision transition-all duration-500 transform hover:-translate-y-1 cursor-pointer">
                         <div className="flex justify-between mb-6">
                             <div className="w-14 h-14 bg-slate-50 text-navy-950 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:text-blue-600 group-hover:bg-blue-50">
                                 <Briefcase className="w-7 h-7" />
@@ -141,7 +141,7 @@ export default function LandingPage() {
                     </button>
 
                     {/* Psicologo */}
-                    <button onClick={() => selectProfile('psychologist')} className="group bg-white p-7 rounded-[2rem] text-left border border-slate-100 hover:border-sky-200 hover:shadow-precision transition-all duration-500 transform hover:-translate-y-1">
+                    <button onClick={() => selectProfile('psychologist')} className="group bg-white p-7 rounded-[2rem] text-left border border-slate-100 hover:border-sky-200 hover:shadow-precision transition-all duration-500 transform hover:-translate-y-1 cursor-pointer">
                         <div className="flex justify-between mb-6">
                             <div className="w-14 h-14 bg-slate-50 text-navy-950 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:text-sky-600 group-hover:bg-sky-50">
                                 <Brain className="w-7 h-7" />
@@ -153,7 +153,7 @@ export default function LandingPage() {
                     </button>
 
                     {/* Directivo */}
-                    <button onClick={() => selectProfile('manager')} className="group bg-white p-7 rounded-[2rem] text-left border border-slate-100 hover:border-emerald-200 hover:shadow-precision transition-all duration-500 transform hover:-translate-y-1">
+                    <button onClick={() => selectProfile('manager')} className="group bg-white p-7 rounded-[2rem] text-left border border-slate-100 hover:border-emerald-200 hover:shadow-precision transition-all duration-500 transform hover:-translate-y-1 cursor-pointer">
                         <div className="flex justify-between mb-6">
                             <div className="w-14 h-14 bg-slate-50 text-navy-950 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:text-emerald-600 group-hover:bg-emerald-50">
                                 <Building2 className="w-7 h-7" />
@@ -165,7 +165,7 @@ export default function LandingPage() {
                     </button>
 
                     {/* Paciente */}
-                    <button onClick={() => selectProfile('patient')} className="group bg-white p-7 rounded-[2rem] text-left border border-slate-100 hover:border-teal-200 hover:shadow-precision transition-all duration-500 transform hover:-translate-y-1">
+                    <button onClick={() => selectProfile('patient')} className="group bg-white p-7 rounded-[2rem] text-left border border-slate-100 hover:border-teal-200 hover:shadow-precision transition-all duration-500 transform hover:-translate-y-1 cursor-pointer">
                         <div className="flex justify-between mb-6">
                             <div className="w-14 h-14 bg-slate-50 text-navy-950 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:text-teal-600 group-hover:bg-teal-50">
                                 <HeartPulse className="w-7 h-7" />

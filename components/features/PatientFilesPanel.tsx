@@ -47,7 +47,7 @@ export default function PatientFilesPanel() {
             <h3 className="font-display font-bold text-2xl text-navy-900">Biblioteca de Expedientes</h3>
             <p className="text-sm text-slate-500">Gestión centralizada de historiales clínicos.</p>
           </div>
-          <button onClick={togglePatientFiles} className="p-2 hover:bg-slate-200 rounded-full transition">
+          <button onClick={togglePatientFiles} className="p-2 hover:bg-slate-200 rounded-full transition cursor-pointer">
             <X className="w-6 h-6 text-slate-500" />
           </button>
         </div>
@@ -89,7 +89,7 @@ export default function PatientFilesPanel() {
               </div>
               
               <button className={clsx(
-                "px-4 py-2 text-xs font-bold rounded-lg transition group-hover:bg-blue-600 group-hover:text-white",
+                "px-4 py-2 text-xs font-bold rounded-lg transition group-hover:bg-blue-600 group-hover:text-white cursor-pointer",
                 patient.active ? "bg-slate-50 text-blue-600" : "bg-slate-50 text-slate-600"
               )}>
                 {patient.active ? "Ver Activo" : "Abrir"}
@@ -100,7 +100,7 @@ export default function PatientFilesPanel() {
 
         {/* Footer Action */}
         <div className="p-6 border-t border-slate-100 bg-slate-50 shrink-0 safe-bottom-scroll">
-          <button className="w-full py-3 bg-navy-900 text-white rounded-xl font-bold hover:bg-blue-700 transition flex items-center justify-center gap-2 shadow-lg">
+          <button className="w-full py-3 bg-navy-900 text-white rounded-xl font-bold hover:bg-blue-700 transition flex items-center justify-center gap-2 shadow-lg cursor-pointer">
             <Plus className="w-4 h-4" /> Nuevo Expediente
           </button>
         </div>

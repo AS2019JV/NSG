@@ -197,7 +197,7 @@ export default function NSGClarity() {
                 </div>
                 <button 
                     onClick={() => showToast("Buscando actualizaciones...", "info")}
-                    className="w-full mt-4 py-2 text-xs font-bold text-slate-500 hover:text-blue-600 transition flex items-center justify-center gap-2"
+                    className="w-full mt-4 py-2 text-xs font-bold text-slate-500 hover:text-blue-600 transition flex items-center justify-center gap-2 cursor-pointer"
                 >
                     <RefreshCw className="w-3 h-3" /> Verificar Sincronización
                 </button>
@@ -250,7 +250,7 @@ export default function NSGClarity() {
 
                 <button 
                     onClick={() => showToast("Historial completo no disponible en demo", "info")}
-                    className="w-full mt-8 py-3.5 text-xs font-bold text-slate-600 hover:text-white border border-slate-200 hover:border-navy-900 hover:bg-navy-900 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-2 active:scale-95"
+                    className="w-full mt-8 py-3.5 text-xs font-bold text-slate-600 hover:text-white border border-slate-200 hover:border-navy-900 hover:bg-navy-900 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
                 >
                     Ver Historial Completo <ArrowRight className="w-3 h-3" />
                 </button>

@@ -119,7 +119,7 @@ export default function Settings() {
             </p>
             <button 
                 onClick={() => showToast('Perfil actualizado', 'success')} 
-                className="text-xs font-bold text-white bg-navy-900 px-4 py-2 rounded-lg hover:bg-blue-600 transition shadow-md flex items-center gap-2 mx-auto sm:mx-0"
+                className="text-xs font-bold text-white bg-navy-900 px-4 py-2 rounded-lg hover:bg-blue-600 transition shadow-md flex items-center gap-2 mx-auto sm:mx-0 cursor-pointer"
             >
                 <Edit2 className="w-3 h-3" /> Editar Perfil
             </button>
@@ -186,7 +186,7 @@ export default function Settings() {
             className={clsx(
               "w-full py-4 px-6 rounded-2xl font-bold text-sm transition-all duration-300 flex items-center justify-center gap-3 shadow-md",
               selectedFile && !isUploading
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-lg hover:scale-[1.02]'
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-lg hover:scale-[1.02] cursor-pointer'
                 : 'bg-slate-100 text-slate-400 cursor-not-allowed'
             )}
           >
@@ -226,14 +226,14 @@ export default function Settings() {
         <div className="flex flex-col sm:flex-row gap-4">
           <button 
             onClick={() => showToast('Iniciando descarga...', 'success')} 
-            className="flex-1 px-6 py-4 bg-slate-50 text-navy-900 font-bold rounded-2xl border border-slate-200 hover:bg-white hover:shadow-md transition-all flex items-center justify-center gap-3 group"
+            className="flex-1 px-6 py-4 bg-slate-50 text-navy-900 font-bold rounded-2xl border border-slate-200 hover:bg-white hover:shadow-md transition-all flex items-center justify-center gap-3 group cursor-pointer"
           >
             <Download className="w-5 h-5 text-slate-400 group-hover:text-blue-600 transition-colors" /> 
             Exportar Todo (JSON)
           </button>
           <button 
             onClick={() => showToast('Cache eliminado', 'success')} 
-            className="flex-1 px-6 py-4 bg-red-50 text-red-600 font-bold rounded-2xl border border-red-100 hover:bg-red-100 hover:shadow-md transition-all flex items-center justify-center gap-3 group"
+            className="flex-1 px-6 py-4 bg-red-50 text-red-600 font-bold rounded-2xl border border-red-100 hover:bg-red-100 hover:shadow-md transition-all flex items-center justify-center gap-3 group cursor-pointer"
           >
             <Trash2 className="w-5 h-5 group-hover:scale-110 transition-transform" /> 
             Limpiar Cache Local

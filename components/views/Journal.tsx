@@ -15,12 +15,12 @@ export default function Journal() {
         />
         <div className="flex justify-between items-center border-t border-slate-100 pt-4 mt-4">
           <div className="flex gap-2 text-slate-400">
-            <button className="p-2 hover:bg-slate-50 rounded-lg transition"><Image className="w-5 h-5" /></button>
-            <button className="p-2 hover:bg-slate-50 rounded-lg transition"><Mic className="w-5 h-5" /></button>
+            <button className="p-2 hover:bg-slate-50 rounded-lg transition cursor-pointer"><Image className="w-5 h-5" /></button>
+            <button className="p-2 hover:bg-slate-50 rounded-lg transition cursor-pointer"><Mic className="w-5 h-5" /></button>
           </div>
           <button 
             onClick={() => showToast('Entrada guardada', 'success')} 
-            className="bg-navy-900 text-white px-6 py-2 rounded-xl font-bold text-sm hover:bg-blue-700 transition"
+            className="bg-navy-900 text-white px-6 py-2 rounded-xl font-bold text-sm hover:bg-blue-700 transition cursor-pointer"
           >
             Guardar Entrada
           </button>

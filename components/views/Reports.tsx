@@ -47,7 +47,7 @@ function ReportCard({ name, meta, icon: Icon, color }: ReportCardProps) {
         <h4 className="font-bold text-navy-900">{name}</h4>
         <p className="text-xs text-slate-400 mt-1 font-bold uppercase tracking-wide">{meta}</p>
       </div>
-      <button className={`text-xs font-bold px-4 py-2 rounded-lg transition w-full ${colors[color]}`}>
+      <button className={`text-xs font-bold px-4 py-2 rounded-lg transition w-full cursor-pointer ${colors[color]}`}>
         Descargar
       </button>
     </div>

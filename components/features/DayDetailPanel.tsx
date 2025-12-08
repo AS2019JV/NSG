@@ -28,7 +28,7 @@ export default function DayDetailPanel() {
             <h3 className="font-display font-bold text-2xl text-navy-900">Agenda Diaria</h3>
             <p className="text-sm text-slate-500 font-medium mt-1">{selectedCalendarDate}, 2024</p>
           </div>
-          <button onClick={closeDayDetail} className="p-2 hover:bg-slate-200 rounded-full transition">
+          <button onClick={closeDayDetail} className="p-2 hover:bg-slate-200 rounded-full transition cursor-pointer">
             <X className="w-6 h-6 text-slate-500" />
           </button>
         </div>
@@ -67,7 +67,7 @@ export default function DayDetailPanel() {
 
         {/* Footer */}
         <div className="p-6 border-t border-slate-100 bg-white shrink-0 safe-bottom-scroll">
-          <button className="w-full py-4 bg-navy-900 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition flex items-center justify-center gap-2 shadow-lg">
+          <button className="w-full py-4 bg-navy-900 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition flex items-center justify-center gap-2 shadow-lg cursor-pointer">
             <Plus className="w-4 h-4" /> Añadir Nuevo Evento
           </button>
         </div>

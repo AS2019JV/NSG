@@ -25,9 +25,9 @@ export default function CalendarView() {
       <div className="flex justify-between items-center mb-6 shrink-0">
         <div><h3 className="font-display font-bold text-3xl text-navy-900">{MONTHS[currentMonthIndex]} 2024</h3></div>
         <div className="flex gap-2">
-          <button onClick={() => changeMonth(-1)} className="p-2 bg-white rounded-lg border hover:bg-slate-50 active:scale-95 transition"><ChevronLeft className="w-4 h-4" /></button>
-          <button onClick={() => changeMonth(1)} className="p-2 bg-white rounded-lg border hover:bg-slate-50 active:scale-95 transition"><ChevronRight className="w-4 h-4" /></button>
-          <button onClick={() => showToast('Nuevo Evento','info')} className="px-4 bg-blue-600 text-white text-xs font-bold rounded-lg active:scale-95 transition hover:bg-blue-500 flex items-center gap-1"><Plus className="w-3 h-3" /> Evento</button>
+          <button onClick={() => changeMonth(-1)} className="p-2 bg-white rounded-lg border hover:bg-slate-50 active:scale-95 transition cursor-pointer"><ChevronLeft className="w-4 h-4" /></button>
+          <button onClick={() => changeMonth(1)} className="p-2 bg-white rounded-lg border hover:bg-slate-50 active:scale-95 transition cursor-pointer"><ChevronRight className="w-4 h-4" /></button>
+          <button onClick={() => showToast('Nuevo Evento','info')} className="px-4 bg-blue-600 text-white text-xs font-bold rounded-lg active:scale-95 transition hover:bg-blue-500 flex items-center gap-1 cursor-pointer"><Plus className="w-3 h-3" /> Evento</button>
         </div>
       </div>
       <div className="bg-white rounded-[2rem] shadow-card border border-slate-200 overflow-hidden flex-1 flex flex-col min-h-0">

@@ -54,14 +54,14 @@ export default function NSGSystem() {
             <div className="flex items-center gap-2 pr-2">
                 <button 
                   onClick={() => handleAITrigger('standard')}
-                  className="p-3 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-colors"
+                  className="p-3 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-full transition-colors cursor-pointer"
                   aria-label="Usar micrófono"
                 >
                     <Mic className="w-5 h-5" />
                 </button>
                 <button 
                   onClick={() => handleAITrigger('research')}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2.5 rounded-full font-medium shadow-md hover:shadow-lg hover:brightness-105 transition-all flex items-center gap-2"
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2.5 rounded-full font-medium shadow-md hover:shadow-lg hover:brightness-105 transition-all flex items-center gap-2 cursor-pointer"
                 >
                     <BrandAtom className="w-5 h-5 grayscale brightness-200" />
                     <span className="hidden sm:inline">Generar</span>
@@ -132,7 +132,7 @@ function ModuleCard({ title, description, icon: Icon, color, delay = "", onClick
   return (
     <button 
       onClick={onClick}
-      className={`text-left bg-slate-50 hover:bg-white border border-slate-200 hover:border-blue-200 p-6 rounded-4xl transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/5 group flex flex-col justify-between h-56 ${delay}`}
+      className={`text-left bg-slate-50 hover:bg-white border border-slate-200 hover:border-blue-200 p-6 rounded-4xl transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/5 group flex flex-col justify-between h-56 cursor-pointer ${delay}`}
     >
       <div>
         <div className={`mb-4 ${color} bg-white p-3 rounded-2xl w-fit shadow-sm group-hover:scale-110 transition-transform duration-300`}>

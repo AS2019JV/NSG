@@ -89,7 +89,7 @@ export default function ThemeToggle() {
             <button
               key={option.id}
               onClick={() => setTheme(option.id)}
-              className={`flex-1 flex flex-col items-center gap-1.5 px-3 py-2.5 rounded-lg transition-all duration-300 ${
+              className={`flex-1 flex flex-col items-center gap-1.5 px-3 py-2.5 rounded-lg transition-all duration-300 cursor-pointer ${
                 isActive
                   ? "bg-white shadow-md text-blue-600 scale-105"
                   : "text-slate-500 hover:text-slate-700 hover:bg-white/50"

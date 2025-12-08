@@ -20,7 +20,7 @@ export default function AIModal() {
             {/* Close Button - Enhanced */}
             <button 
                 onClick={toggleAI} 
-                className="absolute top-6 right-6 lg:-top-10 lg:-right-12 z-50 group outline-none focus:outline-none"
+                className="absolute top-6 right-6 lg:-top-10 lg:-right-12 z-50 group outline-none focus:outline-none cursor-pointer"
                 aria-label="Close"
             >
                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-200/50 hover:bg-slate-200 lg:bg-white/10 lg:hover:bg-white/20 transition-all duration-200 backdrop-blur-sm">

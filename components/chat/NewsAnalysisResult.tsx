@@ -63,7 +63,7 @@ export default function NewsAnalysisResult({ tag, roleContext }: NewsAnalysisRes
           </div>
 
           {/* Action Button */}
-          <button className="w-full py-3 bg-navy-900 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition shadow-lg flex items-center justify-center gap-2 active:scale-95">
+          <button className="w-full py-3 bg-navy-900 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition shadow-lg flex items-center justify-center gap-2 active:scale-95 cursor-pointer">
             <Play className="w-4 h-4" /> Ejecutar Plan de Acción
           </button>
         </div>

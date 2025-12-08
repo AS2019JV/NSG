@@ -45,13 +45,13 @@ export default function NSGHorizon() {
         <div className="flex gap-3 w-full lg:w-auto">
           <button 
             onClick={() => showToast('Reproduciendo Audio...', 'info')} 
-            className="flex-1 lg:flex-none px-6 py-3 bg-slate-50 text-navy-900 font-bold rounded-xl hover:bg-slate-100 transition border border-slate-200 flex items-center justify-center gap-2"
+            className="flex-1 lg:flex-none px-6 py-3 bg-slate-50 text-navy-900 font-bold rounded-xl hover:bg-slate-100 transition border border-slate-200 flex items-center justify-center gap-2 cursor-pointer"
           >
             <Play className="w-4 h-4" /> Reproducir Audio
           </button>
           <button 
             onClick={() => showToast('Exportando PDF...', 'success')} 
-            className="flex-1 lg:flex-none px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition shadow-lg shadow-blue-200 flex items-center justify-center gap-2"
+            className="flex-1 lg:flex-none px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition shadow-lg shadow-blue-200 flex items-center justify-center gap-2 cursor-pointer"
           >
             <FileCheck className="w-4 h-4" /> Exportar Plan PDF
           </button>
@@ -160,7 +160,7 @@ export default function NSGHorizon() {
               <p className="text-sm text-slate-500 mb-4 line-clamp-3">
                 Aplicar el principio de "Eat the Frog" pero invertido para creativos: Estrategia primero, operación después.
               </p>
-              <button className="w-full py-2.5 bg-slate-50 text-purple-700 font-bold text-xs rounded-xl hover:bg-purple-100 transition">
+              <button className="w-full py-2.5 bg-slate-50 text-purple-700 font-bold text-xs rounded-xl hover:bg-purple-100 transition cursor-pointer">
                 Ver Guía de Implementación
               </button>
             </div>
@@ -177,7 +177,7 @@ export default function NSGHorizon() {
               <p className="text-sm text-slate-500 mb-4 line-clamp-3">
                 Reagendar reuniones de KPIs a las 3:00 PM. Utilizar las mañanas (8am - 11am) exclusivamente para diseño de visión.
               </p>
-              <button className="w-full py-2.5 bg-slate-50 text-emerald-700 font-bold text-xs rounded-xl hover:bg-emerald-100 transition">
+              <button className="w-full py-2.5 bg-slate-50 text-emerald-700 font-bold text-xs rounded-xl hover:bg-emerald-100 transition cursor-pointer">
                 Añadir a Calendario
               </button>
             </div>
@@ -241,7 +241,7 @@ export default function NSGHorizon() {
 
             <button 
               onClick={() => showToast('Personalizando...', 'info')} 
-              className="w-full mt-6 py-3 bg-navy-900 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition shadow-lg flex items-center justify-center gap-2"
+              className="w-full mt-6 py-3 bg-navy-900 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition shadow-lg flex items-center justify-center gap-2 cursor-pointer"
             >
               <PlusCircle className="w-4 h-4" /> Personalizar más acciones con AI
             </button>

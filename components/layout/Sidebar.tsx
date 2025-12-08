@@ -58,7 +58,7 @@ export default function Sidebar() {
           </div>
           
           {/* Close Button (Visible only on Mobile) */}
-          <button className="lg:hidden p-2 text-slate-400 hover:text-white transition" onClick={toggleSidebar}>
+          <button className="lg:hidden p-2 text-slate-400 hover:text-white transition cursor-pointer" onClick={toggleSidebar}>
             <X className="w-5 h-5"/>
           </button>
         </div>
@@ -97,7 +97,7 @@ export default function Sidebar() {
                         if (window.innerWidth < 1024) toggleSidebar(); 
                       }}
                       className={clsx(
-                        "w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium transition-all mb-1",
+                        "w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-medium transition-all mb-1 cursor-pointer",
                         // Remove default focus outline and white flash
                         "focus:outline-none focus-visible:outline-none active:scale-[0.98]",
                         
@@ -133,7 +133,7 @@ export default function Sidebar() {
            </div>
            <Link 
               href="/" 
-              className="flex items-center gap-3 text-sm font-medium hover:text-white transition w-full p-2.5 rounded-lg hover:bg-white/5 text-slate-400 group"
+              className="flex items-center gap-3 text-sm font-medium hover:text-white transition w-full p-2.5 rounded-lg hover:bg-white/5 text-slate-400 group cursor-pointer"
            >
               <LogOut className="w-4 h-4 group-hover:text-red-400 transition" /> Cerrar Sesión
            </Link>
