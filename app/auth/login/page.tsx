@@ -7,6 +7,7 @@ import { CONTEXT, RoleType } from "@/data/context";
 import BrandAtom from "@/components/ui/BrandAtom";
 import clsx from "clsx";
 import { Lock, ChevronLeft } from "lucide-react";
+import { authService } from '@/lib/auth';
 
 function LoginContent() {
   const router = useRouter();
@@ -15,6 +16,9 @@ function LoginContent() {
   
   const [selectedRole, setSelectedRole] = useState<RoleType | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const roleParam = searchParams.get('role') as RoleType | null;
@@ -32,13 +36,29 @@ function LoginContent() {
 
   const handleLogin = async () => {
     if (!selectedRole) return;
-    setIsAnimating(true);
-    
-    // Simulate network delay for "authenticating"
-    await new Promise(resolve => setTimeout(resolve, 800));
+    if (!email || !password) {
+        setError("Por favor ingresa usuario y contraseña.");
+        return;
+    }
 
-    setRole(selectedRole);
-    router.push("/dashboard");
+    setIsAnimating(true);
+    setError(null);
+    
+    try {
+        const data = await authService.login({ email, password });
+        
+        if (data.token) {
+            localStorage.setItem('token', data.token);
+        }
+
+        setRole(selectedRole);
+        router.push("/dashboard");
+    } catch (err: any) {
+        console.error("Login failed", err);
+        setError(err.response?.data?.message || "Credenciales inválidas. Intenta nuevamente.");
+    } finally {
+        setIsAnimating(false);
+    }
   };
 
   // If we are redirecting or don't have a role yet, show nothing or a loader
@@ -71,6 +91,13 @@ function LoginContent() {
                 </div>
             </div>
 
+            {/* Error Message */}
+            {error && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl text-center">
+                    {error}
+                </div>
+            )}
+
             {/* Login Form */}
             <div className="w-full relative">
                 <div className="space-y-6">
@@ -81,8 +108,13 @@ function LoginContent() {
                                 <div className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors flex items-center justify-center font-bold text-[10px]">@</div>
                                 <input 
                                     type="text"
+                                    value={email}
+                                    onChange={(e) => {
+                                        setEmail(e.target.value);
+                                        setError(null);
+                                    }}
                                     className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400"
-                                    placeholder="Ingresa tu usuario"
+                                    placeholder="Ingresa tu email"
                                 />
                             </div>
                         </div>
@@ -93,6 +125,11 @@ function LoginContent() {
                                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                                 <input 
                                     type="password"
+                                    value={password}
+                                    onChange={(e) => {
+                                        setPassword(e.target.value);
+                                        setError(null);
+                                    }}
                                     className="w-full bg-slate-50 border border-slate-200 text-slate-900 text-sm rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-slate-400"
                                     placeholder="Ingresa tu contraseña"
                                 />

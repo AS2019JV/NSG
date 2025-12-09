@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import BrandAtom from "@/components/ui/BrandAtom";
 import { Lock, ChevronLeft, User, Mail, ArrowRight } from "lucide-react";
 import Link from 'next/link';
+import { authService } from '@/lib/auth';
 
 function RegisterContent() {
   const router = useRouter();
@@ -15,22 +16,47 @@ function RegisterContent() {
     password: '',
     confirmPassword: ''
   });
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError(null);
   };
 
   const handleRegister = async () => {
-    if (!formData.name || !formData.email || !formData.password) return;
-    setIsAnimating(true);
+    if (!formData.name || !formData.email || !formData.password) {
+      setError("Por favor completa todos los campos requiredos.");
+      return;
+    }
     
-    // Simulate network delay for "registration"
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    setIsAnimating(true);
+    setError(null);
 
-    // For now, just redirect to login so they can sign in with their new "account"
-    // Or redirect purely to dashboard if auto-login is desired.
-    // Let's go to dashboard to reduce friction, assuming success.
-    router.push("/dashboard");
+    const registrationData = {
+      username: formData.name,
+      email: formData.email,
+      password: formData.password,
+    };
+
+    console.log("Registering with data:", registrationData);
+
+    try {
+      const response = await authService.register(registrationData);
+      
+      if (response && response.token) {
+        localStorage.setItem('token', response.token);
+        // If we have a token, we can go straight to dashboard
+        router.push("/dashboard");
+      } else {
+        // Otherwise go to login
+        router.push("/auth/login");
+      }
+    } catch (err: any) {
+      console.error("Registration failed", err);
+      setError(err.response?.data?.message || "Error al registrarse. Intenta nuevamente.");
+    } finally {
+      setIsAnimating(false);
+    }
   };
 
   return (
@@ -60,13 +86,20 @@ function RegisterContent() {
                 </div>
             </div>
 
+            {/* Error Message */}
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl text-center">
+                {error}
+              </div>
+            )}
+
             {/* Register Form */}
             <div className="w-full relative">
                 <div className="space-y-5">
                     
                     {/* Name */}
                      <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 ml-1 uppercase tracking-wider">Nombre Completo</label>
+                        <label className="text-xs font-bold text-slate-500 ml-1 uppercase tracking-wider">Nombre de Usuario</label>
                         <div className="relative group">
                             <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                             <input 
@@ -97,8 +130,8 @@ function RegisterContent() {
                     </div>
 
                     {/* Password */}
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2 col-span-2 md:col-span-1">
+                    <div className="space-y-5">
+                        <div className="space-y-2">
                             <label className="text-xs font-bold text-slate-500 ml-1 uppercase tracking-wider">Contraseña</label>
                             <div className="relative group">
                                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
@@ -112,7 +145,7 @@ function RegisterContent() {
                                 />
                             </div>
                         </div>
-                        <div className="space-y-2 col-span-2 md:col-span-1">
+                        <div className="space-y-2" hidden>
                             <label className="text-xs font-bold text-slate-500 ml-1 uppercase tracking-wider">Confirmar</label>
                             <div className="relative group">
                                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
