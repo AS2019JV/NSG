@@ -1,10 +1,10 @@
 "use client";
 
 import { useAppStore } from "@/store/useAppStore";
-import { Sun, Moon, Zap } from "lucide-react";
+import { Sun, Moon, Zap, Laptop } from "lucide-react";
 import { useEffect, useState } from "react";
 
-type Theme = "light" | "dark" | "neon";
+type Theme = "light" | "dark" | "neon" | "system";
 
 interface ThemeOption {
   id: Theme;
@@ -32,40 +32,26 @@ const THEME_OPTIONS: ThemeOption[] = [
     icon: Zap,
     description: "High Contrast",
   },
+  {
+    id: "system",
+    label: "System",
+    icon: Laptop,
+    description: "Match Device",
+  },
 ];
 
 export default function ThemeToggle() {
   const { theme, setTheme } = useAppStore();
   const [mounted, setMounted] = useState(false);
 
-  // Avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (!mounted) return;
-
-    const root = document.documentElement;
-    root.classList.remove("light", "dark", "neon");
-    root.classList.add(theme);
-
-    // Update CSS variables based on theme
-    if (theme === "dark") {
-      root.style.setProperty("--background", "#0B1121");
-      root.style.setProperty("--foreground", "#ededed");
-    } else if (theme === "neon") {
-      root.style.setProperty("--background", "#020410");
-      root.style.setProperty("--foreground", "#60A5FA");
-    } else {
-      root.style.setProperty("--background", "#F8FAFC");
-      root.style.setProperty("--foreground", "#0F172A");
-    }
-  }, [theme, mounted]);
-
   if (!mounted) {
     return (
       <div className="flex items-center gap-2 bg-slate-100 rounded-xl p-1">
+        <div className="w-10 h-10 rounded-lg bg-slate-200 animate-pulse"></div>
         <div className="w-10 h-10 rounded-lg bg-slate-200 animate-pulse"></div>
         <div className="w-10 h-10 rounded-lg bg-slate-200 animate-pulse"></div>
         <div className="w-10 h-10 rounded-lg bg-slate-200 animate-pulse"></div>

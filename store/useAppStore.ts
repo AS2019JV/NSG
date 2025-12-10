@@ -12,13 +12,13 @@ export interface Message {
 
 interface AppState {
   currentRole: Role;
-  theme: 'light' | 'dark' | 'neon';
+  theme: 'light' | 'dark' | 'neon' | 'system';
   isSidebarOpen: boolean;
   isContextCached: boolean;
   conversations: Record<Role, Message[]>;
   
   setRole: (role: Role) => void;
-  setTheme: (theme: 'light' | 'dark' | 'neon') => void;
+  setTheme: (theme: 'light' | 'dark' | 'neon' | 'system') => void;
   toggleSidebar: () => void;
   setContextCached: (cached: boolean) => void;
   addMessage: (role: Role, message: Message) => void;
