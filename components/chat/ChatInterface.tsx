@@ -8,15 +8,18 @@ import {
   Mic, 
   ArrowUp, 
   Sparkles, 
-  Loader2
+  Loader2,
+  Bot,
+  BrainCircuit
 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 // Refresh import to clear stale cache
 import DynamicIsland from '@/components/layout/DynamicIsland';
 import clsx from 'clsx';
 import BrandAtom from '@/components/ui/BrandAtom';
 import AtomEffect from '@/components/ui/AtomEffect';
 import NewsAnalysisResult from './NewsAnalysisResult';
-import ModelSelectorTabs from './ModelSelectorTabs';
 import axios from 'axios';
 
 // Extended Message Type to support your Analysis Cards AND standard text
@@ -43,7 +46,8 @@ export default function ChatInterface() {
   const [conversations, setConversations] = useState<Record<string, Message[]>>({});
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
   const [mode, setMode] = useState('standard'); 
-  
+  const [selectedModel, setSelectedModel] = useState('Chat GPT');
+
   // Derived state for current view
   const messages = conversations[mode] || [];
   const isLoading = loadingStates[mode] || false;
@@ -73,9 +77,23 @@ export default function ChatInterface() {
     setCacheName('n8n-managed');
   }, [setContextCached]);
 
-  // Scroll to bottom on new messages
+  // Scroll to bottom on MODE switch (Context/Tab change) - Instant
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    chatEndRef.current?.scrollIntoView({ behavior: "instant" });
+  }, [mode]);
+
+  // Smart Auto-Scroll for Messages
+  useEffect(() => {
+    const lastMsg = messages[messages.length - 1];
+    const isUserLast = lastMsg?.role === 'user';
+
+    // 1. If Loading (Thinking...) -> Scroll to show spinner
+    // 2. If User sent a message -> Scroll to confirm input
+    if (isLoading || isUserLast) {
+       chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+    // 3. If AI finished responding (Text appears) -> DO NOT scroll.
+    //    This keeps the User's question and the *start* of the AI response in view.
   }, [messages, isLoading]);
 
 
@@ -198,45 +216,131 @@ export default function ChatInterface() {
       {/* --- LAYER 1: DYNAMIC ISLAND (Visuals) --- */}
       <div className="absolute top-0 left-0 w-full flex justify-center pt-6 lg:pt-8 z-40 pointer-events-none">
         <div className="pointer-events-auto">
-            <DynamicIsland currentMode={mode} setMode={setMode} />
+            <DynamicIsland 
+                currentMode={mode} 
+                setMode={setMode} 
+                selectedModel={selectedModel}
+                setSelectedModel={setSelectedModel}
+            />
         </div>
       </div>
 
       {/* --- LAYER 2: CHAT BODY --- */}
-      <div className="flex-1 overflow-y-auto custom-scroll p-6 lg:p-12 pt-24 lg:pt-32 space-y-8">
+      <div className="flex-1 overflow-y-auto custom-scroll p-6 lg:p-12 pt-24 lg:pt-40 space-y-8">
         
-        {/* Messages List - Material 3 Style */}
-        {/* Messages List - Gemini Style */}
+        {/* Messages List */}
         <div className="flex flex-col gap-8 max-w-3xl mx-auto w-full">
-            {messages.map((msg) => (
-            <div key={msg.id} className={clsx("flex w-full animate-fade-in-up", msg.role === 'user' ? "justify-end" : "justify-start")}>
-                
-                {msg.role === 'user' ? (
-                // USER MESSAGE - Right Aligned Bubble
-                <div className="bg-[#f0f4f9] text-[#1f1f1f] px-6 py-4 rounded-[32px] rounded-br-[4px] text-[16px] max-w-[80%] leading-relaxed font-normal selection:bg-blue-100">
-                    {msg.content}
-                </div>
-                ) : (
-                // AI MESSAGE - Plain Text with Atom Icon
-                <div className="flex gap-5 group w-full">
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1">
-                        <BrandAtom className="w-8 h-8" />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0 pt-1.5">
-                        {msg.type === 'analysis' ? (
-                            <NewsAnalysisResult 
-                            tag={msg.metadata?.tag}
-                            roleContext={msg.metadata?.roleContext}
-                            />
+            {messages.map((msg) => {
+                // Calculate display content based on global selectedModel
+                let displayContent: string | null = msg.content;
+                let isWaiting = false;
+
+                if (msg.role === 'assistant') {
+                    try {
+                        if (msg.content && msg.content.trim().startsWith('{')) {
+                            const parsed = JSON.parse(msg.content);
+                            if (parsed.openAI_response || parsed.gemini_response) {
+                                if (selectedModel === 'Chat GPT') {
+                                    displayContent = parsed.openAI_response || "No OpenAI response available.";
+                                } else if (selectedModel === 'Gemini') {
+                                    displayContent = parsed.gemini_response || null;
+                                } else if (selectedModel === 'Claude') {
+                                    displayContent = parsed.claude_response || null;
+                                }
+                            }
+                        } else {
+                            // Simple string - assume it belongs to Default/GPT
+                            if (selectedModel !== 'Chat GPT') {
+                                displayContent = null;
+                            }
+                        }
+                    } catch (e) {
+                         // Fallback
+                        if (selectedModel !== 'Chat GPT') {
+                            displayContent = null;
+                        }
+                    }
+
+                    if (!displayContent) isWaiting = true;
+                }
+
+                return (
+                    // Removed 'animate-fade-in-up' from here which causes re-trigger shake on updates
+                    <div key={msg.id} className={clsx("flex w-full", msg.role === 'user' ? "justify-end" : "justify-start")}>
+                        
+                        {msg.role === 'user' ? (
+                        // USER MESSAGE - Distinct "Modal" / Card Style (Google Blue)
+                        <div className="bg-[#0b57d0] text-white px-6 py-4 rounded-[24px] rounded-br-[4px] shadow-sm shadow-blue-900/10 text-[16px] max-w-[80%] leading-relaxed font-normal selection:bg-white/20 tracking-wide">
+                            {msg.content}
+                        </div>
                         ) : (
-                            <ModelSelectorTabs content={msg.content} />
+                        // AI MESSAGE
+                        <div className="flex gap-5 group w-full">
+                            <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-1">
+                                <BrandAtom className="w-8 h-8" variant="colored" />
+                            </div>
+                            
+                            <div className="flex-1 min-w-0 pt-1.5">
+                                {msg.type === 'analysis' ? (
+                                    <NewsAnalysisResult 
+                                    tag={msg.metadata?.tag}
+                                    roleContext={msg.metadata?.roleContext}
+                                    />
+                                ) : (
+                                    <div className="text-[16px] text-[#1f1f1f] leading-8 font-normal tracking-normal animate-fade-in">
+                                        {!isWaiting ? (
+                                            <div className="prose prose-slate max-w-none">
+                                                <ReactMarkdown 
+                                                    remarkPlugins={[remarkGfm]}
+                                                    components={{
+                                                        // Notion-like styling overrides
+                                                        h1: ({node, ...props}) => <h1 className="text-2xl font-bold mt-6 mb-4 text-slate-900 tracking-tight" {...props} />,
+                                                        h2: ({node, ...props}) => <h2 className="text-xl font-bold mt-5 mb-3 text-slate-800 tracking-tight" {...props} />,
+                                                        h3: ({node, ...props}) => <h3 className="text-lg font-semibold mt-4 mb-2 text-slate-800" {...props} />,
+                                                        p: ({node, ...props}) => <p className="mb-4 leading-relaxed text-slate-700" {...props} />,
+                                                        ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-4 space-y-1 text-slate-700" {...props} />,
+                                                        ol: ({node, ...props}) => <ol className="list-decimal pl-6 mb-4 space-y-1 text-slate-700" {...props} />,
+                                                        li: ({node, ...props}) => <li className="pl-1" {...props} />,
+                                                        strong: ({node, ...props}) => <strong className="font-semibold text-slate-900" {...props} />,
+                                                        code: ({node, inline, className, children, ...props}: any) => {
+                                                            return inline ? (
+                                                                <code className="bg-slate-100 px-1.5 py-0.5 rounded text-[13px] font-mono text-[#e01e5a] border border-slate-200 align-middle" {...props}>{children}</code>
+                                                            ) : (
+                                                                <div className="bg-[#1e1e1e] rounded-lg p-4 my-4 overflow-x-auto border border-slate-800 shadow-sm">
+                                                                    <code className="text-sm font-mono text-slate-200 block whitespace-pre" {...props}>{children}</code>
+                                                                </div>
+                                                            );
+                                                        },
+                                                        blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-slate-300 pl-4 italic my-4 text-slate-600 bg-slate-50 py-2 pr-2 rounded-r" {...props} />,
+                                                        a: ({node, ...props}) => <a className="text-blue-600 hover:underline cursor-pointer font-medium" {...props} />,
+                                                        table: ({node, ...props}) => <div className="overflow-x-auto my-4"><table className="min-w-full divide-y divide-slate-200 border border-slate-200" {...props} /></div>,
+                                                        th: ({node, ...props}) => <th className="bg-slate-50 px-4 py-2 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider border-b" {...props} />,
+                                                        td: ({node, ...props}) => <td className="px-4 py-2 whitespace-nowrap text-sm text-slate-600 border-b" {...props} />
+                                                    }}
+                                                >
+                                                    {displayContent || ''}
+                                                </ReactMarkdown>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-3 text-slate-400 mt-2 px-1 animate-pulse">
+                                                <div className="opacity-70">
+                                                    {selectedModel === 'Gemini' ? <Sparkles className="w-4 h-4" /> : 
+                                                     selectedModel === 'Claude' ? <BrainCircuit className="w-4 h-4" /> : 
+                                                     <Bot className="w-4 h-4" />}
+                                                </div>
+                                                <span className="text-[14px] font-medium tracking-wide">
+                                                    {msg.content ? `${selectedModel} response hidden.` : `Generando respuesta con ${selectedModel}...`}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                         )}
                     </div>
-                </div>
-                )}
-            </div>
-            ))}
+                );
+            })}
         </div>
 
         {/* Loading State (Thinking...) */}

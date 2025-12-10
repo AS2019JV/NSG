@@ -37,6 +37,9 @@ export default function AIModal() {
               className="fixed inset-0 z-[120] bg-[#f0f4f9] flex flex-col shadow-2xl overflow-hidden"
             >
               
+              {/* Header Gradient Overlay: Masks content scrolling behind the Dynamic Island */}
+              <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-[#f0f4f9] via-[#f0f4f9]/90 to-transparent z-[30] pointer-events-none" />
+
               {/* Dynamic Back Button - Pro UI Placement */}
               <m.div 
                 initial={{ opacity: 0, x: -20 }}

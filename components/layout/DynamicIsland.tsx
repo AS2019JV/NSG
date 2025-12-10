@@ -6,17 +6,21 @@ import { CONTEXT, RoleType } from "@/data/context";
 import { Dispatch, SetStateAction, useRef } from "react";
 import clsx from "clsx";
 
+// Update Props Interface
 interface DynamicIslandProps {
   currentMode: string;
   setMode: Dispatch<SetStateAction<string>>;
+  selectedModel?: string; // Optional for backward compatibility if needed, but we'll use it
+  setSelectedModel?: Dispatch<SetStateAction<string>>;
 }
 
-export default function DynamicIsland({ currentMode, setMode }: DynamicIslandProps) {
+export default function DynamicIsland({ currentMode, setMode, selectedModel, setSelectedModel }: DynamicIslandProps) {
   const { currentRole } = useAppStore();
   const containerRef = useRef<HTMLDivElement>(null);
   
   // Get menu items for current role
   const roleKey = (currentRole as RoleType) || 'consultant';
+// ... (rest of existing logic)
   const menuItems = CONTEXT[roleKey]?.menu || [];
   
   // Combine Standard + Menu Items (excluding NSG Intelligence)
@@ -26,7 +30,7 @@ export default function DynamicIsland({ currentMode, setMode }: DynamicIslandPro
   ];
 
   return (
-    <div className="relative z-50 flex flex-col items-center justify-center p-4 transition-all duration-500 ease-in-out" ref={containerRef}>
+    <div className="relative z-50 flex flex-col items-center justify-center p-4 transition-all duration-500 ease-in-out gap-3" ref={containerRef}>
       
       <div className="relative flex items-center justify-center w-full max-w-[calc(100vw-6rem)] md:max-w-3xl mx-auto">
         <div className={clsx(
@@ -46,7 +50,7 @@ export default function DynamicIsland({ currentMode, setMode }: DynamicIslandPro
                  key={item.id}
                  onClick={() => setMode(item.id)}
                  className={clsx(
-                    "flex items-center gap-2.5 px-5 py-2.5 rounded-full transition-all duration-300 ease-out whitespace-nowrap group relative flex-shrink-0 cursor-pointer",
+                    "flex items-center gap-2.5 px-5 py-2.5 rounded-full transition-all duration-300 ease-out whitespace-nowrap group relative shrink-0 cursor-pointer",
                     isActive 
                         ? (isSpecial ? "bg-blue-600/10 text-blue-400" : "bg-blue-600/20 text-blue-400 ring-1 ring-blue-500/30") 
                         : "text-slate-400 hover:text-slate-200 hover:bg-white/5",
@@ -55,7 +59,7 @@ export default function DynamicIsland({ currentMode, setMode }: DynamicIslandPro
                  )}
                >
                  <Icon className={clsx(
-                   "w-5 h-5 transition-colors flex-shrink-0", 
+                   "w-5 h-5 transition-colors shrink-0", 
                    isActive ? "text-blue-400" : "text-slate-500 group-hover:text-slate-300"
                  )} />
                  <span className="text-[14px] font-semibold tracking-wide">
@@ -72,6 +76,31 @@ export default function DynamicIsland({ currentMode, setMode }: DynamicIslandPro
 
         </div>
       </div>
+
+      {/* --- SECONDARY LAYER: AI MODEL SELECTOR --- */}
+      {setSelectedModel && selectedModel && (
+        <div className="animate-fade-in-up flex items-center justify-center gap-1 bg-white/80 backdrop-blur-md border border-white/20 p-1.5 rounded-full shadow-sm hover:shadow-md transition-all duration-300">
+             {['Chat GPT', 'Gemini', 'Claude'].map((model) => {
+                 const isModelActive = selectedModel === model;
+                 return (
+                    <button
+                        key={model}
+                        onClick={() => setSelectedModel(model)}
+                        className={clsx(
+                            "px-4 py-1.5 rounded-full text-[12px] font-medium transition-all duration-200 flex items-center gap-1.5",
+                            isModelActive 
+                                ? "bg-white text-[#0b57d0] shadow-sm ring-1 ring-slate-100" 
+                                : "text-slate-500 hover:bg-slate-100/50 hover:text-slate-700"
+                        )}
+                    >
+                        {/* Dot Indicator */}
+                        <div className={clsx("w-1.5 h-1.5 rounded-full transition-colors", isModelActive ? "bg-[#0b57d0]" : "bg-slate-300")} />
+                        {model}
+                    </button>
+                 );
+             })}
+        </div>
+      )}
 
       {/* Scrollbar hide styles */}
       <style jsx>{`

@@ -36,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${inter.variable} ${jakarta.variable} ${mono.variable} antialiased h-full`}>
+    <html lang="es" className={`${inter.variable} ${jakarta.variable} ${mono.variable} antialiased h-full`} suppressHydrationWarning>
       <body className="h-full overflow-hidden font-sans selection:bg-blue-100 selection:text-blue-900">
         <ThemeProvider>
           <ToastProvider>{children}</ToastProvider>

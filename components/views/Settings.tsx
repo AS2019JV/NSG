@@ -58,14 +58,23 @@ export default function Settings() {
 
       console.log('Uploading PDF (multipart):', selectedFile.name);
 
-      const response = await axios.post('/api/chat', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      // Remove manual Content-Type header to allow browser to set boundary automatically
+      const response = await axios.post('/api/chat', formData);
 
       console.log('Upload response:', response.data);
 
       setUploadStatus('success');
-      setUploadMessage(`${selectedFile.name} subido exitosamente`);
+      
+      // Extract text from N8N response
+      const responseData = response.data;
+      const responseText = responseData.response || 
+                           responseData.output || 
+                           responseData.content || 
+                           responseData.text || 
+                           responseData.message || 
+                           `${selectedFile.name} subido exitosamente`;
+                           
+      setUploadMessage(responseText);
       setSelectedFile(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -76,17 +85,42 @@ export default function Settings() {
       console.error('Error uploading PDF:', error);
       
       let errorMessage = 'Error al subir el PDF';
+      let debugInfo = '';
       
-      if (error.response && error.response.status === 404) {
-        errorMessage = 'Servicio no disponible. Intenta más tarde.';
-      } else if (error.response && error.response.data) {
-        errorMessage = error.response.data.error || errorMessage;
-      } else if (error.message) {
-        errorMessage = error.message;
+      if (error.response) {
+          const data = error.response.data;
+          
+          if (error.response.status === 404) {
+             errorMessage = 'Error 404: Ruta de API no encontrada (/api/upload)';
+          } else if (error.response.status === 502) {
+             // Try to parse the N8N error details
+             let n8nDetails = data.details;
+             try {
+                const parsed = JSON.parse(data.details);
+                // "The requested webhook is not registered"
+                if (parsed.message) n8nDetails = parsed.message;
+                // "Click the 'Execute workflow' button..."
+                if (parsed.hint) n8nDetails += `\nSuggestion: ${parsed.hint}`;
+                
+                // Add method hint
+                n8nDetails += `\nImportant: File uploads require the N8N Webhook to be set to 'POST'.`;
+             } catch (e) { /* use raw details */ }
+
+             errorMessage = `N8N Error (${data.n8n_status})`;
+             debugInfo = n8nDetails;
+          } else {
+             errorMessage = data.error || data.message || `Error del servidor (${error.response.status})`;
+             debugInfo = data.details || '';
+          }
+      } else if (error.request) {
+          errorMessage = 'Error de red: No se recibió respuesta del servidor';
+      } else {
+          errorMessage = error.message;
       }
 
       setUploadStatus('error');
-      setUploadMessage(errorMessage);
+      // Use pre-line whitespace for the suggestion newline
+      setUploadMessage(`${errorMessage}: \n${debugInfo}`);
       showToast(errorMessage, 'error');
     } finally {
       setIsUploading(false);
