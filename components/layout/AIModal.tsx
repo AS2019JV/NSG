@@ -1,41 +1,68 @@
 "use client";
 import { useUIStore } from "@/store/useUIStore";
-import { X } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import ChatInterface from "@/components/chat/ChatInterface";
-import clsx from "clsx";
+import { m, AnimatePresence, LazyMotion, domAnimation } from "framer-motion";
 
 export default function AIModal() {
   const { isAIOpen, toggleAI } = useUIStore();
 
-  if (!isAIOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-120 flex items-center justify-center p-0 lg:p-8">
-        {/* Backdrop */}
-        <div className="absolute inset-0 bg-navy-950/60 backdrop-blur-xl transition-opacity" onClick={toggleAI}></div>
-        
-        {/* Wrapper for positioning button outside */}
-        <div className="relative w-full h-dvh lg:h-[90vh] lg:max-w-7xl animate-fade-in-up flex flex-col">
-            
-            {/* Close Button - Enhanced */}
-            <button 
-                onClick={toggleAI} 
-                className="absolute top-6 right-6 lg:-top-10 lg:-right-12 z-50 group outline-none focus:outline-none cursor-pointer"
-                aria-label="Close"
-            >
-                 <div className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-200/50 hover:bg-slate-200 lg:bg-white/10 lg:hover:bg-white/20 transition-all duration-200 backdrop-blur-sm">
-                    <X className="w-5 h-5 text-slate-600 lg:text-white/80 lg:group-hover:text-white transition-colors" />
-                 </div>
-            </button>
+    <LazyMotion features={domAnimation}>
+      <AnimatePresence>
+        {isAIOpen && (
+          <>
+            {/* 1. Backdrop Layer: Solves the "Blue vs White" clash by neutralizing the background first */}
+            <m.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }} // Fast fade to mask content immediately
+              className="fixed inset-0 z-[110] bg-navy-950/40 backdrop-blur-sm"
+              onClick={toggleAI} // Optional: Click outside to close (though it's full screen, good for intent)
+            />
 
-            {/* Modal Container */}
-            <div className="bg-slate-50 w-full h-full lg:h-full lg:rounded-[2.5rem] shadow-2xl flex flex-col relative overflow-hidden lg:border lg:border-white/40 lg:ring-1 lg:ring-white/50">
-                {/* Chat Interface Integration */}
-                <div className="flex-1 w-full h-full overflow-hidden relative">
-                    <ChatInterface />
-                </div>
-            </div>
-        </div>
-    </div>
+            {/* 2. Main Surface: "Material 3" Elevation & Expansion */}
+            <m.div
+              key="ai-modal"
+              initial={{ opacity: 0, scale: 0.95, y: 20, filter: "blur(10px)" }}
+              animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, scale: 0.98, y: 10, filter: "blur(10px)", transition: { duration: 0.15 } }}
+              transition={{ 
+                type: "spring",
+                stiffness: 300,
+                damping: 30,
+                mass: 0.8 // Snappy but smooth "Google" feel
+              }}
+              className="fixed inset-0 z-[120] bg-[#f0f4f9] flex flex-col shadow-2xl overflow-hidden"
+            >
+              
+              {/* Dynamic Back Button - Pro UI Placement */}
+              <m.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2, duration: 0.3 }}
+                className="absolute top-6 left-6 z-50"
+              >
+                  <button 
+                      onClick={toggleAI} 
+                      className="group flex items-center gap-2 pl-3 pr-4 py-2.5 rounded-full bg-white/80 backdrop-blur-md border border-white/50 shadow-sm hover:shadow-md hover:bg-white transition-all duration-300 transform active:scale-95 cursor-pointer"
+                  >
+                      <div className="bg-slate-100 group-hover:bg-blue-50 text-slate-500 group-hover:text-blue-600 rounded-full p-1.5 transition-colors">
+                          <ArrowLeft className="w-4 h-4" />
+                      </div>
+                      <span className="text-sm font-semibold text-slate-600 group-hover:text-slate-900 tracking-tight">Volver</span>
+                  </button>
+              </m.div>
+
+              {/* Full Screen Chat Interface */}
+              <div className="flex-1 w-full h-full relative">
+                  <ChatInterface />
+              </div>
+            </m.div>
+          </>
+        )}
+      </AnimatePresence>
+    </LazyMotion>
   );
 }
