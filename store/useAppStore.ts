@@ -10,6 +10,16 @@ export interface Message {
   createdAt?: Date;
 }
 
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  role: string;
+  imgURL: string;
+  created_at: string;
+  updated_at: string;
+}
+
 interface AppState {
   currentRole: Role;
   theme: 'light' | 'dark' | 'neon' | 'system';
@@ -17,6 +27,9 @@ interface AppState {
   isContextCached: boolean;
   conversations: Record<Role, Message[]>;
   userId: string;
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
   
   setRole: (role: Role) => void;
   setTheme: (theme: 'light' | 'dark' | 'neon' | 'system') => void;
@@ -24,6 +37,10 @@ interface AppState {
   setContextCached: (cached: boolean) => void;
   addMessage: (role: Role, message: Message) => void;
   setMessages: (role: Role, messages: Message[]) => void;
+  setUser: (user: User | null) => void;
+  setAuthenticated: (isAuthenticated: boolean) => void;
+  setLoading: (isLoading: boolean) => void;
+  logout: () => void;
 }
 
 export const useAppStore = create<AppState>()(
@@ -40,6 +57,9 @@ export const useAppStore = create<AppState>()(
         patient: [],
       },
       userId: 'user_12345', // Default ID for demo/testing
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
 
       setRole: (role) => set({ currentRole: role }),
       setTheme: (theme) => set({ theme }),
@@ -57,6 +77,24 @@ export const useAppStore = create<AppState>()(
           [role]: messages
         }
       })),
+      setUser: (user) => set({ 
+        user, 
+        userId: user?.id || 'user_12345',
+        isAuthenticated: !!user 
+      }),
+      setAuthenticated: (isAuthenticated) => set({ isAuthenticated }),
+      setLoading: (isLoading) => set({ isLoading }),
+      logout: () => set({ 
+        user: null, 
+        isAuthenticated: false, 
+        userId: 'user_12345',
+        conversations: {
+          consultant: [],
+          psychologist: [],
+          manager: [],
+          patient: [],
+        }
+      }),
     }),
     {
       name: 'nsg-storage',
@@ -64,7 +102,9 @@ export const useAppStore = create<AppState>()(
         currentRole: state.currentRole, 
         theme: state.theme,
         conversations: state.conversations,
-        userId: state.userId
+        userId: state.userId,
+        user: state.user,
+        isAuthenticated: state.isAuthenticated
       }),
     }
   )

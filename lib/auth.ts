@@ -11,9 +11,25 @@ export interface LoginData {
   password: string;
 }
 
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  role: string;
+  imgURL: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface AuthResponse {
-  user: any; // Adjustable based on actual response
+  user: User;
   token: string;
+  message?: string;
+}
+
+export interface VerifyTokenResponse {
+  success: boolean;
+  user: User;
 }
 
 export const authService = {
@@ -27,12 +43,12 @@ export const authService = {
     return response.data;
   },
 
-  verifySession: async () => {
+  verifySession: async (): Promise<VerifyTokenResponse | null> => {
     if (typeof window !== 'undefined' && !localStorage.getItem('token')) {
-      return; 
+      return null; 
     }
     try {
-      const response = await api.get('/auth/verify-token');
+      const response = await api.get<VerifyTokenResponse>('/auth/verify-token');
       return response.data;
     } catch (error: any) {
       // Only remove token if the error is explicitly an authentication error (401)

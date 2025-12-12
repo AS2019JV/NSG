@@ -2,15 +2,18 @@
 import { useUIStore } from "@/store/useUIStore";
 import { useAppStore } from "@/store/useAppStore";
 import { CONTEXT } from "@/data/context";
-import { Menu, Bell, FileText } from "lucide-react";
+import { Menu, Bell, FileText, User, LogOut } from "lucide-react";
 import { useState, useMemo } from "react";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function TopNav() {
   const { toggleSidebar, toggleAI } = useUIStore();
   const { currentRole } = useAppStore();
+  const { user, logout } = useAuth();
   const pathname = usePathname();
   const [showNotifs, setShowNotifs] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   // Derive the dynamic title and subtitle
   const { title, subtitle } = useMemo(() => {
@@ -54,6 +57,45 @@ export default function TopNav() {
       </div>
 
       <div className="flex items-center gap-3 lg:gap-6">
+         {/* User Menu */}
+         <div className="relative">
+            <button 
+               onClick={() => setShowUserMenu(!showUserMenu)} 
+               className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-50 transition cursor-pointer"
+            >
+               <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-sm">
+                  {user?.username ? user.username.charAt(0).toUpperCase() : 'U'}
+               </div>
+               <div className="hidden lg:block text-left">
+                  <p className="text-sm font-semibold text-navy-900">{user?.username || 'Usuario'}</p>
+                  <p className="text-xs text-slate-500">{user?.email || 'email@ejemplo.com'}</p>
+               </div>
+            </button>
+            
+            {showUserMenu && (
+               <div className="absolute right-0 top-14 w-64 bg-white/95 backdrop-blur-xl rounded-2xl shadow-sovereign border border-slate-100 p-2 animate-fade-in-up origin-top-right z-50">
+                  <div className="p-3 border-b border-slate-100 mb-2">
+                     <p className="font-semibold text-navy-900 text-sm">{user?.username}</p>
+                     <p className="text-xs text-slate-500">{user?.email}</p>
+                     <p className="text-xs text-blue-600 font-medium mt-1 capitalize">{user?.role || 'Usuario'}</p>
+                  </div>
+                  <div className="space-y-1">
+                     <button className="w-full flex items-center gap-3 p-2 text-left hover:bg-slate-50 rounded-lg transition text-sm">
+                        <User className="w-4 h-4 text-slate-500" />
+                        <span className="text-slate-700">Mi Perfil</span>
+                     </button>
+                     <button 
+                        onClick={logout}
+                        className="w-full flex items-center gap-3 p-2 text-left hover:bg-red-50 rounded-lg transition text-sm text-red-600"
+                     >
+                        <LogOut className="w-4 h-4" />
+                        <span>Cerrar Sesión</span>
+                     </button>
+                  </div>
+               </div>
+            )}
+         </div>
+
          {/* Notification Bell */}
          <div className="relative">
             <button onClick={() => setShowNotifs(!showNotifs)} className="w-10 h-10 lg:w-11 lg:h-11 rounded-full bg-white flex items-center justify-center text-slate-600 hover:bg-slate-50 hover:text-navy-900 transition relative border border-slate-200 shadow-sm hover:shadow-md cursor-pointer">

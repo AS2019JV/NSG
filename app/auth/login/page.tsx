@@ -7,15 +7,15 @@ import { CONTEXT, RoleType } from "@/data/context";
 import BrandAtom from "@/components/ui/BrandAtom";
 import clsx from "clsx";
 import { Lock, ChevronLeft } from "lucide-react";
-import { authService } from '@/lib/auth';
+import { useAuth } from '@/hooks/useAuth';
 
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const setRole = useAppStore((state) => state.setRole);
+  const { login, isLoading } = useAuth();
   
   const [selectedRole, setSelectedRole] = useState<RoleType | null>(null);
-  const [isAnimating, setIsAnimating] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -41,23 +41,19 @@ function LoginContent() {
         return;
     }
 
-    setIsAnimating(true);
     setError(null);
     
     try {
-        const data = await authService.login({ email, password });
+        const result = await login(email, password);
         
-        if (data.token) {
-            localStorage.setItem('token', data.token);
+        if (result.success) {
+            console.log('Usuario autenticado:', result.user);
+            setRole(selectedRole);
+            router.push("/dashboard");
         }
-
-        setRole(selectedRole);
-        router.push("/dashboard");
     } catch (err: any) {
         console.error("Login failed", err);
         setError(err.response?.data?.message || "Credenciales inválidas. Intenta nuevamente.");
-    } finally {
-        setIsAnimating(false);
     }
   };
 
@@ -146,10 +142,10 @@ function LoginContent() {
                         </button>
                         <button 
                             onClick={handleLogin}
-                            disabled={isAnimating}
+                            disabled={isLoading}
                             className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 px-6 rounded-xl shadow-lg shadow-blue-600/20 hover:shadow-blue-600/30 transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
                         >
-                            {isAnimating ? "Verificando..." : "Acceder"}
+                            {isLoading ? "Verificando..." : "Acceder"}
                         </button>
                     </div>
                 </div>
