@@ -6,12 +6,10 @@ import BrandAtom from "@/components/ui/BrandAtom";
 import { Lock, ChevronLeft, User, Mail, ArrowRight } from "lucide-react";
 import Link from 'next/link';
 import { authService } from '@/lib/auth';
-import { useAuth } from '@/app/hooks/useAuth';
 import { useAppStore } from '@/store/useAppStore';
 
 function RegisterContent() {
   const router = useRouter();
-  const setUserId = useAppStore((state) => state.setUserId);
   const [isAnimating, setIsAnimating] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
@@ -20,7 +18,6 @@ function RegisterContent() {
     confirmPassword: ''
   });
   const [error, setError] = useState<string | null>(null);
-  const { login } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -48,10 +45,11 @@ function RegisterContent() {
       const response = await authService.register(registrationData);
       
       if (response && response.token) {
-        login(response.token);
+        localStorage.setItem('token', response.token);
         
         if (response.user && response.user.id) {
-            setUserId(response.user.id);
+            // setUserId(response.user.id); // Removed
+             console.log("User registered with ID:", response.user.id);
         }
 
         // If we have a token, we can go straight to dashboard

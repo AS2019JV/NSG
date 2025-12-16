@@ -9,19 +9,16 @@ import clsx from "clsx";
 import { Lock, ChevronLeft } from "lucide-react";
 import { authService } from '@/lib/auth';
 
-
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const setRole = useAppStore((state) => state.setRole);
 
-  
   const [selectedRole, setSelectedRole] = useState<RoleType | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-
   
   useEffect(() => {
     const roleParam = searchParams.get('role') as RoleType | null;
