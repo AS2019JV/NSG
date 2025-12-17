@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import clsx from "clsx";
 import api from "@/lib/api";
+import axios from "axios";
 
 // --- Types ---
 interface TranscriptItem {
@@ -219,8 +220,19 @@ export default function NSGHorizon() {
                      onClick={async () => {
                         if (isConnected) return;
                         try {
-                            const response = await api.get('/fathom/connect');
+                            const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://nsg-backend.onrender.com';
+                            const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
+                            // Use direct axios call to bypass the Bearer token interceptor in @/lib/api
+                            // We manually attach only the token (without 'Bearer ') as requested
+                            const response = await axios.get(`${backendUrl}/fathom/connect`, {
+                                headers: {
+                                    'Authorization': token ? `${token}` : ''
+                                }
+                            });
+                            
                             if (response.data && (response.data.url || typeof response.data === 'string')) {
+                                // Redirect user to Fathom to approve connection
                                 window.location.href = response.data.url || response.data;
                             } else {
                                 console.error('Unexpected response:', response.data);
