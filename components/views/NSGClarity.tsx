@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import clsx from "clsx";
 import { useToast } from "@/components/ui/ToastProvider";
+import JarvisAssistant from "@/components/features/JarvisAssistant";
 
 // --- SUB-COMPONENT: Timeline Item ---
 interface TimelineItemProps {
@@ -107,6 +108,9 @@ export default function NSGClarity() {
   return (
     <div className="max-w-7xl mx-auto h-full flex flex-col animate-fade-in-up pb-10">
       
+      {/* 0. JARVIS ASSISTANT */}
+      <JarvisAssistant />
+
       {/* 1. Header Section */}
       <div className="mb-10 flex flex-col md:flex-row justify-between items-center gap-8">
         <div className="flex-1">
