@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { Fathom } from 'fathom-typescript';
 
-const FATHOM_CLIENT_ID = "TU_FATHOM_CLIENT_ID";
-const BASE_URL = "http://localhost:3001";
+const FATHOM_CLIENT_ID = "NrRk5m9NohU_t6nODvkSZD-sufh9cRp4Nh_gsRe9--U";
+const BASE_URL = "https://nsg-backend.onrender.com";
 
 export async function GET() {
   const clientId = FATHOM_CLIENT_ID;

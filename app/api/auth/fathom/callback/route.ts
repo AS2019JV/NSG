@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 import { Fathom } from 'fathom-typescript';
 import { cookies } from 'next/headers';
 
-const FATHOM_CLIENT_ID = "TU_FATHOM_CLIENT_ID";
-const FATHOM_CLIENT_SECRET = "TU_FATHOM_CLIENT_SECRET";
-const BASE_URL = "http://localhost:3001";
+const FATHOM_CLIENT_ID = "NrRk5m9NohU_t6nODvkSZD-sufh9cRp4Nh_gsRe9--U";
+const FATHOM_CLIENT_SECRET = "TU_FATHOM_CLIENT_SECRET"; // Necesitas obtener este valor de Fathom
+const BASE_URL = "https://nsg-backend.onrender.com";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
