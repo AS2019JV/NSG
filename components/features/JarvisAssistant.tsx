@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { 
-  Mic, 
   Volume2, 
   VolumeX,
   Cpu,
@@ -28,8 +27,6 @@ export default function JarvisAssistant() {
   const [showNotification, setShowNotification] = useState(false);
   const { showToast } = useToast();
   
-  // Use a ref for the API key to prevent it from being exposed in source control if possible, 
-  // or pull from env vars. For now, we'll keep the logic structure but use an env var.
   const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || ""; 
 
   // --- AUDIO UTILS ---
@@ -85,7 +82,7 @@ export default function JarvisAssistant() {
         for (let i = 0; i < pcmData.length; i++) {
           pcmData[i] = (binaryString.charCodeAt(i * 2 + 1) << 8) | binaryString.charCodeAt(i * 2);
         }
-        const wavBlob = pcmToWav(pcmData, 24000); // 24kHz is typical for Gemini Audio
+        const wavBlob = pcmToWav(pcmData, 24000); 
         const audio = new Audio(URL.createObjectURL(wavBlob));
         audio.onended = () => setStatus('IDLE');
         await audio.play();
@@ -138,8 +135,6 @@ export default function JarvisAssistant() {
 
   const toggleListening = () => {
     if (status === 'LISTENING') return;
-    
-    // Type checking for SpeechRecognition
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     
     if (SpeechRecognition) {
@@ -171,169 +166,240 @@ export default function JarvisAssistant() {
     }
   };
 
+  // Border Gradient Logic: Active on Listening or Speaking or Thinking
+  const isSystemActive = status !== 'IDLE';
+
   return (
-    // Adapted container to fit in NSG Clarity (removed min-h-screen, added height/radius)
-    <div className="relative w-full h-[500px] mb-8 bg-[#010409] rounded-[2.5rem] text-cyan-400 font-sans p-4 md:p-8 flex flex-col items-center justify-center overflow-hidden border border-navy-800 shadow-2xl group">
+    <div className="relative w-full h-[500px] min-h-[500px] shrink-0 mb-8 z-40 group select-none">
       
-      {/* BACKGROUND EFFECTS */}
-      <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(6,182,212,0.15)_0%,transparent_70%)]"></div>
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px]"></div>
-      </div>
-
-      {/* NOTIFICATION LAYER */}
-      <div className={clsx(
-          "absolute top-24 left-1/2 -translate-x-1/2 w-full max-w-md z-50 transition-all duration-500 transform",
-          showNotification ? 'translate-y-0 opacity-100' : '-translate-y-10 opacity-0 pointer-events-none'
-      )}>
-        <div className="bg-black/80 backdrop-blur-2xl border border-cyan-500/30 rounded-2xl p-4 shadow-[0_0_40px_rgba(6,182,212,0.2)] flex items-start gap-4">
-          <div className="bg-cyan-500/20 p-2 rounded-xl shrink-0">
-            <Bell size={18} className="text-cyan-400 animate-pulse" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h4 className="text-[10px] font-black uppercase tracking-widest text-cyan-600 mb-1 flex justify-between items-center">
-              <span>J.A.R.V.I.S. • Transmisión</span>
-              <button onClick={() => setShowNotification(false)} className="hover:text-white transition"><X size={12} /></button>
-            </h4>
-            <p className="text-sm text-white/90 leading-relaxed font-light max-h-32 overflow-y-auto custom-scroll pr-1">
-              {lastResponse}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* HEADER */}
-      <div className="absolute top-8 left-0 w-full px-8 md:px-12 flex justify-between items-center z-20">
-        <div className="flex items-center gap-3">
-          <Cpu size={16} className="text-cyan-800" />
-          <span className="text-[10px] tracking-[0.6em] text-cyan-800 font-bold">PROTOCOLO MARK.VIII</span>
-        </div>
-        <div className="flex gap-4">
-            <button onClick={() => setIsMuted(!isMuted)} className="p-2 text-cyan-800 hover:text-cyan-400 transition-colors">
-            {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-            </button>
-        </div>
-      </div>
-
-      {/* REACTOR CORE */}
-      <div className="relative z-10 flex flex-col items-center justify-center gap-12 mt-4">
+      {/* === MAIN CONTAINER === */}
+      <div 
+        className={clsx(
+          "absolute inset-0 rounded-[32px] overflow-hidden transition-all duration-700",
+          "bg-gradient-to-b from-[#0f172a] to-[#020617]", // Deep Slate/Navy gradient
+          "border border-white/10 shadow-2xl shadow-black/50"
+        )}
+      >
         
-        {/* Core Button / Visualizer */}
-        <button 
-          onClick={toggleListening}
-          className="relative group focus:outline-none cursor-pointer"
+        {/* === ACTIVE BORDER SYSTEM (Surrounds the Screen) === */}
+        {/* The "lights" that move when user says something */}
+        <div 
+            className={clsx(
+                "absolute inset-0 pointer-events-none transition-opacity duration-1000 z-0",
+                isSystemActive ? "opacity-100" : "opacity-0"
+            )}
         >
-          {/* Outer Segmented Ring */}
-          <div className="absolute -inset-16 border border-cyan-500/5 rounded-full pointer-events-none"></div>
-          
-          {/* Rotating Segments */}
-          <div className="absolute -inset-10 border-t-2 border-b-2 border-cyan-500/20 rounded-full animate-[spin_10s_linear_infinite] pointer-events-none"></div>
-          <div className="absolute -inset-10 border-l-2 border-r-2 border-cyan-400/10 rounded-full animate-[spin_15s_linear_infinite_reverse] pointer-events-none"></div>
-
-          {/* Glow */}
-          <div className={clsx(
-              "absolute -inset-4 rounded-full transition-all duration-700 blur-xl opacity-0 pointer-events-none",
-              status === 'LISTENING' && "opacity-100 bg-siri-gradient animate-siri-glow scale-125"
-          )}></div>
-
-          {/* Core Body */}
-          <div className={clsx(
-            "relative w-56 h-56 md:w-64 md:h-64 rounded-full bg-slate-950 flex items-center justify-center transition-all duration-500 border-2 overflow-hidden",
-            status === 'IDLE' ? 'border-cyan-500/20 shadow-[0_0_30px_rgba(6,182,212,0.1)]' : 
-            status === 'LISTENING' ? 'border-white/40 scale-105' :
-            status === 'THINKING' ? 'border-cyan-400/50 shadow-[0_0_50px_rgba(6,182,212,0.3)]' :
-            'border-cyan-400 shadow-[0_0_60px_rgba(6,182,212,0.4)]'
-          )}>
-            
-            {/* Thinking Spinner */}
-            {status === 'THINKING' && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Loader2 className="w-16 h-16 text-cyan-400 animate-spin" />
-                <div className="absolute w-40 h-40 border border-dashed border-cyan-500/30 rounded-full animate-[spin_3s_linear_infinite]"></div>
-              </div>
-            )}
-
-            {/* Speaking Pulse */}
-            {status === 'SPEAKING' && [1, 2, 3].map(i => (
-              <div key={i} className="absolute inset-0 border-2 border-cyan-400/30 rounded-full animate-core-wave" style={{ animationDelay: `${i * 0.4}s` }}></div>
-            ))}
-
-            {/* Listening Waveform Mesh */}
-            {status === 'LISTENING' && (
-              <div className="absolute inset-0 opacity-40 bg-siri-gradient animate-[spin_2s_linear_infinite]"></div>
-            )}
-
-            {/* Inner Mechanical Core */}
+            {/* Moving Multi-Color Gradient Border */}
             <div className={clsx(
-                "relative w-28 h-28 md:w-32 md:h-32 rounded-full border border-cyan-500/40 flex items-center justify-center bg-black transition-transform duration-500 z-10",
-                status === 'LISTENING' ? 'scale-90 bg-white' : 'scale-100'
-            )}>
-              <div className={clsx(
-                  "w-10 h-10 rounded-full transition-all duration-500 blur-[4px]",
-                  status === 'LISTENING' ? 'bg-indigo-500' : 'bg-cyan-500'
-              )}></div>
-              <div className="absolute inset-4 border border-dashed border-cyan-500/20 rounded-full"></div>
-            </div>
-          </div>
-        </button>
+                "absolute inset-[-50%] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(6,182,212,0.8)_60deg,rgba(255,255,255,0.8)_120deg,rgba(16,185,129,0.8)_180deg,transparent_360deg)]",
+                "mix-blend-screen opacity-100 animate-[spin_4s_linear_infinite]",
+                status === 'SPEAKING' ? "duration-[2s]" : "duration-[4s]" 
+            )}></div>
+            
+            {/* Illuminated Glow Behind Border */}
+            <div className={clsx(
+                "absolute -inset-[3px] rounded-[34px] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(6,182,212,0.5)_60deg,rgba(255,255,255,0.5)_120deg,rgba(16,185,129,0.5)_180deg,transparent_360deg)]",
+                "blur-xl opacity-40 animate-[spin_4s_linear_infinite]",
+                status === 'SPEAKING' ? "duration-[2s] opacity-60" : "duration-[4s]"
+            )}></div>
+            
+            {/* Inner Mask to create the border line */}
+            <div className="absolute inset-[1px] bg-[#020617] rounded-[32px] z-10"></div>
+        </div>
 
-        {/* Info Text */}
-        <div className="text-center">
-          <h2 className={clsx(
-              "text-xl sm:text-2xl font-light tracking-[0.4em] transition-all duration-500",
-              status === 'IDLE' ? 'text-white/20' : 'text-white'
+
+        {/* === BACKGROUND LAYERS (Siri Aurora Effect) === */}
+        {/* The "Liquid Aurora Surge" Interface Layer */}
+        <div className={clsx(
+            "absolute inset-0 z-0 pointer-events-none transition-opacity duration-1000", 
+            isSystemActive ? "opacity-100" : "opacity-0"
+        )}>
+           
+           {/* 1. Chromatic Aurora Surge (Bottom Up) */}
+           {/* Only show this surge animation when first activating if we had a transition state, but here we keep it active or loop it gently */}
+           <div className="absolute inset-0 overflow-hidden">
+               <div className={clsx(
+                   "absolute bottom-[-30%] left-[-20%] w-[140%] h-[140%] backdrop-blur-3xl border-t-[6px] border-sky-400/40 shadow-[0_-15px_120px_rgba(56,189,248,0.5)]",
+                   isSystemActive && "animate-[aurora-surge_4s_ease-in-out_infinite_alternate]" 
+               )} />
+               <div className={clsx(
+                   "absolute bottom-[-30%] left-[-15%] w-[140%] h-[140%] backdrop-blur-3xl border-t-[2px] border-emerald-400/30 mix-blend-screen",
+                   isSystemActive && "animate-[aurora-surge-delay_4s_ease-in-out_infinite_alternate]"
+               )} />
+               
+               {/* Center Soft Light Bloom */}
+               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] bg-white/20 rounded-full blur-[80px] animate-[soft-bloom_3s_ease-in-out_infinite]" />
+           </div>
+
+           {/* 2. Atmospheric Bleed */}
+           <div className="absolute inset-0 bg-gradient-to-br from-sky-500/10 via-transparent to-emerald-500/10 blur-[100px] animate-[slow-breathe_8s_ease-in-out_infinite]" />
+            
+           {/* 3. Premium Particle Dust */}
+           <div className="absolute inset-0 opacity-30">
+                <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-white rounded-full blur-[1px] animate-[float-slow_6s_linear_infinite]" />
+                <div className="absolute top-1/2 right-1/4 w-0.5 h-0.5 bg-sky-300 rounded-full blur-[0.5px] animate-[float-medium_8s_linear_infinite]" />
+                <div className="absolute bottom-1/4 left-1/3 w-1 h-1 bg-emerald-300 rounded-full blur-[1px] animate-[float-fast_5s_linear_infinite]" />
+           </div>
+        </div>
+
+        {/* Base Background (Always visible) */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#020617_100%)] z-0 pointer-events-none"></div>
+
+
+        {/* === HEADS UP DISPLAY (HUD) === */}
+        {/* Top Left: Identity */}
+        <div className="absolute top-8 left-8 z-30 flex items-center gap-3">
+          <div className={clsx(
+            "w-8 h-8 rounded-lg flex items-center justify-center border transition-colors duration-500",
+            isSystemActive ? "bg-cyan-500/10 border-cyan-400/50" : "bg-white/5 border-white/10"
           )}>
-            {status === 'LISTENING' ? 'IDENTIFICANDO VOZ...' : 
-             status === 'THINKING' ? 'PROCESANDO DATOS' : 
-             status === 'SPEAKING' ? 'TRANSMITIENDO' : 'SISTEMA EN ESPERA'}
-          </h2>
-          <p className="mt-4 text-[10px] tracking-widest text-cyan-800 uppercase font-mono">Haga clic en el núcleo para hablar</p>
+             <Cpu size={14} className={isSystemActive ? "text-cyan-400 animate-pulse" : "text-slate-500"} />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-[10px] font-bold tracking-[0.2em] text-white">NSG SYSTEM</span>
+            <span className="text-[8px] font-mono text-cyan-500/60 uppercase tracking-widest">v2.4.0 • ONLINE</span>
+          </div>
         </div>
+
+        {/* Top Right: Controls */}
+        <div className="absolute top-8 right-8 z-30 flex gap-2">
+           <button 
+              onClick={() => setIsMuted(!isMuted)}
+              className="p-2.5 rounded-full bg-white/5 border border-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all active:scale-95"
+           >
+              {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+           </button>
+        </div>
+
+
+        {/* === CENTER: REACTOR ARC CENTRAL INTERACTIVO (Technologic Style) === */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pb-12">
+            
+            {/* Core Button / Visualizer */}
+            <button 
+              onClick={toggleListening}
+              className="relative group focus:outline-none cursor-pointer"
+            >
+              {/* Outer Segmented Ring */}
+              <div className="absolute -inset-12 border border-cyan-500/5 rounded-full"></div>
+              
+              {/* Rotating Segments (Technologic Circles) */}
+              <div className="absolute -inset-8 border-t-[1px] border-b-[1px] border-cyan-500/20 rounded-full animate-[spin_10s_linear_infinite]"></div>
+              <div className="absolute -inset-8 border-l-[1px] border-r-[1px] border-cyan-400/10 rounded-full animate-[spin_15s_linear_infinite_reverse]"></div>
+
+              {/* Siri/Apple Listen Glow */}
+              <div className={clsx(
+                  "absolute -inset-4 rounded-full transition-all duration-700 blur-xl opacity-0",
+                  status === 'LISTENING' && "opacity-80 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 animate-pulse scale-110"
+              )}>
+              </div>
+
+              {/* Core Body */}
+              <div className={clsx(
+                  "relative w-40 h-40 md:w-48 md:h-48 rounded-full bg-slate-950 flex items-center justify-center transition-all duration-500 border border-cyan-500/30 overflow-hidden shadow-2xl",
+                  status === 'IDLE' ? "border-cyan-500/20 shadow-[0_0_20px_rgba(6,182,212,0.1)]" : 
+                  status === 'LISTENING' ? "border-white/40 scale-105 shadow-[0_0_40px_rgba(6,182,212,0.2)]" :
+                  status === 'THINKING' ? "border-cyan-400/50 shadow-[0_0_30px_rgba(6,182,212,0.2)]" :
+                  "border-cyan-400 shadow-[0_0_40px_rgba(6,182,212,0.3)]"
+              )}>
+                
+                {/* Thinking Spinner Layers */}
+                {status === 'THINKING' && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Loader2 className="w-10 h-10 text-cyan-400 animate-spin" />
+                    <div className="absolute w-24 h-24 border border-dashed border-cyan-500/30 rounded-full animate-[spin_3s_linear_infinite]"></div>
+                  </div>
+                )}
+
+                {/* Speaking Pulse Waves */}
+                {status === 'SPEAKING' && [1, 2, 3].map(i => (
+                  <div key={i} className="absolute inset-0 border-2 border-cyan-400/30 rounded-full animate-[shockwave_2s_infinite]" style={{ animationDelay: `${i * 0.4}s` }}></div>
+                ))}
+
+                {/* Siri Waveform Mesh (Listening only) */}
+                {status === 'LISTENING' && (
+                  <div className="absolute inset-0 opacity-40 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 animate-[spin_2s_linear_infinite]"></div>
+                )}
+
+                {/* Inner Mechanical Core */}
+                <div className={clsx(
+                    "relative w-20 h-20 md:w-24 md:h-24 rounded-full border border-cyan-500/30 flex items-center justify-center bg-black transition-transform duration-500 shadow-inner",
+                    status === 'LISTENING' ? "scale-90 bg-white" : "scale-100"
+                )}>
+                  <div className={clsx(
+                      "w-8 h-8 rounded-full transition-all duration-500 blur-[2px]",
+                      status === 'LISTENING' ? "bg-indigo-500" : "bg-cyan-500"
+                  )}></div>
+                  <div className="absolute inset-2 border border-dashed border-cyan-500/20 rounded-full"></div>
+                </div>
+              </div>
+            </button>
+
+            {/* Info Text */}
+            <div className="mt-8 text-center z-30 space-y-2">
+              <h2 className={clsx(
+                  "text-lg font-light tracking-[0.3em] transition-all duration-500",
+                  status === 'IDLE' ? "text-white/30" : "text-white"
+              )}>
+                {status === 'LISTENING' ? 'IDENTIFICANDO VOZ...' : 
+                 status === 'THINKING' ? 'PROCESANDO DATOS' : 
+                 status === 'SPEAKING' ? 'TRANSMITIENDO' : 'SISTEMA EN ESPERA'}
+              </h2>
+              <p className="text-[9px] tracking-[0.2em] text-cyan-500/60 uppercase font-mono">Haga clic en el núcleo para hablar</p>
+            </div>
+        </div>
+
+
+        {/* === INPUT FIELD (Bottom Dock) === */}
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-full max-w-sm z-30">
+            <div className={clsx(
+                "relative group flex items-center gap-3 px-5 py-3 rounded-full transition-all duration-500",
+                "bg-white/5 backdrop-blur-md border border-white/5",
+                "hover:bg-white/10 hover:border-white/10 focus-within:bg-[#0B1121]/80 focus-within:border-white/20 focus-within:shadow-[0_0_30px_rgba(6,182,212,0.1)]"
+            )}>
+                 <Zap size={14} className="text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+                 <input 
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleAction(input)}
+                    placeholder="Enter command..."
+                    className="flex-1 bg-transparent border-none text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none font-medium tracking-wide"
+                 />
+            </div>
+        </div>
+
+        {/* === RESPONSE NOTIFICATION (Overlay) === */}
+        <div className={clsx(
+            "absolute top-24 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-40 transition-all duration-500 ease-out",
+            showNotification ? "opacity-100 translate-y-0 scale-100" : "opacity-0 -translate-y-4 scale-95 pointer-events-none"
+        )}>
+           <div className="bg-[#0f172a]/80 backdrop-blur-xl border border-white/10 p-5 rounded-2xl shadow-2xl shadow-black relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-white to-emerald-500 opacity-50"></div>
+              
+              <div className="flex justify-between items-start mb-3 relative z-10">
+                 <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span className="text-[10px] font-bold tracking-widest text-slate-400 uppercase">System Response</span>
+                 </div>
+                 <button onClick={() => setShowNotification(false)} className="text-slate-500 hover:text-white transition-colors"><X size={14} /></button>
+              </div>
+              <p className="text-sm text-slate-200 leading-relaxed font-light custom-scroll max-h-40 overflow-y-auto relative z-10">
+                 {lastResponse}
+              </p>
+           </div>
+        </div>
+
       </div>
 
-      {/* INPUT ALTERNATIVO */}
-      <div className="absolute bottom-12 w-full max-w-sm px-4 opacity-10 hover:opacity-100 transition-opacity duration-500 z-20">
-        <div className="relative flex items-center bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-2 gap-2">
-          <input 
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleAction(input)}
-            placeholder="Introducir comando manual..."
-            className="flex-1 bg-transparent border-none text-white text-xs focus:ring-0 placeholder:text-cyan-900/40 focus:outline-none px-2"
-          />
-          <Zap size={14} className="mr-2 text-cyan-900" />
-        </div>
-      </div>
-
-      {/* COORDENADAS STARK */}
-      <div className="absolute bottom-6 w-full px-8 md:px-12 flex justify-between items-center opacity-20 text-[9px] font-mono tracking-[0.2em] text-cyan-500 pointer-events-none">
-        <span className="hidden sm:inline">STARK_INDUSTRIES_SECURE_LINK</span>
-        <div className="flex gap-4 w-full sm:w-auto justify-between sm:justify-end">
-          <span>MALIBU: 34.0259° N</span>
-          <span>REACTOR: ESTABLE</span>
-        </div>
-      </div>
-
-      {/* Internal Styles for unique animations */}
       <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes core-wave {
-          0% { transform: scale(1); opacity: 0.6; }
-          100% { transform: scale(1.8); opacity: 0; }
+        @keyframes music-bars {
+            0%, 100% { height: 8px; opacity: 0.5; }
+            50% { height: 20px; opacity: 1; }
         }
-        @keyframes siri-glow {
-          0% { filter: blur(20px) hue-rotate(0deg); opacity: 0.5; }
-          50% { filter: blur(35px) hue-rotate(180deg); opacity: 0.8; }
-          100% { filter: blur(20px) hue-rotate(360deg); opacity: 0.5; }
-        }
-        .animate-core-wave {
-          animation: core-wave 2s cubic-bezier(0, 0, 0.2, 1) infinite;
-        }
-        .animate-siri-glow {
-          animation: siri-glow 3s linear infinite;
-        }
-        .bg-siri-gradient {
-          background: conic-gradient(from 0deg, #5eead4, #3b82f6, #8b5cf6, #ec4899, #5eead4);
+        @keyframes shockwave {
+            0% { transform: scale(1); opacity: 0.8; border-width: 1px; }
+            100% { transform: scale(2.5); opacity: 0; border-width: 0px; }
         }
       `}} />
     </div>
