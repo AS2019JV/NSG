@@ -63,14 +63,14 @@ export default function JarvisAssistant() {
         return;
       }
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-tts:generateContent?key=${apiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: text }] }], // Removed English prompt to ensure natural Spanish
+          contents: [{ parts: [{ text: text }] }],
           generationConfig: {
             responseModalities: ["AUDIO"],
-            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Fenrir" } } } // Fenrir: Deep, elegant, warm
+            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Aoede" } } } // Aoede: Deep, confident (1.5 variant)
           }
         })
       });
@@ -87,26 +87,32 @@ export default function JarvisAssistant() {
         audio.onended = () => setStatus('IDLE');
         await audio.play();
       } else { 
-        throw new Error("No audio data returned");
+        // Silently switch to fallback without throwing logic error
+        console.warn("Gemini TTS returned no audio, switching to fallback.");
+        fallbackSpeak(text);
       }
     } catch (e) { 
-      console.error("TTS API failed, switching to system voice:", e);
-      // Fallback: Browser Native TTS with Voice Selection
+      console.warn("TTS API connection failed:", e);
+      fallbackSpeak(text);
+    }
+  };
+
+  const fallbackSpeak = (text: string) => {
+      showToast("Usando voz del sistema (Conexión inestable)", "error");
       const utterance = new SpeechSynthesisUtterance(text);
       const voices = window.speechSynthesis.getVoices();
-      // Try to find a high-quality Spanish voice (Google or Microsoft)
-      const preferredVoice = voices.find(v => v.lang.includes('es') && (v.name.includes('Google') || v.name.includes('Microsoft'))) ||
-                             voices.find(v => v.lang.includes('es'));
-      
+      const preferredVoice = voices.find(v => v.name.includes("Google Español")) ||
+                             voices.find(v => v.lang === "es-ES" && v.name.includes("Google")) ||
+                             voices.find(v => v.lang.includes("es") && !v.name.includes("Microsoft"));
+
       if (preferredVoice) utterance.voice = preferredVoice;
       
-      utterance.rate = 0.9; // Slightly slower for elegance
-      utterance.pitch = 0.9; // Slightly deeper
+      utterance.rate = 1.0; 
+      utterance.pitch = 1.0; 
       utterance.volume = 1.0;
       utterance.lang = "es-ES";
       utterance.onend = () => setStatus('IDLE');
       window.speechSynthesis.speak(utterance);
-    }
   };
 
   const handleAction = async (userQuery: string) => {
@@ -124,7 +130,7 @@ export default function JarvisAssistant() {
             return;
         }
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
