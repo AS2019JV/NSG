@@ -12,10 +12,12 @@ import {
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useToast } from "@/components/ui/ToastProvider";
+import { authService } from "@/lib/auth"; // Import authService
+import { useEffect } from 'react';
 
 // --- CONFIGURATION ---
-const SYSTEM_PROMPT = `Eres NSG. Tu personalidad es culta, sarcástica y eficiente. 
-Tus respuestas deben ser brillantes y breves. Te diriges al usuario como "Señor".`;
+const BASE_SYSTEM_PROMPT = `Eres NSG. Tu personalidad es culta, profesional y eficiente. 
+Tus respuestas deben ser brillantes y breves.`;
 
 export default function JarvisAssistant() {
   const [input, setInput] = useState('');
@@ -24,10 +26,27 @@ export default function JarvisAssistant() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [status, setStatus] = useState<'IDLE' | 'LISTENING' | 'THINKING' | 'SPEAKING'>('IDLE');
+
   const [showNotification, setShowNotification] = useState(false);
+  const [username, setUsername] = useState<string>("Usuario"); // Default to Usuario
   const { showToast } = useToast();
   
   const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || ""; 
+
+  // Fetch Username Effect
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const data = await authService.verifySession();
+        if (data?.user?.username) {
+          setUsername(data.user.username);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user info for Jarvis", error);
+      }
+    };
+    fetchUser();
+  }, []);
 
   // --- AUDIO UTILS ---
   const pcmToWav = (pcmData: Int16Array, sampleRate: number) => {
@@ -135,7 +154,7 @@ export default function JarvisAssistant() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: userQuery }] }],
-          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] }
+          systemInstruction: { parts: [{ text: `${BASE_SYSTEM_PROMPT} Te diriges al usuario como "${username}".` }] }
         })
       });
       const data = await response.json();
@@ -146,7 +165,7 @@ export default function JarvisAssistant() {
         setLastResponse(errorMessage);
         setShowNotification(true);
         setIsProcessing(false);
-        speak("Se ha detectado un error en el sistema, señor.");
+        speak("Se ha detectado un error en el sistema.");
         return;
       }
 
@@ -157,7 +176,7 @@ export default function JarvisAssistant() {
           setLastResponse("Protocolo de error: Respuesta vacía del servidor.");
           setShowNotification(true);
           setIsProcessing(false);
-          speak("No he recibido datos, señor.");
+          speak("No he recibido datos.");
           return;
       }
       
