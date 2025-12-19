@@ -63,7 +63,7 @@ export default function JarvisAssistant() {
         return;
       }
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-tts:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -87,11 +87,18 @@ export default function JarvisAssistant() {
         audio.onended = () => setStatus('IDLE');
         await audio.play();
       } else { 
-        setStatus('IDLE'); 
+        throw new Error("No audio data returned");
       }
     } catch (e) { 
-      console.error(e);
-      setStatus('IDLE'); 
+      console.error("TTS API failed, switching to system voice:", e);
+      // Fallback: Browser Native TTS
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+      utterance.lang = "es-ES"; // Default to Spanish as per user context
+      utterance.onend = () => setStatus('IDLE');
+      window.speechSynthesis.speak(utterance);
     }
   };
 
