@@ -14,7 +14,7 @@ import clsx from 'clsx';
 import { useToast } from "@/components/ui/ToastProvider";
 
 // --- CONFIGURATION ---
-const SYSTEM_PROMPT = `Eres JARVIS. Tu personalidad es culta, sarcástica y eficiente. 
+const SYSTEM_PROMPT = `Eres NSG. Tu personalidad es culta, sarcástica y eficiente. 
 Tus respuestas deben ser brillantes y breves. Te diriges al usuario como "Señor".`;
 
 export default function JarvisAssistant() {
@@ -110,17 +110,36 @@ export default function JarvisAssistant() {
             return;
         }
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-001:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: userQuery }] }],
-          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-          tools: [{ google_search: {} }]
+          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] }
         })
       });
       const data = await response.json();
-      const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text || "Protocolo de error activo, señor.";
+      
+      if (data.error) {
+        console.error("Gemini API Error:", data.error);
+        const errorMessage = `Error del sistema: ${data.error.message || "Fallo desconocido"}`;
+        setLastResponse(errorMessage);
+        setShowNotification(true);
+        setIsProcessing(false);
+        speak("Se ha detectado un error en el sistema, señor.");
+        return;
+      }
+
+      const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      
+      if (!aiText) {
+          console.error("No content in response:", data);
+          setLastResponse("Protocolo de error: Respuesta vacía del servidor.");
+          setShowNotification(true);
+          setIsProcessing(false);
+          speak("No he recibido datos, señor.");
+          return;
+      }
       
       setLastResponse(aiText);
       setShowNotification(true);
@@ -128,6 +147,8 @@ export default function JarvisAssistant() {
       speak(aiText);
     } catch (e) {
       console.error(e);
+      setLastResponse("Error crítico de conexión.");
+      setShowNotification(true);
       setIsProcessing(false);
       setStatus('IDLE');
     }
@@ -172,6 +193,44 @@ export default function JarvisAssistant() {
   return (
     <div className="relative w-full h-[500px] min-h-[500px] shrink-0 mb-8 z-40 group select-none">
       
+      {/* === EXTERNAL NEON HALO (UNCLIPPED - BLUE TECH) === */}
+      {/* This layer sits behind the main container and is allowed to spill out */}
+      <div className={clsx(
+          "absolute inset-0 z-0 pointer-events-none transition-opacity duration-500",
+          isSystemActive ? "opacity-100" : "opacity-0" // Hidden when idle, appears when active
+      )}>
+          {/* TIER 0: Proximity Border Flash (Tight & Intense) */}
+          <div className={clsx(
+               "absolute -inset-[30px] rounded-[50px] bg-blue-100 mix-blend-overlay",
+               "blur-[30px] opacity-0 transition-opacity duration-200",
+               isSystemActive && "opacity-100 animate-pulse"
+          )}></div>
+
+          {/* TIER 1: Massive Core Impulse (Cyan Tech) */}
+          <div className={clsx(
+               "absolute -inset-[100px] rounded-[100px] bg-cyan-500",
+               "blur-[100px] opacity-100 transition-opacity duration-300 mix-blend-screen", // Constant opacity base
+               isSystemActive && "opacity-80 animate-[pulse_1s_cubic-bezier(0.4,0,0.6,1)_infinite]"
+          )}></div>
+          
+          {/* TIER 2: Atmospheric Flood (Deep Blue) */}
+          <div className={clsx(
+               "absolute -inset-[300px] rounded-[300px] bg-blue-600",
+               "blur-[150px] opacity-40 transition-opacity duration-500 mix-blend-screen",
+               isSystemActive && "opacity-50 animate-[pulse_2s_ease-in-out_infinite]"
+          )}></div>
+      </div>
+      
+      {/* === FRONT-FACING LENS GLARE (OVERLAY) === */}
+      {/* This layer sits ON TOP of the reactor (z-50) to create a blinding light bleeding over the UI */}
+      <div className={clsx(
+          "absolute inset-0 z-50 pointer-events-none transition-opacity duration-300 mix-blend-screen",
+          isSystemActive ? "opacity-60" : "opacity-0"
+      )}>
+           <div className="absolute inset-[-50px] bg-[radial-gradient(circle_at_center,rgba(52,211,153,0.3)_0%,transparent_70%)] blur-[40px] animate-pulse"></div>
+           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-emerald-400/20 blur-[80px] rounded-full"></div>
+      </div>
+
       {/* === MAIN CONTAINER === */}
       <div 
         className={clsx(
@@ -181,30 +240,45 @@ export default function JarvisAssistant() {
         )}
       >
         
-        {/* === ACTIVE BORDER SYSTEM (Surrounds the Screen) === */}
-        {/* The "lights" that move when user says something */}
         <div 
             className={clsx(
                 "absolute inset-0 pointer-events-none transition-opacity duration-1000 z-0",
-                isSystemActive ? "opacity-100" : "opacity-0"
+                isSystemActive ? "opacity-100" : "opacity-0" // Hidden when idle
             )}
         >
-            {/* Moving Multi-Color Gradient Border */}
+
+            {/* 2. Center-to-Border Branding Light (Blue Burst) */}
             <div className={clsx(
-                "absolute inset-[-50%] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(6,182,212,0.8)_60deg,rgba(255,255,255,0.8)_120deg,rgba(16,185,129,0.8)_180deg,transparent_360deg)]",
-                "mix-blend-screen opacity-100 animate-[spin_4s_linear_infinite]",
-                status === 'SPEAKING' ? "duration-[2s]" : "duration-[4s]" 
+                "absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.8)_0%,rgba(6,182,212,0.5)_50%,transparent_80%)]",
+                "opacity-0 transition-opacity duration-300 mix-blend-screen",
+                isSystemActive && "opacity-100 animate-[pulse_1.5s_ease-in-out_infinite]"
+            )}></div>
+
+            {/* 3. Moving Multi-Color Gradient Border (Blue Tech - Thinner inner visible) */}
+            <div className={clsx(
+                "absolute -inset-[10px] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(6,182,212,1)_60deg,rgba(59,130,246,1)_120deg,rgba(6,182,212,1)_180deg,transparent_360deg)]",
+                "opacity-100 animate-[spin_2s_linear_infinite] shadow-[0_0_100px_rgba(6,182,212,1)] mix-blend-plus-lighter",
+                 status === 'SPEAKING' ? "duration-1000" : "duration-[2s]" 
             )}></div>
             
-            {/* Illuminated Glow Behind Border */}
+            {/* 4. Illuminated Glow Behind Border (Blue Intensity) */}
             <div className={clsx(
-                "absolute -inset-[3px] rounded-[34px] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(6,182,212,0.5)_60deg,rgba(255,255,255,0.5)_120deg,rgba(16,185,129,0.5)_180deg,transparent_360deg)]",
-                "blur-xl opacity-40 animate-[spin_4s_linear_infinite]",
-                status === 'SPEAKING' ? "duration-[2s] opacity-60" : "duration-[4s]"
+                "absolute -inset-[20px] rounded-[40px] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(6,182,212,0.8)_60deg,rgba(59,130,246,0.8)_120deg,rgba(6,182,212,0.8)_180deg,transparent_360deg)]",
+                "blur-2xl opacity-100 animate-[spin_2s_linear_infinite] transition-opacity duration-500", // Always visible (opacity-100)
+                status === 'SPEAKING' ? "duration-1000" : "duration-[2s]"
             )}></div>
             
-            {/* Inner Mask to create the border line */}
-            <div className="absolute inset-[1px] bg-[#020617] rounded-[32px] z-10"></div>
+            {/* 4. Inner Mask (Apple Premium Glass Effect - Refined) */}
+            {/* Added subtle specular gradient at top for physical glass look */}
+            <div className="absolute inset-[6px] bg-black/90 backdrop-blur-3xl rounded-[28px] z-10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.15),inset_0_-1px_1px_rgba(0,0,0,0.5)] border border-white/5 ring-1 ring-white/5 ring-inset">
+                {/* Specular Top Reflection */}
+                <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-white/5 to-transparent rounded-t-[28px] pointer-events-none opacity-50"></div>
+            </div>
+            
+            {/* 5. Cinematic Grain Overlay (Anti-Banding Texture) */}
+            <div className="absolute inset-0 z-20 pointer-events-none opacity-[0.03] mix-blend-overlay" 
+                 style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}>
+            </div>
         </div>
 
 
@@ -215,30 +289,40 @@ export default function JarvisAssistant() {
             isSystemActive ? "opacity-100" : "opacity-0"
         )}>
            
-           {/* 1. Chromatic Aurora Surge (Bottom Up) */}
-           {/* Only show this surge animation when first activating if we had a transition state, but here we keep it active or loop it gently */}
-           <div className="absolute inset-0 overflow-hidden">
+           {/* 1. Dynamic Pro Siri Aura (Apple Intelligence Style) */}
+           {/* Fluid iridescent mesh gradients with additive blending */}
+           <div className="absolute inset-0 overflow-hidden z-10 opacity-80 mix-blend-plus-lighter pointer-events-none">
+               
+               {/* Orb 1: Deep Indigo/Blue Base (Anchor) */}
                <div className={clsx(
-                   "absolute bottom-[-30%] left-[-20%] w-[140%] h-[140%] backdrop-blur-3xl border-t-[6px] border-sky-400/40 shadow-[0_-15px_120px_rgba(56,189,248,0.5)]",
-                   isSystemActive && "animate-[aurora-surge_4s_ease-in-out_infinite_alternate]" 
-               )} />
-               <div className={clsx(
-                   "absolute bottom-[-30%] left-[-15%] w-[140%] h-[140%] backdrop-blur-3xl border-t-[2px] border-emerald-400/30 mix-blend-screen",
-                   isSystemActive && "animate-[aurora-surge-delay_4s_ease-in-out_infinite_alternate]"
+                   "absolute bottom-[-10%] left-[10%] w-[90%] h-[90%] rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.8),rgba(79,70,229,0.4),transparent)] blur-[60px]",
+                   "animate-[aurora-float-1_12s_infinite_ease-in-out]", 
+                   isSystemActive && "opacity-100" 
                )} />
                
-               {/* Center Soft Light Bloom */}
-               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] bg-white/20 rounded-full blur-[80px] animate-[soft-bloom_3s_ease-in-out_infinite]" />
+               {/* Orb 2: Vibrant Fuschia/Pink Accent (The "Siri" Spark) */}
+               <div className={clsx(
+                   "absolute top-[0%] right-[0%] w-[60%] h-[60%] rounded-full bg-[radial-gradient(circle,rgba(236,72,153,0.8),rgba(168,85,247,0.5),transparent)] blur-[70px]",
+                   "animate-[aurora-float-2_9s_infinite_ease-in-out]",
+                   isSystemActive && "opacity-90"
+               )} />
+
+               {/* Orb 3: Bright Cyan/Teal Highlight (Energy) */}
+               <div className={clsx(
+                   "absolute top-[30%] left-[30%] w-[50%] h-[50%] rounded-full bg-[radial-gradient(circle,rgba(34,211,238,0.9),rgba(56,189,248,0.5),transparent)] blur-[50px]",
+                   "animate-[aurora-float-3_7s_infinite_ease-in-out]",
+                   isSystemActive && "opacity-100"
+               )} />
            </div>
 
            {/* 2. Atmospheric Bleed */}
            <div className="absolute inset-0 bg-gradient-to-br from-sky-500/10 via-transparent to-emerald-500/10 blur-[100px] animate-[slow-breathe_8s_ease-in-out_infinite]" />
             
-           {/* 3. Premium Particle Dust */}
-           <div className="absolute inset-0 opacity-30">
-                <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-white rounded-full blur-[1px] animate-[float-slow_6s_linear_infinite]" />
-                <div className="absolute top-1/2 right-1/4 w-0.5 h-0.5 bg-sky-300 rounded-full blur-[0.5px] animate-[float-medium_8s_linear_infinite]" />
-                <div className="absolute bottom-1/4 left-1/3 w-1 h-1 bg-emerald-300 rounded-full blur-[1px] animate-[float-fast_5s_linear_infinite]" />
+           {/* 3. Premium Particle Dust (NEON SPARKS) */}
+           <div className="absolute inset-0 opacity-100 mix-blend-screen z-20">
+                <div className="absolute top-1/4 left-1/4 w-1.5 h-1.5 bg-white rounded-full blur-[0.5px] animate-float-slow shadow-[0_0_10px_white]" />
+                <div className="absolute top-1/2 right-1/4 w-1 h-1 bg-cyan-300 rounded-full blur-[0.5px] animate-float-medium shadow-[0_0_10px_cyan]" />
+                <div className="absolute bottom-1/4 left-1/3 w-1.5 h-1.5 bg-emerald-300 rounded-full blur-[0.5px] animate-float-fast shadow-[0_0_10px_emerald]" />
            </div>
         </div>
 
@@ -248,16 +332,21 @@ export default function JarvisAssistant() {
 
         {/* === HEADS UP DISPLAY (HUD) === */}
         {/* Top Left: Identity */}
-        <div className="absolute top-8 left-8 z-30 flex items-center gap-3">
+        {/* Top Left: Identity (Refined Typography) */}
+        <div className="absolute top-8 left-8 z-30 flex items-center gap-4">
           <div className={clsx(
-            "w-8 h-8 rounded-lg flex items-center justify-center border transition-colors duration-500",
-            isSystemActive ? "bg-cyan-500/10 border-cyan-400/50" : "bg-white/5 border-white/10"
+            "w-8 h-8 rounded-lg flex items-center justify-center border transition-all duration-500 shadow-sm",
+            isSystemActive ? "bg-cyan-500/10 border-cyan-400/30 shadow-[0_0_10px_rgba(34,211,238,0.2)]" : "bg-white/5 border-white/10"
           )}>
              <Cpu size={14} className={isSystemActive ? "text-cyan-400 animate-pulse" : "text-slate-500"} />
           </div>
-          <div className="flex flex-col">
-            <span className="text-[10px] font-bold tracking-[0.2em] text-white">NSG SYSTEM</span>
-            <span className="text-[8px] font-mono text-cyan-500/60 uppercase tracking-widest">v2.4.0 • ONLINE</span>
+          <div className="flex flex-col justify-center h-full space-y-0.5">
+            <span className="text-[10px] font-bold tracking-[0.25em] text-white/90">NSG SYSTEM</span>
+            <div className="flex items-center gap-2">
+                <span className="text-[8px] font-mono text-cyan-500/80 uppercase tracking-widest">v2.4.0</span>
+                <span className={clsx("w-1 h-1 rounded-full", isSystemActive ? "bg-emerald-400 animate-pulse" : "bg-slate-600")}></span>
+                <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest">{isSystemActive ? 'ONLINE' : 'STANDBY'}</span>
+            </div>
           </div>
         </div>
 
@@ -363,7 +452,7 @@ export default function JarvisAssistant() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleAction(input)}
-                    placeholder="Enter command..."
+                    placeholder="Ingresar comando..."
                     className="flex-1 bg-transparent border-none text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none font-medium tracking-wide"
                  />
             </div>
@@ -393,6 +482,26 @@ export default function JarvisAssistant() {
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
+        /* Apple Pro Fluid Animations */
+        @keyframes aurora-float-1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -20px) scale(1.1); }
+            66% { transform: translate(-20px, 10px) scale(0.95); }
+        }
+        @keyframes aurora-float-2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-40px, 30px) scale(1.2); }
+        }
+        @keyframes aurora-float-3 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(20px, 40px) scale(0.9); }
+            66% { transform: translate(-30px, -20px) scale(1.1); }
+        }
+        
+        .animate-aurora-float-1 { animation: aurora-float-1 12s infinite cubic-bezier(0.4, 0, 0.2, 1); }
+        .animate-aurora-float-2 { animation: aurora-float-2 9s infinite cubic-bezier(0.4, 0, 0.2, 1); }
+        .animate-aurora-float-3 { animation: aurora-float-3 7s infinite cubic-bezier(0.4, 0, 0.2, 1); }
+
         @keyframes music-bars {
             0%, 100% { height: 8px; opacity: 0.5; }
             50% { height: 20px; opacity: 1; }
@@ -400,6 +509,33 @@ export default function JarvisAssistant() {
         @keyframes shockwave {
             0% { transform: scale(1); opacity: 0.8; border-width: 1px; }
             100% { transform: scale(2.5); opacity: 0; border-width: 0px; }
+        }
+        @keyframes liquid-shimmer {
+          0%, 100% { filter: blur(1.5px) brightness(1); }
+          50% { filter: blur(2.5px) brightness(1.3); }
+        }
+        
+        /* Utility Classes */
+        .animate-aurora-surge {
+          animation: aurora-surge 4s cubic-bezier(0.16, 1, 0.3, 1) infinite alternate;
+        }
+        .animate-aurora-surge-delay {
+          animation: aurora-surge-delay 4s cubic-bezier(0.16, 1, 0.3, 1) infinite alternate;
+        }
+        .animate-soft-bloom {
+          animation: soft-bloom 3s cubic-bezier(0.25, 0.1, 0.25, 1) infinite alternate;
+        }
+        .animate-slow-breathe {
+          animation: slow-breathe 8s ease-in-out infinite;
+        }
+        .animate-float-slow {
+          animation: float-slow 4s linear infinite; /* Faster */
+        }
+        .animate-float-medium {
+            animation: float-medium 5s linear infinite; /* Faster */
+        }
+        .animate-float-fast {
+            animation: float-fast 3s linear infinite; /* Faster */
         }
       `}} />
     </div>
