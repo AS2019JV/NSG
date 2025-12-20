@@ -14,12 +14,13 @@ import clsx from 'clsx';
 import { useToast } from "@/components/ui/ToastProvider";
 import { authService } from "@/lib/auth"; // Import authService
 import { useEffect } from 'react';
+import ReactMarkdown from 'react-markdown'; // Import ReactMarkdown
 
 // --- CONFIGURATION ---
 const BASE_SYSTEM_PROMPT = `Eres NSG. Tu personalidad es culta, profesional y eficiente. 
 Tus respuestas deben ser brillantes y breves.`;
 
-export default function JarvisAssistant() {
+export default function NsgAssistant() {
   const [input, setInput] = useState('');
   const [lastResponse, setLastResponse] = useState<string | null>(null);
   const [isListening, setIsListening] = useState(false);
@@ -75,6 +76,16 @@ export default function JarvisAssistant() {
   const speak = async (text: string) => {
     if (isMuted) return;
     setStatus('SPEAKING');
+
+    /* 
+     INFORMATION TO REINCORPORATE PREMIUM VOICE:
+     1. Uncomment the block below (from 'try {' to the closing brace before fallback).
+     2. Ensure your Google Cloud Project has 'Gemini API' enabled and sufficient quota.
+     3. The model 'gemini-1.5-flash' with voice 'Aoede' (or 'Charon') provides the premium experience.
+    */
+    
+    /* 
+    // --- PREMIUM VOICE (GEMINI TTS) START ---
     try {
       if (!apiKey) {
         showToast("Falta la API Key de Gemini", "error");
@@ -105,19 +116,27 @@ export default function JarvisAssistant() {
         const audio = new Audio(URL.createObjectURL(wavBlob));
         audio.onended = () => setStatus('IDLE');
         await audio.play();
+        return; // Exit if premium voice works
       } else { 
         // Silently switch to fallback without throwing logic error
         console.warn("Gemini TTS returned no audio, switching to fallback.");
-        fallbackSpeak(text);
+        // Fallthrough to fallback
       }
     } catch (e) { 
       console.warn("TTS API connection failed:", e);
-      fallbackSpeak(text);
+      // Fallthrough to fallback
     }
+    // --- PREMIUM VOICE END ---
+    */
+
+    // Fallback: Browser Native TTS
+    // Strip markdown characters for cleaner speech (removes **, *, #, `, etc.)
+    const cleanText = text.replace(/[*#_`~]/g, ''); 
+    fallbackSpeak(cleanText);
   };
 
   const fallbackSpeak = (text: string) => {
-      showToast("Usando voz del sistema (Conexión inestable)", "error");
+      // Toast removed as per user request (fallback is now default)
       const utterance = new SpeechSynthesisUtterance(text);
       const voices = window.speechSynthesis.getVoices();
       const preferredVoice = voices.find(v => v.name.includes("Google Español")) ||
@@ -512,9 +531,16 @@ export default function JarvisAssistant() {
                  </div>
                  <button onClick={() => setShowNotification(false)} className="text-slate-500 hover:text-white transition-colors"><X size={14} /></button>
               </div>
-              <p className="text-sm text-slate-200 leading-relaxed font-light custom-scroll max-h-40 overflow-y-auto relative z-10">
-                 {lastResponse}
-              </p>
+              <div className="text-sm text-slate-200 leading-relaxed font-light custom-scroll max-h-40 overflow-y-auto relative z-10">
+                 <ReactMarkdown 
+                    components={{
+                        p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
+                        strong: ({node, ...props}) => <strong className="text-white font-bold text-shadow-sm" {...props} />
+                    }}
+                 >
+                    {lastResponse || ''}
+                 </ReactMarkdown>
+              </div>
            </div>
         </div>
 
