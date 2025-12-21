@@ -11,6 +11,8 @@ import {
   Zap, Activity, ChevronRight, CheckCircle, Trash2
 } from "lucide-react";
 import clsx from "clsx";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // --- Types ---
 interface TranscriptItem {
@@ -69,41 +71,88 @@ export default function NSGHorizon() {
 
   const [fathomToken, setFathomToken] = useState<string | null>(null);
 
-  // Check initial connection
+  // Check initial connection from backend
   useEffect(() => {
-     if (typeof window !== 'undefined') {
-        const token = localStorage.getItem('fathom_token');
-        if (token) {
-            setFathomToken(token);
-            setIsConnected(true);
+     const checkFathomConnection = async () => {
+        try {
+            const jwtToken = localStorage.getItem('token');
+            if (!jwtToken) return;
+
+            const response = await fetch('https://nsg-backend.onrender.com/fathom/status', {
+                headers: {
+                    'Authorization': jwtToken
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.connected) {
+                    setIsConnected(true);
+                    setFathomToken('***'); // Don't store actual token in frontend
+                }
+            }
+        } catch (error) {
+            console.error('Error checking Fathom connection:', error);
         }
-     }
+     };
+
+     checkFathomConnection();
   }, []);
 
   const handleConnectFathom = (token: string) => {
-      localStorage.setItem('fathom_token', token);
-      setFathomToken(token);
+      // Token is already saved in backend by the modal
+      setFathomToken('***'); // Don't store actual token
       setIsConnected(true);
       setShowFathomModal(false);
       showToast('Fathom conectado exitosamente', 'success');
   };
 
-  const handleDisconnectFathom = () => {
-      localStorage.removeItem('fathom_token');
-      setFathomToken(null);
-      setIsConnected(false);
-      showToast('Fathom desconectado', 'info');
-  };
+  const handleDisconnectFathom = async () => {
+      try {
+          const jwtToken = localStorage.getItem('token');
+          if (!jwtToken) return;
+
+          const response = await fetch('https://nsg-backend.onrender.com/fathom/token', {
+              method: 'DELETE',
+              headers: {
+                  'Authorization': jwtToken
+              }
+          });
+
+        if (response.ok) {
+            setFathomToken(null);
+            setIsConnected(false);
+            setFolders([]); // Limpiar las sesiones de la interfaz
+            setSelectedFolder(null); // Cerrar la vista de detalle si estaba abierta
+            showToast('Fathom desconectado y datos limpiados', 'info');
+        } else {
+            showToast('Error desconectando Fathom', 'error');
+        }
+    } catch (error) {
+        console.error('Error disconnecting Fathom:', error);
+        showToast('Error desconectando Fathom', 'error');
+    }
+};
 
   // Fetch Data on Mount
   useEffect(() => {
     const fetchHorizonData = async () => {
+      // Si no estamos conectados, no intentamos cargar datos de Fathom
+      if (!isConnected) {
+        setIsLoading(false);
+        setFolders([]);
+        return;
+      }
+
       try {
         setIsLoading(true);
-        const response = await fetch('/api/nsg-horizon', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: userId || 'user_guest' })
+        const jwtToken = localStorage.getItem('token');
+        const response = await fetch('https://nsg-backend.onrender.com/fathom/meetings', {
+          method: 'GET',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': jwtToken || ''
+          }
         });
 
         if (!response.ok) {
@@ -191,7 +240,7 @@ export default function NSGHorizon() {
     };
 
     fetchHorizonData();
-  }, [userId, showToast]);
+  }, [userId, isConnected]);
 
   // Reset checked items when folder changes
   useEffect(() => {
@@ -247,15 +296,15 @@ export default function NSGHorizon() {
                                 <CheckCircle className="w-5 h-5" />
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-[10px] uppercase font-bold text-blue-200 tracking-wider">Token Activo</span>
-                                <span className="text-sm font-mono text-white font-bold max-w-[120px] truncate">
-                                    {fathomToken}
+                                <span className="text-[10px] uppercase font-bold text-blue-200 tracking-wider">Conectado</span>
+                                <span className="text-sm text-white font-bold">
+                                    Fathom Analytics
                                 </span>
                             </div>
                             <button 
                                 onClick={handleDisconnectFathom}
                                 className="ml-2 p-2 hover:bg-white/10 rounded-lg text-red-300 hover:text-red-200 transition cursor-pointer"
-                                title="Desconectar y eliminar token"
+                                title="Desconectar y eliminar API key"
                             >
                                 <Trash2 className="w-5 h-5" />
                             </button>
@@ -541,6 +590,21 @@ export default function NSGHorizon() {
         {/* RIGHT COLUMN: CONTEXT & ACTIONS */}
         <div className="lg:col-span-7 flex flex-col gap-6 h-full overflow-y-auto custom-scroll pr-1 pb-4">
           
+          {/* Fathom Summary Card */}
+          <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm relative overflow-hidden shrink-0">
+              <div className="relative z-10">
+                <h4 className="font-display font-bold text-xl mb-4 text-navy-900 flex items-center gap-3">
+                    <div className="p-1.5 bg-blue-100 rounded-lg"><FileText className="w-4 h-4 text-blue-600" /></div> 
+                    Resumen de la Sesión
+                </h4>
+                <div className="prose prose-slate max-w-none text-slate-700 text-sm leading-relaxed markdown-content">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {selectedFolder.description}
+                  </ReactMarkdown>
+                </div>
+              </div>
+          </div>
+
           {/* Context Engine Card */}
           {selectedFolder.aiInfo?.contextEngine && (
             <div className="bg-navy-950 text-white p-8 rounded-[2.5rem] relative overflow-hidden shadow-2xl shrink-0">
