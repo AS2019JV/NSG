@@ -4,20 +4,20 @@ import "./globals.css";
 import { ToastProvider } from "@/components/ui/ToastProvider";
 
 const inter = Inter({ 
-  subsets: ["latin"], 
-  weight: ["300", "400", "500", "600"],
+  subsets: ["latin"],
+  display: "swap",
   variable: "--font-inter" 
 });
 
 const jakarta = Plus_Jakarta_Sans({ 
-  subsets: ["latin"], 
-  weight: ["400", "500", "600", "700", "800"],
+  subsets: ["latin"],
+  display: "swap",
   variable: "--font-jakarta" 
 });
 
 const mono = JetBrains_Mono({ 
-  subsets: ["latin"], 
-  weight: ["400", "500"],
+  subsets: ["latin"],
+  display: "swap",
   variable: "--font-mono" 
 });
 

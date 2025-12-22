@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "clean": "rimraf .next node_modules/.cache"
   },
   "dependencies": {
     "@ai-sdk/google": "^2.0.44",

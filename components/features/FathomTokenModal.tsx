@@ -34,30 +34,38 @@ export default function FathomTokenModal({ isOpen, onClose, onConnect }: FathomT
     setError('');
 
     try {
-        const response = await fetch('/api/fathom/verify', {
+        // Get JWT token from localStorage
+        const jwtToken = localStorage.getItem('token');
+        
+        if (!jwtToken) {
+            throw new Error('No estás autenticado. Por favor inicia sesión.');
+        }
+
+        // Save token to backend
+        const response = await fetch('https://nsg-backend.onrender.com/fathom/token', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: token.trim() })
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': jwtToken
+            },
+            body: JSON.stringify({ fathom_access_token: token.trim() })
         });
 
         if (!response.ok) {
             const data = await response.json().catch(() => ({}));
-            // Combine main error with details if available
-            const detailedMessage = data.details 
-                ? `${data.error}: ${data.details}` 
-                : (data.error || 'Token inválido. Verifique sus credenciales.');
+            const detailedMessage = data.message || data.error || 'Error guardando el token.';
             throw new Error(detailedMessage);
         }
 
-        // If successful
+        // If successful, call parent callback
         onConnect(token);
         setToken('');
         
     } catch (err) {
-        console.error("Token verification error:", err);
-        setError(err instanceof Error ? err.message : 'No se pudo verificar el token.');
+        console.error("Token save error:", err);
+        setError(err instanceof Error ? err.message : 'No se pudo guardar el token.');
     } finally {
-        setIsVerifying(false); // Stop loading regardless of outcome (unless success closes modal via parent, but safe here)
+        setIsVerifying(false);
     }
   };
 
@@ -82,7 +90,7 @@ export default function FathomTokenModal({ isOpen, onClose, onConnect }: FathomT
                     Conectar Fathom Manualmente
                 </h3>
                 <p className="text-slate-500 text-sm mt-1">
-                    Ingresa tu token de acceso personal para sincronizar.
+                    Ingresa tu API key personal para sincronizar.
                 </p>
             </div>
             <button 
@@ -98,7 +106,7 @@ export default function FathomTokenModal({ isOpen, onClose, onConnect }: FathomT
         <div className="space-y-4">
             <div className="space-y-2">
                 <label className="text-xs font-bold text-navy-900 uppercase tracking-wide ml-1">
-                    Access Token
+                    API KEY
                 </label>
                 <div className="relative group">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">
@@ -128,7 +136,7 @@ export default function FathomTokenModal({ isOpen, onClose, onConnect }: FathomT
                     </p>
                 )}
                 <p className="text-xs text-slate-400 ml-1">
-                    Tu token se guardará de forma segura.
+                    Tu API key se guardará de forma segura.
                 </p>
             </div>
 
