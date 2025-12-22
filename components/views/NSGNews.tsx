@@ -1,10 +1,48 @@
-"use client";
-import { Zap, Search, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { Zap, Search, Sparkles, Mic } from "lucide-react";
 import { NewsCard } from "@/components/ui/NewsCard";
 import { useChatStore } from "@/store/useChatStore";
+import { useToast } from "@/components/ui/ToastProvider";
+import clsx from "clsx";
 
 export default function NSGNews() {
   const runNewsAnalysis = useChatStore((state) => state.runNewsAnalysis);
+  const { showToast } = useToast();
+  
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isListening, setIsListening] = useState(false);
+
+  const handleVoiceSearch = () => {
+    if (isListening) return;
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'es-ES';
+      recognition.continuous = false;
+      recognition.interimResults = false;
+
+      recognition.onstart = () => setIsListening(true);
+      
+      recognition.onresult = (e: any) => { 
+        const transcript = e.results[0][0].transcript;
+        setSearchQuery(transcript);
+        setIsListening(false);
+      };
+
+      recognition.onerror = (e: any) => {
+          if (e.error !== 'no-speech' && e.error !== 'aborted') {
+             showToast("Error de voz", "error");
+          }
+          setIsListening(false);
+      };
+
+      recognition.onend = () => setIsListening(false);
+      recognition.start();
+    } else {
+        showToast("Navegador no soporta voz", "error");
+    }
+  };
 
   const handleAnalyze = (title: string, tag: string) => {
     runNewsAnalysis(title, tag);
@@ -24,11 +62,24 @@ export default function NSGNews() {
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                 <input 
                     type="text" 
-                    placeholder="Buscar tendencias, reportes o insights..." 
-                    className="w-full pl-10 pr-4 py-2 bg-transparent border-none focus:outline-none text-sm font-medium text-navy-900 placeholder:text-slate-400"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder={isListening ? "Escuchando..." : "Buscar tendencias, reportes o insights..."}
+                    className="w-full pl-10 pr-10 py-2 bg-transparent border-none focus:outline-none text-sm font-medium text-navy-900 placeholder:text-slate-400"
                 />
+                
+                {/* Functional Microphone */}
+                <button 
+                  onClick={handleVoiceSearch}
+                  className={clsx(
+                    "absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-full transition-all duration-300 cursor-pointer",
+                    isListening ? "bg-red-50 text-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)] scale-110" : "hover:bg-slate-100 text-slate-400 hover:text-blue-600"
+                  )}
+                >
+                   <Mic className={clsx("w-4 h-4", isListening && "animate-pulse")} />
+                </button>
             </div>
-            <button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-blue-600/20 transition-all duration-300 hover:scale-[1.02] active:scale-95 flex items-center gap-2 shrinks-0 group">
+            <button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-blue-600/20 transition-all duration-300 hover:scale-[1.02] active:scale-95 flex items-center gap-2 shrinks-0 group cursor-pointer">
                 <div className="w-4 h-4 relative flex items-center justify-center">
                    <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible">
                       <defs>
