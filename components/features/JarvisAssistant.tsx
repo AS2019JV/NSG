@@ -139,13 +139,17 @@ export default function NsgAssistant() {
       // Toast removed as per user request (fallback is now default)
       const utterance = new SpeechSynthesisUtterance(text);
       const voices = window.speechSynthesis.getVoices();
+      
+      // Improved logic: Prefer "Google Español" (usually best free), then Microsoft (can be good), then any ES.
       const preferredVoice = voices.find(v => v.name.includes("Google Español")) ||
                              voices.find(v => v.lang === "es-ES" && v.name.includes("Google")) ||
-                             voices.find(v => v.lang.includes("es") && !v.name.includes("Microsoft"));
+                             voices.find(v => v.name.includes("Microsoft Alvaro")) || // Often better
+                             voices.find(v => v.name.includes("Microsoft Elena")) ||
+                             voices.find(v => v.lang.includes("es"));
 
       if (preferredVoice) utterance.voice = preferredVoice;
       
-      utterance.rate = 1.0; 
+      utterance.rate = 1.05; // Slightly faster helps reduce robotic drag
       utterance.pitch = 1.0; 
       utterance.volume = 1.0;
       utterance.lang = "es-ES";
@@ -307,23 +311,23 @@ export default function NsgAssistant() {
 
             {/* 2. Center-to-Border Branding Light (Blue Burst) */}
             <div className={clsx(
-                "absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.8)_0%,rgba(6,182,212,0.5)_50%,transparent_80%)]",
+                "absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(37,99,235,0.8)_0%,rgba(79,70,229,0.5)_50%,transparent_80%)]", // Blue to Indigo
                 "opacity-0 transition-opacity duration-300 mix-blend-screen",
                 isSystemActive && "opacity-100 animate-[pulse_1.5s_ease-in-out_infinite]"
             )}></div>
 
             {/* 3. Moving Multi-Color Gradient Border (Blue Tech - Thinner inner visible) */}
             <div className={clsx(
-                "absolute -inset-[10px] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(6,182,212,1)_60deg,rgba(59,130,246,1)_120deg,rgba(6,182,212,1)_180deg,transparent_360deg)]",
-                "opacity-100 animate-[spin_2s_linear_infinite] shadow-[0_0_100px_rgba(6,182,212,1)] mix-blend-plus-lighter",
-                 status === 'SPEAKING' ? "duration-1000" : "duration-[2s]" 
+                "absolute -inset-[10px] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(37,99,235,1)_60deg,rgba(79,70,229,1)_120deg,rgba(37,99,235,1)_180deg,transparent_360deg)]", // Blue/Indigo Conic
+                "opacity-100 animate-[spin_1s_linear_infinite] shadow-[0_0_100px_rgba(37,99,235,1)] mix-blend-plus-lighter will-change-transform",
+                 status === 'SPEAKING' ? "duration-500" : "duration-[1s]" 
             )}></div>
             
             {/* 4. Illuminated Glow Behind Border (Blue Intensity) */}
             <div className={clsx(
-                "absolute -inset-[20px] rounded-[40px] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(6,182,212,0.8)_60deg,rgba(59,130,246,0.8)_120deg,rgba(6,182,212,0.8)_180deg,transparent_360deg)]",
-                "blur-2xl opacity-100 animate-[spin_2s_linear_infinite] transition-opacity duration-500", // Always visible (opacity-100)
-                status === 'SPEAKING' ? "duration-1000" : "duration-[2s]"
+                "absolute -inset-[20px] rounded-[40px] bg-[conic-gradient(from_0deg,transparent_0deg,rgba(37,99,235,0.8)_60deg,rgba(79,70,229,0.8)_120deg,rgba(37,99,235,0.8)_180deg,transparent_360deg)]", // Blue/Indigo Conic
+                "blur-xl opacity-100 animate-[spin_1s_linear_infinite] transition-opacity duration-500 will-change-transform", // Reduced blur for perf
+                status === 'SPEAKING' ? "duration-500" : "duration-[1s]"
             )}></div>
             
             {/* 4. Inner Mask (Apple Premium Glass Effect - Refined) */}
@@ -376,37 +380,37 @@ export default function NsgAssistant() {
            {/* 2. Atmospheric Bleed */}
            <div className="absolute inset-0 bg-gradient-to-br from-sky-500/10 via-transparent to-emerald-500/10 blur-[100px] animate-[slow-breathe_8s_ease-in-out_infinite]" />
             
-           {/* 3. Premium Particle Dust (NEON SPARKS) */}
-           <div className="absolute inset-0 opacity-100 mix-blend-screen z-20">
-                <div className="absolute top-1/4 left-1/4 w-1.5 h-1.5 bg-white rounded-full blur-[0.5px] animate-float-slow shadow-[0_0_10px_white]" />
-                <div className="absolute top-1/2 right-1/4 w-1 h-1 bg-cyan-300 rounded-full blur-[0.5px] animate-float-medium shadow-[0_0_10px_cyan]" />
-                <div className="absolute bottom-1/4 left-1/3 w-1.5 h-1.5 bg-emerald-300 rounded-full blur-[0.5px] animate-float-fast shadow-[0_0_10px_emerald]" />
-           </div>
-        </div>
-
-        {/* Base Background (Always visible) */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#020617_100%)] z-0 pointer-events-none"></div>
-
-
-        {/* === HEADS UP DISPLAY (HUD) === */}
-        {/* Top Left: Identity */}
-        {/* Top Left: Identity (Refined Typography) */}
-        <div className="absolute top-8 left-8 z-30 flex items-center gap-4">
-          <div className={clsx(
-            "w-8 h-8 rounded-lg flex items-center justify-center border transition-all duration-500 shadow-sm",
-            isSystemActive ? "bg-cyan-500/10 border-cyan-400/30 shadow-[0_0_10px_rgba(34,211,238,0.2)]" : "bg-white/5 border-white/10"
-          )}>
-             <Cpu size={14} className={isSystemActive ? "text-cyan-400 animate-pulse" : "text-slate-500"} />
-          </div>
-          <div className="flex flex-col justify-center h-full space-y-0.5">
-            <span className="text-[10px] font-bold tracking-[0.25em] text-white/90">NSG SYSTEM</span>
-            <div className="flex items-center gap-2">
-                <span className="text-[8px] font-mono text-cyan-500/80 uppercase tracking-widest">v2.4.0</span>
-                <span className={clsx("w-1 h-1 rounded-full", isSystemActive ? "bg-emerald-400 animate-pulse" : "bg-slate-600")}></span>
-                <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest">{isSystemActive ? 'ONLINE' : 'STANDBY'}</span>
+            {/* 3. Premium Particle Dust (NEON SPARKS - Brand Colors) */}
+            <div className="absolute inset-0 opacity-100 mix-blend-screen z-20">
+                 <div className="absolute top-1/4 left-1/4 w-1.5 h-1.5 bg-blue-300 rounded-full blur-[0.5px] animate-float-slow shadow-[0_0_10px_rgb(147,197,253)]" />
+                 <div className="absolute top-1/2 right-1/4 w-1 h-1 bg-indigo-300 rounded-full blur-[0.5px] animate-float-medium shadow-[0_0_10px_rgb(165,180,252)]" />
+                 <div className="absolute bottom-1/4 left-1/3 w-1.5 h-1.5 bg-blue-400 rounded-full blur-[0.5px] animate-float-fast shadow-[0_0_10px_rgb(96,165,250)]" />
             </div>
-          </div>
-        </div>
+         </div>
+
+         {/* Base Background (Always visible) */}
+         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#020617_100%)] z-0 pointer-events-none"></div>
+
+
+         {/* === HEADS UP DISPLAY (HUD) === */}
+         {/* Top Left: Identity */}
+         {/* Top Left: Identity (Refined Typography) */}
+         <div className="absolute top-8 left-8 z-30 flex items-center gap-4">
+           <div className={clsx(
+             "w-8 h-8 rounded-lg flex items-center justify-center border transition-all duration-500 shadow-sm",
+             isSystemActive ? "bg-blue-500/10 border-blue-400/30 shadow-[0_0_10px_rgba(59,130,246,0.2)]" : "bg-white/5 border-white/10"
+           )}>
+              <Cpu size={14} className={isSystemActive ? "text-blue-400 animate-pulse" : "text-slate-500"} />
+           </div>
+           <div className="flex flex-col justify-center h-full space-y-0.5">
+             <span className="text-[10px] font-bold tracking-[0.25em] text-white/90">NSG SYSTEM</span>
+             <div className="flex items-center gap-2">
+                 <span className="text-[8px] font-mono text-blue-500/80 uppercase tracking-widest">v2.4.0</span>
+                 <span className={clsx("w-1 h-1 rounded-full", isSystemActive ? "bg-indigo-400 animate-pulse" : "bg-slate-600")}></span>
+                 <span className="text-[8px] font-mono text-slate-500 uppercase tracking-widest">{isSystemActive ? 'ONLINE' : 'STANDBY'}</span>
+             </div>
+           </div>
+         </div>
 
         {/* Top Right: Controls */}
         <div className="absolute top-8 right-8 z-30 flex gap-2">
@@ -428,56 +432,56 @@ export default function NsgAssistant() {
               className="relative group focus:outline-none cursor-pointer"
             >
               {/* Outer Segmented Ring */}
-              <div className="absolute -inset-12 border border-cyan-500/5 rounded-full"></div>
+              <div className="absolute -inset-12 border border-blue-500/5 rounded-full"></div>
               
-              {/* Rotating Segments (Technologic Circles) */}
-              <div className="absolute -inset-8 border-t-[1px] border-b-[1px] border-cyan-500/20 rounded-full animate-[spin_10s_linear_infinite]"></div>
-              <div className="absolute -inset-8 border-l-[1px] border-r-[1px] border-cyan-400/10 rounded-full animate-[spin_15s_linear_infinite_reverse]"></div>
+              {/* Rotating Segments (Technologic Circles) - Speed Up */}
+              <div className="absolute -inset-8 border-t-[1px] border-b-[1px] border-blue-500/20 rounded-full animate-[spin_5s_linear_infinite]"></div>
+              <div className="absolute -inset-8 border-l-[1px] border-r-[1px] border-blue-400/10 rounded-full animate-[spin_8s_linear_infinite_reverse]"></div>
 
               {/* Siri/Apple Listen Glow */}
               <div className={clsx(
                   "absolute -inset-4 rounded-full transition-all duration-700 blur-xl opacity-0",
-                  status === 'LISTENING' && "opacity-80 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 animate-pulse scale-110"
+                  status === 'LISTENING' && "opacity-80 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 animate-pulse scale-110"
               )}>
               </div>
 
               {/* Core Body */}
               <div className={clsx(
-                  "relative w-40 h-40 md:w-48 md:h-48 rounded-full bg-slate-950 flex items-center justify-center transition-all duration-500 border border-cyan-500/30 overflow-hidden shadow-2xl",
-                  status === 'IDLE' ? "border-cyan-500/20 shadow-[0_0_20px_rgba(6,182,212,0.1)]" : 
-                  status === 'LISTENING' ? "border-white/40 scale-105 shadow-[0_0_40px_rgba(6,182,212,0.2)]" :
-                  status === 'THINKING' ? "border-cyan-400/50 shadow-[0_0_30px_rgba(6,182,212,0.2)]" :
-                  "border-cyan-400 shadow-[0_0_40px_rgba(6,182,212,0.3)]"
+                  "relative w-40 h-40 md:w-48 md:h-48 rounded-full bg-slate-950 flex items-center justify-center transition-all duration-500 border border-blue-500/30 overflow-hidden shadow-2xl",
+                  status === 'IDLE' ? "border-blue-500/20 shadow-[0_0_20px_rgba(37,99,235,0.1)]" : 
+                  status === 'LISTENING' ? "border-white/40 scale-105 shadow-[0_0_40px_rgba(37,99,235,0.2)]" :
+                  status === 'THINKING' ? "border-blue-400/50 shadow-[0_0_30px_rgba(37,99,235,0.2)]" :
+                  "border-blue-400 shadow-[0_0_40px_rgba(37,99,235,0.3)]"
               )}>
                 
                 {/* Thinking Spinner Layers */}
                 {status === 'THINKING' && (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <Loader2 className="w-10 h-10 text-cyan-400 animate-spin" />
-                    <div className="absolute w-24 h-24 border border-dashed border-cyan-500/30 rounded-full animate-[spin_3s_linear_infinite]"></div>
+                    <Loader2 className="w-10 h-10 text-blue-400 animate-spin" />
+                    <div className="absolute w-24 h-24 border border-dashed border-blue-500/30 rounded-full animate-[spin_3s_linear_infinite]"></div>
                   </div>
                 )}
 
                 {/* Speaking Pulse Waves */}
                 {status === 'SPEAKING' && [1, 2, 3].map(i => (
-                  <div key={i} className="absolute inset-0 border-2 border-cyan-400/30 rounded-full animate-[shockwave_2s_infinite]" style={{ animationDelay: `${i * 0.4}s` }}></div>
+                  <div key={i} className="absolute inset-0 border-2 border-blue-400/30 rounded-full animate-[shockwave_2s_infinite]" style={{ animationDelay: `${i * 0.4}s` }}></div>
                 ))}
 
                 {/* Siri Waveform Mesh (Listening only) */}
                 {status === 'LISTENING' && (
-                  <div className="absolute inset-0 opacity-40 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 animate-[spin_2s_linear_infinite]"></div>
+                  <div className="absolute inset-0 opacity-40 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 animate-[spin_2s_linear_infinite]"></div>
                 )}
 
                 {/* Inner Mechanical Core */}
                 <div className={clsx(
-                    "relative w-20 h-20 md:w-24 md:h-24 rounded-full border border-cyan-500/30 flex items-center justify-center bg-black transition-transform duration-500 shadow-inner",
+                    "relative w-20 h-20 md:w-24 md:h-24 rounded-full border border-blue-500/30 flex items-center justify-center bg-black transition-transform duration-500 shadow-inner",
                     status === 'LISTENING' ? "scale-90 bg-white" : "scale-100"
                 )}>
                   <div className={clsx(
                       "w-8 h-8 rounded-full transition-all duration-500 blur-[2px]",
-                      status === 'LISTENING' ? "bg-indigo-500" : "bg-cyan-500"
+                      status === 'LISTENING' ? "bg-indigo-500" : "bg-blue-500"
                   )}></div>
-                  <div className="absolute inset-2 border border-dashed border-cyan-500/20 rounded-full"></div>
+                  <div className="absolute inset-2 border border-dashed border-blue-500/20 rounded-full"></div>
                 </div>
               </div>
             </button>
@@ -492,7 +496,7 @@ export default function NsgAssistant() {
                  status === 'THINKING' ? 'PROCESANDO DATOS' : 
                  status === 'SPEAKING' ? 'TRANSMITIENDO' : 'SISTEMA EN ESPERA'}
               </h2>
-              <p className="text-[9px] tracking-[0.2em] text-cyan-500/60 uppercase font-mono">Haga clic en el núcleo para hablar</p>
+              <p className="text-[9px] tracking-[0.2em] text-blue-500/60 uppercase font-mono">Haga clic en el núcleo para hablar</p>
             </div>
         </div>
 
@@ -502,9 +506,9 @@ export default function NsgAssistant() {
             <div className={clsx(
                 "relative group flex items-center gap-3 px-5 py-3 rounded-full transition-all duration-500",
                 "bg-white/5 backdrop-blur-md border border-white/5",
-                "hover:bg-white/10 hover:border-white/10 focus-within:bg-[#0B1121]/80 focus-within:border-white/20 focus-within:shadow-[0_0_30px_rgba(6,182,212,0.1)]"
+                "hover:bg-white/10 hover:border-white/10 focus-within:bg-[#0B1121]/80 focus-within:border-white/20 focus-within:shadow-[0_0_30px_rgba(37,99,235,0.1)]"
             )}>
-                 <Zap size={14} className="text-slate-500 group-focus-within:text-cyan-400 transition-colors" />
+                 <Zap size={14} className="text-slate-500 group-focus-within:text-blue-400 transition-colors" />
                  <input 
                     type="text"
                     value={input}
