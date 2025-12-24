@@ -133,12 +133,13 @@ export default function JarvisAssistant() {
     setInput(''); 
 
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`, {
+      // Use Flash 1.5 for ultra-fast response
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: userQuery }] }],
-          systemInstruction: { parts: [{ text: `${BASE_SYSTEM_PROMPT} Te diriges al ejecutivo "${username}".` }] }
+          systemInstruction: { parts: [{ text: `${BASE_SYSTEM_PROMPT} Te diriges al ejecutivo "${username}". Responde de forma instantánea y concisa.` }] }
         })
       });
       const data = await response.json();
@@ -168,21 +169,38 @@ export default function JarvisAssistant() {
       recognitionRef.current = recognition; 
       recognition.lang = 'es-ES';
       recognition.continuous = false;
-      recognition.interimResults = false;
+      recognition.interimResults = true;
 
       recognition.onstart = () => { setStatus('LISTENING'); setIsListening(true); };
+      
       recognition.onresult = (e: any) => { 
-        const transcript = e.results[0][0].transcript;
-        handleAction(transcript); 
-        setIsListening(false); 
+        const transcript = Array.from(e.results)
+          .map((result: any) => result[0])
+          .map((result: any) => result.transcript)
+          .join('');
+        
+        // Dynamic real-time input feedback
+        setInput(transcript);
+
+        if (e.results[0].isFinal) {
+            handleAction(transcript); 
+            setIsListening(false); 
+        }
       };
       recognition.onerror = (e: any) => {
-          console.error("Speech Error:", e.error);
-          setStatus('IDLE');
-          setIsListening(false);
+          if (e.error === 'no-speech') {
+              // Quietly reset if no speech detected
+              setStatus('IDLE');
+              setIsListening(false);
+          } else {
+              console.error("Speech Error:", e.error);
+              setStatus('IDLE');
+              setIsListening(false);
+          }
       };
       recognition.onend = () => { 
-        setStatus((prev) => prev === 'LISTENING' ? 'IDLE' : prev); 
+        // Only reset to IDLE if we haven't already transitioned to THINKING/SPEAKING
+        setStatus((prev) => (prev === 'THINKING' || prev === 'SPEAKING') ? prev : 'IDLE');
         setIsListening(false); 
       };
       recognition.start();
@@ -194,8 +212,8 @@ export default function JarvisAssistant() {
   return (
     <div 
       className={clsx(
-         "relative w-full h-[600px] bg-[#020617] rounded-[2.5rem] overflow-hidden group/desktop shadow-2xl border border-slate-800/50 select-none antialiased text-slate-200 cursor-pointer transition-all duration-700",
-         isActive ? "shadow-[0_20px_80px_rgba(59,130,246,0.2)]" : "hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)]"
+         "relative w-full h-[480px] bg-[#020617] rounded-b-[2.5rem] overflow-hidden group/desktop shadow-2xl border-x border-b border-slate-800/50 select-none antialiased text-slate-200 cursor-pointer transition-all duration-700",
+         isActive ? "shadow-[0_20px_100px_rgba(59,130,246,0.3)]" : "hover:shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
       )}
       onClick={() => { if(!isActive) toggleListening(); }}
       onMouseEnter={() => setIsHovered(true)}
@@ -232,23 +250,23 @@ export default function JarvisAssistant() {
       {/* ==============================================
           PRO BRAND ATOM (Centered Top)
          ============================================== */}
-      <div className={`relative flex flex-col items-center justify-start pt-24 z-20 transition-all duration-1000 cubic-bezier(0.25, 1, 0.5, 1) 
-                      ${isActive ? 'scale-125' : isHovered ? 'scale-105' : 'scale-100'}`}
+      <div className={`relative flex flex-col items-center justify-center h-full z-20 transition-all duration-1000 cubic-bezier(0.25, 1, 0.5, 1) 
+                      ${isActive ? 'scale-[1.2]' : isHovered ? 'scale-105' : 'scale-100'}`}
            onClick={(e) => { e.stopPropagation(); toggleListening(); }}
       >
         
         {/* INNER WAVES (Sonar Effect) */}
         {isActive && (
-            <div className="absolute top-[200px] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full border border-[#60A5FA]/30 bg-[#3B82F6]/10 animate-ripple-1 opacity-0" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border border-[#60A5FA]/30 bg-[#3B82F6]/10 animate-ripple-1 opacity-0" />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full border border-[#3B82F6]/20 bg-[#2563EB]/5 animate-ripple-2 opacity-0" />
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full border border-[#60A5FA]/10 bg-transparent animate-ripple-3 opacity-0" />
             </div>
         )}
 
         {/* Core Glow */}
-        <div className={`absolute top-[180px] left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full blur-[64px] transition-all duration-1000 
-            ${isActive ? 'opacity-40 scale-125 bg-[#3B82F6]' : isHovered ? 'opacity-15 scale-100 bg-[#60A5FA]' : 'opacity-0 scale-50'}`} />
+        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full blur-[64px] transition-all duration-1000 
+            ${isActive ? 'opacity-50 scale-125 bg-[#3B82F6]' : isHovered ? 'opacity-20 scale-100 bg-[#60A5FA]' : 'opacity-0 scale-50'}`} />
 
         <div className="w-64 h-64 flex items-center justify-center animate-atom-breathe relative">
             <svg viewBox="0 0 100 100" className={`w-full h-full overflow-visible transition-all duration-700 
@@ -319,11 +337,11 @@ export default function JarvisAssistant() {
         </div>
         
         {/* LABEL */}
-        <div className={`mt-10 transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1) 
-            ${isActive ? 'opacity-0 translate-y-4 scale-95' : 'opacity-100 group-hover/desktop:-translate-y-2'}`}>
-            <div className="px-5 py-2 rounded-full bg-[#0B1121]/80 backdrop-blur-md border border-[#1e293b]/50 shadow-lg flex items-center gap-2 group-hover/desktop:border-[#3B82F6]/30 group-hover/desktop:shadow-[#3B82F6]/10 transition-all duration-500">
+        <div className={`mt-12 transition-all duration-1000 cubic-bezier(0.34, 1.56, 0.64, 1) 
+            ${isActive ? 'opacity-0 translate-y-8 scale-90' : 'opacity-100 group-hover/desktop:-translate-y-4'}`}>
+            <div className="px-6 py-2 rounded-full bg-[#0B1121]/80 backdrop-blur-md border border-[#1e293b]/50 shadow-xl flex items-center gap-2 group-hover/desktop:border-[#3B82F6]/40 group-hover/desktop:shadow-[#3B82F6]/20 transition-all duration-500">
                 <div className={`w-1.5 h-1.5 rounded-full transition-colors duration-500 ${isHovered ? 'bg-[#60A5FA] animate-pulse' : 'bg-[#94A3B8]'}`} />
-                <span className={`text-[10px] font-bold tracking-[0.2em] uppercase transition-colors duration-500 ${isHovered ? 'text-[#e2e8f0]' : 'text-[#94A3B8]'}`}>
+                <span className={`text-[10px] font-bold tracking-[0.2em] uppercase transition-colors duration-500 ${isHovered ? 'text-white' : 'text-[#94A3B8]'}`}>
                     {isActive ? status : 'Neural Engine'}
                 </span>
             </div>
@@ -331,13 +349,12 @@ export default function JarvisAssistant() {
 
       </div>
 
-      {/* Floating Controls (INPUT BAR) */}
-      <div className="absolute bottom-12 w-full px-8 flex justify-center z-50 overflow-hidden pointer-events-none">
+      <div className="absolute bottom-16 w-full px-8 flex justify-center z-50 pointer-events-none">
           <div 
-             className={`pointer-events-auto transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1) ${isActive ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-12 opacity-0 scale-90'}`}
+             className={`pointer-events-auto transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1) ${isActive || input.length > 0 ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-12 opacity-0 scale-90'}`}
              onClick={(e) => e.stopPropagation()}
           >
-              <div className="flex items-center gap-4 px-6 py-3 bg-[#0B1121]/90 backdrop-blur-2xl rounded-full shadow-[0_20px_50px_-10px_rgba(0,0,0,0.5),0_0_0_1px_rgba(255,255,255,0.1)] border border-white/10 min-w-[320px] max-w-xl">
+              <div className="flex items-center gap-4 px-8 py-4 bg-[#0B1121]/90 backdrop-blur-2xl rounded-full shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.1)] border border-white/10 min-w-[450px] max-w-3xl">
                   <div className="relative">
                       <div className={clsx("w-2.5 h-2.5 rounded-full animate-pulse", status === 'LISTENING' ? "bg-red-500" : "bg-gradient-to-tr from-[#60A5FA] to-[#2563EB]")} />
                   </div>

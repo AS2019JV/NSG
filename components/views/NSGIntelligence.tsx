@@ -18,15 +18,17 @@ export default function NSGIntelligence() {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80vh] w-full max-w-7xl mx-auto px-4 animate-fade-in-up">
+    <div className="flex-1 overflow-y-auto custom-scroll safe-bottom-scroll scroll-smooth w-full animate-fade-in-up flex flex-col items-center">
       
-      {/* 2. Jarvis Assistant Hero */}
-      <div className="w-full max-w-7xl mb-12 relative z-20">
+      {/* 2. Jarvis Assistant Hero - Flush with top/sides */}
+      <div className="w-full relative z-20 mb-12">
          <JarvisAssistant />
       </div>
 
-      {/* 3. Modules Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+      <div className="w-full px-4 sm:px-6 lg:px-8 pb-12 max-w-[1400px]">
+
+        {/* 3. Modules Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
         
         {/* NSG News */}
         <ModuleCard 
@@ -70,6 +72,7 @@ export default function NSGIntelligence() {
 
       </div>
     </div>
+  </div>
   );
 }
 
