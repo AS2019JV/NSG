@@ -10,6 +10,7 @@ import {
     HeartPulse
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function LandingPage() {
     const router = useRouter();
@@ -179,9 +180,9 @@ export default function LandingPage() {
                 <div className="mt-20 lg:mt-24 w-full pt-10 pb-8 text-center flex flex-col items-center gap-6 border-t border-slate-100/50">
                     <div><p className="text-[0.65rem] font-system font-medium text-slate-400 uppercase tracking-widest">&copy; 2024 NSG Intelligence. All rights reserved.</p></div>
                     <div className="flex items-center gap-6 text-[0.7rem] font-system font-medium text-slate-500">
-                        <span className="hover:text-blue-600 cursor-pointer transition">Privacy Policy</span>
+                        <Link href="/politica-de-privacidad" className="hover:text-blue-600 transition">Política de Privacidad</Link>
                         <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                        <span className="hover:text-blue-600 cursor-pointer transition">Terms of Service</span>
+                        <Link href="/condiciones-del-servicio" className="hover:text-blue-600 transition">Condiciones del Servicio</Link>
                     </div>
                 </div>
             </div>
