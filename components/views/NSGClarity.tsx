@@ -363,8 +363,9 @@ export default function NSGClarity() {
     const fetchUser = async () => {
       try {
         const data = await authService.verifySession();
-        if (data?.user?.telegramId || data?.user?.telegram_id) {
-          setTelegramId(data.user.telegramId || data.user.telegram_id);
+        // Backend returns user: { telegram_id: ... }
+        if (data?.user?.telegram_id) {
+          setTelegramId(data.user.telegram_id);
         }
       } catch (error) {
         console.error("NSGClarity: Failed to fetch user session", error);
@@ -388,7 +389,7 @@ export default function NSGClarity() {
     }
 
     setIsLoadingTelegramData(true);
-    if (isManual) showToast("Sincronizando objetivos...", "info");
+    if (isManual) showToast("Sincronizando con Telegram...", "info");
 
     try {
       const jwtToken = localStorage.getItem('token');
@@ -407,26 +408,10 @@ export default function NSGClarity() {
         console.log("📊 DATOS DE TELEGRAM RECIBIDOS:", data);
         setTelegramData(data);
 
-        // Update task descriptions
-        if (data?.daily_checking_in) {
-          setTasks(prev => prev.map(task => {
-            if (task.time === "08:00 AM" && data.daily_checking_in.morning) {
-              return { ...task, desc: data.daily_checking_in.morning };
-            }
-            if (task.time === "01:00 PM" && data.daily_checking_in.noon) {
-              return { ...task, desc: data.daily_checking_in.noon };
-            }
-            if (task.time === "08:00 PM" && data.daily_checking_in.night) {
-              return { ...task, desc: data.daily_checking_in.night };
-            }
-            return task;
-          }));
-
-          if (isManual) showToast("Objetivos actualizados", "success");
-        }
+        if (isManual) showToast("Objetivos actualizados", "success");
       } else {
         console.error('Failed to fetch telegram data:', response.status);
-        if (isManual) showToast("Error al sincronizar", "error");
+        if (isManual) showToast("Error al sincronizar datos", "error");
       }
     } catch (error) {
       console.error('Error fetching telegram data:', error);
@@ -438,8 +423,28 @@ export default function NSGClarity() {
 
   // Fetch Telegram user data when telegramId is available
   useEffect(() => {
-    syncObjectives(false);
+    if (telegramId) {
+      syncObjectives(false);
+    }
   }, [telegramId]);
+
+  // Update tasks when telegramData changes
+  useEffect(() => {
+    if (telegramData) {
+      setTasks(prev => prev.map(task => {
+        if (task.time === "08:00 AM" && telegramData.checkin_morning) {
+          return { ...task, desc: telegramData.checkin_morning };
+        }
+        if (task.time === "01:00 PM" && telegramData.checkin_noon) {
+          return { ...task, desc: telegramData.checkin_noon };
+        }
+        if (task.time === "08:00 PM" && telegramData.checkin_night) {
+          return { ...task, desc: telegramData.checkin_night };
+        }
+        return task;
+      }));
+    }
+  }, [telegramData]);
 
   // Check Google Calendar connection status on mount
   useEffect(() => {
@@ -675,13 +680,15 @@ export default function NSGClarity() {
               <p className={clsx(
                 "text-[0.55rem] font-bold uppercase tracking-widest leading-none mb-0.5 transition-colors",
                 telegramId ? "text-emerald-600/70" : "text-slate-400"
-              )}>Status</p>
+              )}>
+                {telegramData?.name ? telegramData.name : "Status"}
+              </p>
               <div className="flex items-center gap-1.5">
                 <p className={clsx(
                   "text-xs font-bold transition-colors",
                   telegramId ? "text-emerald-900" : "text-navy-900"
                 )}>
-                  {telegramId ? "Activo" : "Conectar Telegram"}
+                  {telegramId ? (telegramData?.username ? `@${telegramData.username}` : "Activo") : "Conectar Telegram"}
                 </p>
                 {telegramId && <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>}
               </div>
