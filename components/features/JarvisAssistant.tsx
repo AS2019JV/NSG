@@ -79,22 +79,52 @@ export default function JarvisAssistant() {
     return new Blob([buffer], { type: 'audio/wav' });
   };
 
+  // --- HELPERS ---
+  // --- HELPERS ---
+  const cleanTextForSpeech = (text: string) => {
+    return text
+      .replace(/\*/g, '')        // Remove all asterisks
+      .replace(/#/g, '')         // Remove hashtags
+      .replace(/[`~>]/g, '')     // Remove code/quote markers
+      .replace(/_/g, '')         // Remove underscores
+      .replace(/-/g, '')         // Remove separate hyphens completely
+      .replace(/\.{2,}/g, '.')   // Normalize multiple dots to single period
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Links [text](url) -> text
+      .replace(/^\s*[-+]\s+/gm, '') // List bullets
+      .replace(/\n+/g, '. ')     // All newlines to pauses
+      .replace(/\s+/g, ' ')      // Collapse multiple spaces
+      .trim();
+  };
+
   const speak = async (text: string) => {
     if (isMuted) return;
     setStatus('SPEAKING');
+    
+    // Clean immediately
+    const plainText = cleanTextForSpeech(text);
+
     try {
-      const plainText = text.replace(/[*_#`]/g, '');
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: plainText }] }],
+          systemInstruction: { parts: [{ text: `${BASE_SYSTEM_PROMPT} Te diriges al ejecutivo "${username}". RESPONDE SIEMPRE EN CASTELLANO (ESPAÑOL DE ESPAÑA). Sé extremadamente conciso. Habla fluido, sin mencionar signos de puntuación.` }] },
           generationConfig: {
             responseModalities: ["AUDIO"],
-            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Aoede" } } }
-          }
+            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } } }
+          },
+          safetySettings: [
+            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+          ]
         })
       });
+
+      if (!response.ok) throw new Error("Audio Generation Failed");
+
       const result = await response.json();
       const audioData = result.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
       if (audioData) {
@@ -111,7 +141,8 @@ export default function JarvisAssistant() {
         fallbackSpeak(plainText);
       }
     } catch (e) { 
-      fallbackSpeak(text);
+      // Ensure fallback also receives CLEAN text
+      fallbackSpeak(plainText);
     }
   };
 
@@ -126,84 +157,163 @@ export default function JarvisAssistant() {
 
   const handleAction = async (userQuery: string) => {
     if (!userQuery.trim()) return;
-    setLastResponse(null);
-    setShowNotification(false);
+    
+    // Haptic feedback
+    if (navigator.vibrate) navigator.vibrate(10);
+    
+    setLastResponse(""); 
+    setShowNotification(true); 
     setIsProcessing(true);
     setStatus('THINKING');
     setInput(''); 
 
     try {
-      // Use Flash 1.5 for ultra-fast response
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+      // Use Standard Endpoint for Reliability
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: userQuery }] }],
-          systemInstruction: { parts: [{ text: `${BASE_SYSTEM_PROMPT} Te diriges al ejecutivo "${username}". Responde de forma instantánea y concisa.` }] }
+          systemInstruction: { parts: [{ text: `${BASE_SYSTEM_PROMPT} Te diriges al ejecutivo "${username}". RESPONDE SIEMPRE EN CASTELLANO (ESPAÑOL DE ESPAÑA). Tu voz es 'Puck'.` }] },
+          safetySettings: [
+            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+          ]
         })
       });
+
+      if (!response.ok) throw new Error(`API Error: ${response.status}`);
+
       const data = await response.json();
       const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      
-      if (!aiText) throw new Error("Empty Response");
-      
-      setLastResponse(aiText);
-      setShowNotification(true);
+
       setIsProcessing(false);
-      speak(aiText);
+
+      if (aiText) {
+          // Speak immediately
+          speak(aiText);
+          
+          // Simulate Streaming for Visuals (Typewriter Effect)
+          let displayed = "";
+          const chunkSize = 5; // chars per tick
+          const delay = 10; // ms per tick
+          
+          for (let i = 0; i < aiText.length; i += chunkSize) {
+              const chunk = aiText.slice(i, i + chunkSize);
+              displayed += chunk;
+              setLastResponse(displayed);
+              // Small delay to simulate typing
+              await new Promise(r => setTimeout(r, delay));
+          }
+      } else {
+          throw new Error("Empty Response");
+      }
+
     } catch (e) {
       console.error(e);
       setLastResponse("Protocol Failure. Connection terminated.");
-      setShowNotification(true);
       setIsProcessing(false);
       setStatus('IDLE');
     }
   };
 
+  // --- VOICE CAPTURE LOGIC ---
+  const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   const toggleListening = () => {
-    if (status === 'LISTENING') return; 
+    if (status === 'LISTENING') {
+        // Manual stop
+        const recognition = recognitionRef.current;
+        if (recognition) recognition.stop();
+        return;
+    }
+
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
       recognitionRef.current = recognition; 
       recognition.lang = 'es-ES';
-      recognition.continuous = false;
+      recognition.continuous = true; // Changed to TRUE to capture full phrases
       recognition.interimResults = true;
 
-      recognition.onstart = () => { setStatus('LISTENING'); setIsListening(true); };
+      recognition.onstart = () => { 
+          setStatus('LISTENING'); 
+          setIsListening(true); 
+          setInput(''); // Clear previous
+      };
       
       recognition.onresult = (e: any) => { 
         const transcript = Array.from(e.results)
           .map((result: any) => result[0])
           .map((result: any) => result.transcript)
-          .join('');
+          .join(' ');
         
-        // Dynamic real-time input feedback
+        // Show real-time feedback
         setInput(transcript);
 
-        if (e.results[0].isFinal) {
-            handleAction(transcript); 
-            setIsListening(false); 
-        }
+        // --- SILENCE DETECTION LOGIC ---
+        // Clear existing timer on every new word
+        if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+
+        // Set a new timer: if user is silent for 1.5 seconds, assume they are done
+        silenceTimerRef.current = setTimeout(() => {
+            recognition.stop(); // This will trigger onend
+        }, 1500); 
       };
+
       recognition.onerror = (e: any) => {
           if (e.error === 'no-speech') {
-              // Quietly reset if no speech detected
-              setStatus('IDLE');
-              setIsListening(false);
+              // Ignore simple silence
+              return;
+          }
+          
+          console.error("Speech Error:", e.error);
+          
+          if (e.error === 'network') {
+               showToast("Error de conexión. Verifique su internet.", "error");
+          } else if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+               showToast("Acceso al micrófono denegado.", "error");
+          } else if (e.error === 'aborted') {
+               // Ignore user aborts
+               return;
           } else {
-              console.error("Speech Error:", e.error);
-              setStatus('IDLE');
-              setIsListening(false);
+               // Generic error
+               showToast(`Error de voz: ${e.error}`, "error");
+          }
+
+          // Reset state for critical errors
+          if (e.error !== 'no-speech' && e.error !== 'aborted') {
+            setStatus('IDLE');
+            setIsListening(false);
           }
       };
+
       recognition.onend = () => { 
-        // Only reset to IDLE if we haven't already transitioned to THINKING/SPEAKING
-        setStatus((prev) => (prev === 'THINKING' || prev === 'SPEAKING') ? prev : 'IDLE');
-        setIsListening(false); 
+        // When recognition stops (either manual or silence timer), send the input if valid.
+        // We need to check the current 'input' state, but state might be stale in callback closure.
+        // Using ref or getting the latest value is safer, but 'input' state update might be enough if we rely on inputRef or similar.
+        // However, we passed 'transcript' to setInput. 
+        // Let's rely on checking the input directly from the ref manually or just using the stored transcript in a Ref if needed.
+        // Simplified: trigger action if we have input.
+        
+        // Note: We need to access the LATEST 'input'. Since closures trap 'input', we should use the inputRef we already have attached to the DOM element!
+        // But inputRef.current.value is reliable.
+        const msg = inputRef.current?.value || "";
+        
+        if (msg.trim().length > 1) {
+             handleAction(msg);
+             setIsListening(false);
+        } else {
+             setStatus('IDLE');
+             setIsListening(false);
+        }
       };
+      
       recognition.start();
+
     } else {
         showToast("Speech Module Unavailable", "error");
     }
@@ -212,96 +322,71 @@ export default function JarvisAssistant() {
   return (
     <div 
       className={clsx(
-         "relative w-full h-[480px] bg-[#020617] rounded-b-[2.5rem] overflow-hidden group/desktop shadow-2xl border-x border-b border-slate-800/50 select-none antialiased text-slate-200 cursor-pointer transition-all duration-700",
-         isActive ? "shadow-[0_20px_100px_rgba(59,130,246,0.3)]" : "hover:shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
+         "relative w-full h-[400px] bg-navy-950 rounded-3xl overflow-hidden group/desktop shadow-2xl border border-white/10 select-none antialiased text-slate-200 cursor-pointer transition-all duration-500 cubic-bezier(0.32, 0.72, 0, 1)",
+         isActive ? "shadow-[0_0_80px_rgba(59,130,246,0.15)] borderColor-blue-900/30" : "hover:shadow-[0_10px_40px_rgba(0,0,0,0.5)] hover:border-white/15"
       )}
       onClick={() => { if(!isActive) toggleListening(); }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      style={{ willChange: "transform, box-shadow" }}
     >
       
-      {/* Subtle Grid Pattern */}
-      <div className="absolute inset-0 opacity-[0.2] transition-all duration-1000 group-hover/desktop:opacity-[0.3]" 
-           style={{ backgroundImage: 'radial-gradient(#334155 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+      {/* Subtle Grid Pattern - Apple Style */}
+      <div className="absolute inset-0 opacity-[0.15] transition-opacity duration-500 group-hover/desktop:opacity-[0.25]" 
+           style={{ backgroundImage: 'radial-gradient(#475569 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
 
-      {/* Vignette */}
-      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,rgba(2,6,23,0.8)_100%)]" />
+      {/* Vignette for depth */}
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,rgba(2,6,23,0.9)_100%)]" />
 
       {/* ==============================================
-          THE PRO BORDER GLOW
+          THE PRO BORDER GLOW (Optimized & Fast)
          ============================================== */}
-      <div className={`absolute inset-0 z-10 pointer-events-none transition-all duration-1000 ease-[cubic-bezier(0.32,0.72,0,1)] ${isActive ? 'opacity-100' : 'opacity-0'}`}>
-        <div className="absolute inset-[-20px] rounded-[30px] opacity-30 blur-[40px]">
-             <div className="w-full h-full bg-pro-blue-flow animate-flow-slow" />
-        </div>
-        <div className="absolute inset-[-10px] rounded-[30px] opacity-60 blur-[15px]">
-             <div className="w-full h-full bg-pro-blue-flow animate-flow-medium" />
-        </div>
-        <div className="absolute inset-[0px] rounded-[2.5rem] p-[3px]" 
-             style={{ 
-                maskImage: 'linear-gradient(white, white), linear-gradient(white, white)', 
-                maskClip: 'content-box, border-box', 
-                maskComposite: 'exclude' 
-             }}>
-             <div className="absolute inset-[-50%] w-[200%] h-[200%] top-[-50%] left-[-50%] bg-pro-blue-flow animate-flow-fast" />
-        </div>
+      <div className={`absolute inset-0 z-10 pointer-events-none transition-opacity duration-500 ${isActive ? 'opacity-100' : 'opacity-0'}`}>
+         <div className="absolute inset-0 rounded-3xl border border-blue-500/20 shadow-[0_0_60px_-10px_rgba(59,130,246,0.2)]" />
       </div>
 
       {/* ==============================================
           PRO BRAND ATOM (Centered Top)
          ============================================== */}
-      <div className={`relative flex flex-col items-center justify-center h-full z-20 transition-all duration-1000 cubic-bezier(0.25, 1, 0.5, 1) 
-                      ${isActive ? 'scale-[1.2]' : isHovered ? 'scale-105' : 'scale-100'}`}
+      <div className={`relative flex flex-col items-center justify-center h-full z-20 transition-transform duration-500 cubic-bezier(0.32, 0.72, 0, 1) 
+                      ${isActive ? 'scale-[1.05]' : isHovered ? 'scale-[1.02]' : 'scale-100'}`}
            onClick={(e) => { e.stopPropagation(); toggleListening(); }}
+           style={{ willChange: "transform" }}
       >
         
         {/* INNER WAVES (Sonar Effect) */}
         {isActive && (
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border border-[#60A5FA]/30 bg-[#3B82F6]/10 animate-ripple-1 opacity-0" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full border border-[#3B82F6]/20 bg-[#2563EB]/5 animate-ripple-2 opacity-0" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full border border-[#60A5FA]/10 bg-transparent animate-ripple-3 opacity-0" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border border-blue-500/20 opacity-0 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]" />
             </div>
         )}
 
         {/* Core Glow */}
-        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full blur-[64px] transition-all duration-1000 
-            ${isActive ? 'opacity-50 scale-125 bg-[#3B82F6]' : isHovered ? 'opacity-20 scale-100 bg-[#60A5FA]' : 'opacity-0 scale-50'}`} />
+        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full blur-[80px] transition-all duration-500 
+            ${isActive ? 'opacity-30 bg-blue-600' : isHovered ? 'opacity-10 bg-blue-400' : 'opacity-0'}`} />
 
-        <div className="w-64 h-64 flex items-center justify-center animate-atom-breathe relative">
-            <svg viewBox="0 0 100 100" className={`w-full h-full overflow-visible transition-all duration-700 
-                                                  ${isActive ? 'drop-shadow-[0_0_30px_rgba(59,130,246,0.5)]' : 'drop-shadow-lg'}`}>
+        <div className="w-56 h-56 flex items-center justify-center animate-atom-breathe relative">
+            <svg viewBox="0 0 100 100" className={`w-full h-full overflow-visible transition-all duration-500 ${isActive ? 'drop-shadow-[0_0_20px_rgba(59,130,246,0.3)]' : 'drop-shadow-none'}`}>
                 <defs>
                     <linearGradient id="proBlueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" stopColor="#60A5FA" />
-                        <stop offset="50%" stopColor="#3B82F6" />
                         <stop offset="100%" stopColor="#2563EB" />
-                    </linearGradient>
-
-                    <linearGradient id="idleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#94A3B8" />
-                        <stop offset="100%" stopColor="#475569" />
-                    </linearGradient>
-
-                    <linearGradient id="hoverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stopColor="#60A5FA" />
-                        <stop offset="100%" stopColor="#3B82F6" />
                     </linearGradient>
                 </defs>
 
                 {/* Orbit Group */}
-                <g className={`origin-center ${isActive ? 'animate-spin-slow' : 'animate-spin-ultra-slow'}`} style={{ transformBox: 'fill-box' }}>
+                <g className={`origin-center ${isActive ? 'animate-[spin_10s_linear_infinite]' : 'animate-[spin_20s_linear_infinite]'}`} style={{ transformBox: 'fill-box' }}>
                     {[0, 60, 120].map((angle, i) => (
                          <circle 
                             key={i}
                             cx="50" cy="50" r="42" 
                             fill="none" 
-                            strokeWidth={isActive ? 1.5 : 1}
-                            stroke={`url(#${isActive ? 'proBlueGrad' : isHovered ? 'hoverGrad' : 'idleGrad'})`}
-                            className="transition-all duration-1000 origin-center ease-out"
+                            strokeWidth={isActive ? 1.2 : 0.8}
+                            stroke="url(#proBlueGrad)"
+                            className="transition-all duration-500 origin-center ease-out"
                             style={{ 
                                 transform: isActive ? `rotate(${angle}deg) scale(1)` : `rotate(${angle}deg) scaleY(0.45)`,
-                                opacity: isActive ? 0.9 : 0.6
+                                opacity: isActive ? 0.8 : 0.4
                             }} 
                         />
                     ))}
@@ -309,11 +394,8 @@ export default function JarvisAssistant() {
                 
                 {/* FIXED ELECTRON ORBIT - CLOCKWISE */}
                 {isActive && (
-                    <g style={{ transformOrigin: '50px 50px' }} className="animate-electron-orbit-clockwise">
-                       {/* Soft diffuse glow layer behind electron */}
-                       <circle cx="50" cy="8" r="6" fill="#60A5FA" className="opacity-30 blur-[4px]" />
-                       {/* Sharp core electron */}
-                       <circle cx="50" cy="8" r="3.5" fill="#60A5FA" className="drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]" />
+                    <g style={{ transformOrigin: '50px 50px' }} className="animate-[spin_3s_linear_infinite]">
+                       <circle cx="50" cy="8" r="3" fill="#60A5FA" className="drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]" />
                     </g>
                 )}
 
@@ -349,14 +431,60 @@ export default function JarvisAssistant() {
 
       </div>
 
-      <div className="absolute bottom-16 w-full px-8 flex justify-center z-50 pointer-events-none">
+      {/* === RESPONSE CARD (Dark Mode) - REPOSITIONED ABOVE INPUT === */}
+      <AnimatePresence>
+      {showNotification && (
+          <motion.div 
+             initial={{ opacity: 0, y: 20 }}
+             animate={{ opacity: 1, y: 0 }}
+             exit={{ opacity: 0, y: 10 }}
+             className="absolute inset-x-0 bottom-32 z-40 flex justify-center px-8 pointer-events-none"
+          >
+              <div 
+                  onClick={(e) => e.stopPropagation()}
+                  className="bg-[#0f172a]/95 backdrop-blur-3xl backdrop-saturate-150 border border-white/10 w-full max-w-2xl max-h-[350px] rounded-3xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden relative pointer-events-auto"
+              >
+                  {/* Pro Gradient Line Top */}
+                  <div className="h-[1.5px] w-full bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-80" />
+
+                  <div className="flex justify-between items-center px-6 py-3 border-b border-white/5 bg-white/[0.02]">
+                      <div className="flex items-center gap-2">
+                         <div className="w-5 h-5 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                            <Bot size={12} className="text-blue-400" />
+                         </div>
+                         <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">NSG Insight</span>
+                      </div>
+                      <button onClick={() => setShowNotification(false)} className="p-1 rounded-full hover:bg-white/5 transition-colors text-slate-500 hover:text-slate-300">
+                          <X size={14} />
+                      </button>
+                  </div>
+                  
+                  <div className="p-6 overflow-y-auto custom-scroll text-slate-300 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                      <div className="prose prose-invert prose-sm max-w-none leading-relaxed">
+                           <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                               {lastResponse || ''}
+                           </ReactMarkdown>
+                           {/* Cursor Effect */}
+                           {isProcessing && <span className="inline-block w-1.5 h-4 ml-1 bg-blue-400 animate-pulse align-middle" />}
+                      </div>
+                  </div>
+              </div>
+          </motion.div>
+      )}
+      </AnimatePresence>
+
+      <div className="absolute bottom-6 w-full px-8 flex justify-center z-50 pointer-events-none">
           <div 
-             className={`pointer-events-auto transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1) ${isActive || input.length > 0 ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-12 opacity-0 scale-90'}`}
+             className={`pointer-events-auto transition-all duration-500 cubic-bezier(0.16, 1, 0.3, 1) ${isActive || input.length > 0 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
              onClick={(e) => e.stopPropagation()}
           >
-              <div className="flex items-center gap-4 px-8 py-4 bg-[#0B1121]/90 backdrop-blur-2xl rounded-full shadow-[0_30px_60px_-15px_rgba(0,0,0,0.6),0_0_0_1px_rgba(255,255,255,0.1)] border border-white/10 min-w-[450px] max-w-3xl">
-                  <div className="relative">
-                      <div className={clsx("w-2.5 h-2.5 rounded-full animate-pulse", status === 'LISTENING' ? "bg-red-500" : "bg-gradient-to-tr from-[#60A5FA] to-[#2563EB]")} />
+              <div className="flex items-center gap-4 px-6 py-3 bg-[#0B1121]/80 backdrop-blur-xl rounded-full shadow-[0_4px_24px_-1px_rgba(0,0,0,0.3)] border border-white/10 min-w-[420px] max-w-2xl hover:border-white/20 transition-all group-input">
+                  <div className="relative flex-shrink-0">
+                      <div className={clsx("w-2 h-2 rounded-full transition-all duration-300", 
+                          status === 'LISTENING' ? "bg-red-500 animate-pulse scale-125" : 
+                          status === 'THINKING' ? "bg-amber-400 animate-bounce" :
+                          "bg-blue-500"
+                      )} />
                   </div>
                   
                   <input 
@@ -365,67 +493,25 @@ export default function JarvisAssistant() {
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleAction(input)}
-                      placeholder={status === 'LISTENING' ? "Listening..." : "Ask NSG Intelligence..."}
-                      className="bg-transparent border-none text-[15px] font-medium text-[#f8fafc] placeholder:text-slate-500 focus:outline-none w-full tracking-tight antialiased"
+                      placeholder={status === 'LISTENING' ? "Escuchando..." : "Pregunta a NSG Intelligence..."}
+                      className="bg-transparent border-none text-[14px] font-medium text-slate-200 placeholder:text-slate-500 focus:outline-none w-full tracking-wide selection:bg-blue-500/30"
                   />
                   
-                  <button onClick={() => handleAction(input)} disabled={!input.trim()} className="text-blue-400 hover:text-white transition-colors disabled:opacity-30">
-                      <Send size={16} />
+                  <button onClick={() => handleAction(input)} disabled={!input.trim()} className="text-blue-500/80 hover:text-blue-400 transition-colors disabled:opacity-0 p-1">
+                      <Send size={15} />
                   </button>
                   
-                  {/* Audio Wave */}
-                  {(status === 'LISTENING' || status === 'SPEAKING' || status === 'THINKING') && (
-                      <div className="flex gap-1 h-4 items-center pl-2 opacity-80 border-l border-white/10 ml-2">
-                          {[1,2,3,4].map((i) => (
-                              <div key={i} className="w-1 bg-[#3B82F6] rounded-full animate-wave" style={{ animationDelay: `${i * 0.15}s` }} />
+                  {/* Audio Wave Mini */}
+                  {(status === 'LISTENING' || status === 'SPEAKING') && (
+                      <div className="flex gap-0.5 h-3 items-center pl-2 border-l border-white/10 ml-1">
+                          {[1,2,3].map((i) => (
+                              <div key={i} className="w-0.5 bg-blue-500 rounded-full animate-wave" style={{ animationDelay: `${i * 0.1}s` }} />
                           ))}
                       </div>
                   )}
               </div>
           </div>
       </div>
-      
-      {/* === RESPONSE CARD (Dark Mode) === */}
-      <AnimatePresence>
-      {showNotification && (
-          <motion.div 
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 1 }}
-             exit={{ opacity: 0 }}
-             className="absolute inset-x-0 bottom-24 z-40 flex justify-center px-8 pointer-events-none"
-          >
-              <motion.div 
-                  initial={{ scale: 0.95, y: 30, opacity: 0 }}
-                  animate={{ scale: 1, y: 0, opacity: 1 }}
-                  exit={{ scale: 0.95, y: 20, opacity: 0 }}
-                  onClick={(e) => e.stopPropagation()}
-                  className="bg-slate-900/95 backdrop-blur-3xl backdrop-saturate-200 border border-white/10 w-full max-w-2xl max-h-[350px] rounded-4xl shadow-[0_40px_120px_-20px_rgba(0,0,0,0.6)] flex flex-col overflow-hidden relative pointer-events-auto"
-              >
-                  <div className="h-[2px] w-full bg-linear-to-r from-blue-500/50 via-purple-500/50 to-pink-500/50" />
-
-                  <div className="flex justify-between items-center px-6 py-4 border-b border-white/5">
-                      <div className="flex items-center gap-3">
-                         <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/30">
-                            <Bot size={14} className="text-blue-400" />
-                         </div>
-                         <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">NSG Insight</span>
-                      </div>
-                      <button onClick={() => setShowNotification(false)} className="p-1.5 rounded-full hover:bg-white/10 transition-colors text-slate-400 hover:text-white">
-                          <X size={16} />
-                      </button>
-                  </div>
-                  
-                  <div className="p-6 overflow-y-auto custom-scroll text-slate-300 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-                      <div className="prose prose-invert prose-sm max-w-none">
-                           <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                               {lastResponse || ''}
-                           </ReactMarkdown>
-                      </div>
-                  </div>
-              </motion.div>
-          </motion.div>
-      )}
-      </AnimatePresence>
 
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes spin-slow {
