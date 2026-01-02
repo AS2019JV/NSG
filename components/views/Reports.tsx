@@ -68,10 +68,6 @@ function FileCard({ title, type, ext, size }: FileCardProps) {
         <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
           <FileText className="w-6 h-6" />
         </div>
-<<<<<<< HEAD
-    )
-}
-=======
         <div>
           <h4 className="font-bold text-navy-900">{title}</h4>
           <p className="text-xs text-slate-500">{type}</p>
@@ -84,4 +80,3 @@ function FileCard({ title, type, ext, size }: FileCardProps) {
     </div>
   );
 }
->>>>>>> 7d4c4a9281d0a9e316e4ad28626e24b2ae4a5e84

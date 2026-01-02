@@ -170,15 +170,9 @@ export default function Settings() {
         {/* Profile Section */}
         <div className="flex flex-col sm:flex-row items-center gap-6 mb-10 p-6 bg-slate-50 rounded-[2rem] border border-slate-100">
           <div className="relative group cursor-pointer">
-<<<<<<< HEAD
-            <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center text-slate-900 font-bold text-3xl shadow-lg group-hover:scale-105 transition-transform duration-300">
+            <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center text-white font-bold text-3xl shadow-lg group-hover:scale-105 transition-transform duration-300">
                 <span className="relative z-10">{username ? username.substring(0, 2).toUpperCase() : 'US'}</span>
                 <div className="absolute inset-0 bg-white/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-=======
-            <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center text-white font-bold text-3xl shadow-lg group-hover:scale-105 transition-transform duration-300">
-              <span className="relative z-10">{username ? username.substring(0, 2).toUpperCase() : 'US'}</span>
-              <div className="absolute inset-0 bg-white/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
->>>>>>> 7d4c4a9281d0a9e316e4ad28626e24b2ae4a5e84
             </div>
             <div className="absolute -bottom-2 -right-2 bg-white p-1.5 rounded-full shadow-md border border-slate-100">
               <div className="bg-emerald-500 w-4 h-4 rounded-full border-2 border-white"></div>
@@ -189,15 +183,9 @@ export default function Settings() {
             <p className="text-slate-500 text-sm mb-3">
               NSG-ID: {userId} • <span className="text-emerald-600 font-medium">Online</span>
             </p>
-<<<<<<< HEAD
-            <button 
-                onClick={() => showToast('Perfil actualizado', 'success')} 
-                className="text-xs font-bold text-slate-900 bg-white px-4 py-2 rounded-lg hover:bg-blue-600 transition shadow-md flex items-center gap-2 mx-auto sm:mx-0 cursor-pointer"
-=======
             <button
               onClick={() => showToast('Perfil actualizado', 'success')}
               className="text-xs font-bold text-white bg-navy-900 px-4 py-2 rounded-lg hover:bg-blue-600 transition shadow-md flex items-center gap-2 mx-auto sm:mx-0 cursor-pointer"
->>>>>>> 7d4c4a9281d0a9e316e4ad28626e24b2ae4a5e84
             >
               <Edit2 className="w-3 h-3" /> Editar Perfil
             </button>
@@ -343,18 +331,6 @@ function ToggleItem({ icon: Icon, title, desc, color, active, onClick }: ToggleI
   // Explicit mapping allows Tailwind to scan these classes correctly
   const styles = {
     blue: {
-<<<<<<< HEAD
-        container: "hover:border-blue-300",
-        iconBox: "bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-slate-900"
-    },
-    purple: {
-        container: "hover:border-purple-300",
-        iconBox: "bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-slate-900"
-    },
-    orange: {
-        container: "hover:border-orange-300",
-        iconBox: "bg-orange-50 text-orange-600 group-hover:bg-orange-600 group-hover:text-slate-900"
-=======
       container: "hover:border-blue-300",
       iconBox: "bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white"
     },
@@ -365,7 +341,6 @@ function ToggleItem({ icon: Icon, title, desc, color, active, onClick }: ToggleI
     orange: {
       container: "hover:border-orange-300",
       iconBox: "bg-orange-50 text-orange-600 group-hover:bg-orange-600 group-hover:text-white"
->>>>>>> 7d4c4a9281d0a9e316e4ad28626e24b2ae4a5e84
     }
   };
 

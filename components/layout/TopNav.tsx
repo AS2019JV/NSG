@@ -41,13 +41,8 @@ export default function TopNav() {
   }, [currentRole, pathname]);
 
   return (
-<<<<<<< HEAD
     <header className="h-20 lg:h-24 bg-white border-b border-slate-200/60 flex items-center justify-between px-4 sm:px-6 lg:px-10 sticky top-0 z-40 shrink-0 shadow-sm transition-all duration-300">
       <div className="flex items-center gap-4">
-=======
-    <header className="h-16 lg:h-20 bg-white/80 backdrop-blur-xl border-b border-slate-200/60 flex items-center justify-between px-4 sm:px-6 lg:px-10 sticky top-0 z-40 shrink-0 shadow-sm transition-all duration-300">
-      <div className="flex items-center gap-2 sm:gap-4 overflow-hidden">
->>>>>>> 7d4c4a9281d0a9e316e4ad28626e24b2ae4a5e84
         <button
           className="lg:hidden p-2 -ml-1 text-navy-900 hover:bg-slate-100 rounded-lg transition shrink-0"
           onClick={toggleSidebar}

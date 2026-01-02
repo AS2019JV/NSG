@@ -184,11 +184,7 @@ export default function CalendarView() {
             </button>
           )}
 
-<<<<<<< HEAD
-          <button onClick={() => showToast('Nuevo Evento','info')} className="px-4 bg-blue-600 text-slate-900 text-xs font-bold rounded-lg active:scale-95 transition hover:bg-blue-500 flex items-center gap-1 cursor-pointer shadow-lg shadow-blue-200"><Plus className="w-3 h-3" /> Evento</button>
-=======
           <button onClick={() => showToast('Nuevo Evento', 'info')} className="px-3 sm:px-4 py-2 bg-blue-600 text-white text-[0.65rem] sm:text-xs font-bold rounded-lg active:scale-95 transition hover:bg-blue-500 flex items-center gap-1 cursor-pointer shadow-lg shadow-blue-200 shrink-0"><Plus className="w-3 h-3" /> <span className="hidden xs:inline">Evento</span></button>
->>>>>>> 7d4c4a9281d0a9e316e4ad28626e24b2ae4a5e84
         </div>
       </div>
       <div className="bg-white rounded-4xl shadow-card border border-slate-200 overflow-hidden flex-1 flex flex-col min-h-0">
@@ -200,18 +196,6 @@ export default function CalendarView() {
             const dayEvents = getEventsForDay(day);
             const isToday = day === new Date().getDate() && currentMonthIndex === new Date().getMonth() && currentYear === new Date().getFullYear();
             return (
-<<<<<<< HEAD
-              <div key={day} onClick={() => openDayDetail(`${day} ${MONTHS[currentMonthIndex]}`)} className={clsx("calendar-cell group cursor-pointer border-r border-b border-slate-50 p-2 min-h-[120px] flex flex-col gap-1 transition-colors hover:bg-slate-50", isToday && "bg-blue-50/30")}>
-                <span className={clsx("text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full mb-1", isToday ? "text-slate-900 bg-blue-600 shadow-md" : "text-slate-400")}>{day}</span>
-                
-                <div className="flex flex-col gap-1 overflow-hidden">
-                    {dayEvents.map(event => (
-                        <div key={event.id} className="event-pill event-strategy bg-blue-50 text-blue-700 text-[0.6rem] px-2 py-1 rounded border-l-2 border-blue-500 font-bold truncate shadow-sm animate-fade-in-up">
-                            {event.summary}
-                        </div>
-                    ))}
-                    {!isConnected && day === 12 && <div className="event-pill event-strategy bg-slate-50 text-slate-600 text-[0.6rem] px-2 py-1 rounded border-l-2 border-slate-400 font-bold truncate opacity-50">Board Meeting (Ejemplo)</div>}
-=======
               <div key={day} onClick={() => openDayDetail(`${day} ${MONTHS[currentMonthIndex]}`)} className={clsx("calendar-cell group cursor-pointer border-r border-b border-slate-50 p-1 sm:p-2 min-h-[80px] sm:min-h-[120px] flex flex-col gap-1 transition-colors hover:bg-slate-50", isToday && "bg-blue-50/30")}>
                 <span className={clsx("text-[0.65rem] sm:text-xs font-bold w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center rounded-full mb-0.5 sm:mb-1", isToday ? "text-white bg-blue-600 shadow-md" : "text-slate-400")}>{day}</span>
 
@@ -222,7 +206,6 @@ export default function CalendarView() {
                     </div>
                   ))}
                   {!isConnected && day === 12 && <div className="event-pill event-strategy bg-slate-50 text-slate-600 text-[0.5rem] sm:text-[0.6rem] px-1 sm:px-2 py-0.5 sm:py-1 rounded border-l-2 border-slate-400 font-bold truncate opacity-50">Board Meeting</div>}
->>>>>>> 7d4c4a9281d0a9e316e4ad28626e24b2ae4a5e84
                 </div>
               </div>
             );

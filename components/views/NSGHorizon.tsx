@@ -583,13 +583,9 @@ export default function NSGHorizon() {
 
           <div className="w-px h-8 sm:h-10 bg-slate-200 mx-1 sm:mx-2 hidden xs:block"></div>
 
-<<<<<<< HEAD
           <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-900 shrink-0 shadow-lg hidden sm:flex">
             <Layers className="w-7 h-7" />
-=======
-          <div className="w-10 h-10 sm:w-14 sm:h-14 bg-navy-950 rounded-xl sm:rounded-2xl flex items-center justify-center text-white shrink-0 shadow-lg hidden sm:flex">
-            <Layers className="w-5 h-5 sm:w-7 sm:h-7" />
->>>>>>> 7d4c4a9281d0a9e316e4ad28626e24b2ae4a5e84
+          </div>
           </div>
           <div className="overflow-hidden">
             <h3 className="font-display font-bold text-lg sm:text-2xl text-navy-900 truncate">{selectedFolder.title}</h3>
@@ -616,11 +612,7 @@ export default function NSGHorizon() {
           </a>
           <button
             onClick={() => showToast('Exportando PDF...', 'success')}
-<<<<<<< HEAD
-            className="flex-1 lg:flex-none px-6 py-3 bg-blue-600 text-slate-900 font-bold rounded-xl hover:bg-blue-500 transition shadow-lg shadow-blue-200 flex items-center justify-center gap-2 cursor-pointer"
-=======
-            className="col-span-2 xs:flex-1 lg:flex-none px-3 sm:px-6 py-2.5 sm:py-3 bg-blue-600 text-white text-xs sm:text-sm font-bold rounded-xl hover:bg-blue-500 transition shadow-lg shadow-blue-200 flex items-center justify-center gap-2 cursor-pointer"
->>>>>>> 7d4c4a9281d0a9e316e4ad28626e24b2ae4a5e84
+            className="flex-1 lg:flex-none px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition shadow-lg shadow-blue-200 flex items-center justify-center gap-2 cursor-pointer"
           >
             <FileCheck className="w-3.5 h-3.5 sm:w-4 h-4" /> <span className="hidden md:inline">Exportar</span> PDF
           </button>

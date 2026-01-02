@@ -634,13 +634,8 @@ export default function NSGClarity() {
             className="flex flex-row items-center gap-3 sm:gap-4 mb-3 cursor-pointer group/header hover:opacity-80 transition-opacity"
             title="Clic para sincronizar objetivos"
           >
-<<<<<<< HEAD
             <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg transform transition group-hover/header:rotate-12 hover:shadow-blue-900/20">
               <Target className="w-6 h-6 text-blue-600" />
-=======
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-navy-950 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg transform transition group-hover/header:rotate-12 hover:shadow-blue-900/20 shrink-0">
-              <Target className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
->>>>>>> 7d4c4a9281d0a9e316e4ad28626e24b2ae4a5e84
             </div>
             <div className="overflow-hidden">
               <h3 className="font-display font-bold text-2xl sm:text-3xl lg:text-4xl text-navy-900 tracking-tight leading-none truncate">
