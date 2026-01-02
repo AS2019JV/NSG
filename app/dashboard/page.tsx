@@ -17,19 +17,19 @@ export default function DashboardDispatcher() {
     }
 
     // 2. Logic: Define the "Home View" for each role
-    // Currently, everyone starts at the Main System (nsg_ios), 
+    // Currently, everyone starts at the Main System (nsg_intelligence), 
     // but you can change this (e.g., manager -> 'metrics')
     const defaultViews: Record<string, string> = {
-      manager: "nsg_ios", 
-      consultant: "nsg_ios", 
-      psychologist: "nsg_ios", 
-      patient:  "nsg_ios",
+      manager: "nsg_intelligence", 
+      consultant: "nsg_intelligence", 
+      psychologist: "nsg_intelligence", 
+      patient:  "nsg_intelligence",
     };
 
-    const view = defaultViews[currentRole] || "nsg_ios";
+    const view = defaultViews[currentRole] || "nsg_intelligence";
     
     // 3. Execute Redirect to the Dynamic Route
-    // This sends the user to: /dashboard/nsg_ios
+    // This sends the user to: /dashboard/nsg_intelligence
     router.replace(`/dashboard/${view}`);
     
   }, [currentRole, router]);

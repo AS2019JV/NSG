@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+// Backend URL is now hardcoded below
+
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
+  baseURL: 'https://nsg-backend.onrender.com',
   headers: {
     'Content-Type': 'application/json',
   },

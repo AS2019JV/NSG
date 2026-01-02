@@ -26,12 +26,18 @@ export default function DynamicIsland({ currentMode, setMode, selectedModel, set
   // Combine Standard + Menu Items (excluding NSG Intelligence)
   const allItems = [
     { id: 'standard', label: 'Standard', icon: Activity },
-    ...menuItems.filter(item => item.id !== 'nsg_ios')
+    ...menuItems.filter(item => item.id !== 'nsg_intelligence')
   ];
 
   return (
     <div className="relative z-50 flex flex-col items-center justify-center p-4 transition-all duration-500 ease-in-out gap-3" ref={containerRef}>
       
+      {/* Header Title - Apple Pro Style */}
+      <div className="flex flex-col items-center animate-fade-in mb-1">
+         <span className="text-[10px] uppercase tracking-[0.2em] text-slate-400 font-bold mb-0.5">System</span>
+         <h2 className="text-lg font-bold text-navy-900 tracking-tight drop-shadow-sm">NSG Intelligence</h2>
+      </div>
+
       <div className="relative flex items-center justify-center w-full max-w-[95vw] md:max-w-3xl mx-auto">
         <div className={clsx(
             "flex flex-nowrap items-center p-1.5 md:p-2 gap-1.5 md:gap-2 w-full md:w-auto",
@@ -43,7 +49,7 @@ export default function DynamicIsland({ currentMode, setMode, selectedModel, set
            
            {allItems.map((item) => {
              const isActive = currentMode === item.id;
-             const isSpecial = item.id === 'nsg_ios';
+             const isSpecial = item.id === 'nsg_intelligence';
              const Icon = item.icon;
 
              return (

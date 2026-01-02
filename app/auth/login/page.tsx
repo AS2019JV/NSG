@@ -13,6 +13,7 @@ function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const setRole = useAppStore((state) => state.setRole);
+  const setUserId = useAppStore((state) => state.setUserId);
 
   const [selectedRole, setSelectedRole] = useState<RoleType | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -50,11 +51,18 @@ function LoginContent() {
         if (data.token) {
              localStorage.setItem('token', data.token);
          }
+        
+        // Save real user ID from backend response
+        if (data.user?.id) {
+            setUserId(data.user.id);
+        }
+        
         setRole(selectedRole);
         router.push("/dashboard");
-    } catch (err: any) {
-        console.error("Login failed", err);
-        setError(err.response?.data?.message || "Credenciales inválidas. Intenta nuevamente.");
+    } catch (err: unknown) {
+        const error = err as any;
+        console.error("Login failed", error);
+        setError(error.response?.data?.message || "Credenciales inválidas. Intenta nuevamente.");
     } finally {
         setIsAnimating(false);
     }
@@ -82,7 +90,7 @@ function LoginContent() {
                 
                 <div className="space-y-1">
                     <h1 className="font-display font-medium text-slate-900 text-2xl tracking-tight">
-                        {`Hola, ${CONTEXT[selectedRole].name}`}
+                        Bienvenido
                     </h1>
                     <p className="text-slate-500 text-sm font-medium">
                         Ingresa tus credenciales para continuar
