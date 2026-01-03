@@ -12,11 +12,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Log the configuration and payload for debugging
-    console.log('--- N8N Proxy Request ---');
-    console.log('Target URL:', webhookUrl.replace(/([a-zA-Z0-9]{5})[a-zA-Z0-9]+([a-zA-Z0-9]{5})/, '$1***$2')); // Mask middle of URL
-    console.log('Payload:', JSON.stringify(body, null, 2));
-
     // Forward the request to N8N
     const response = await fetch(webhookUrl, {
       method: 'POST',
@@ -35,22 +30,21 @@ export async function POST(req: Request) {
       data = await response.text();
       // Try to parse if it's a stringified JSON
       try {
-         data = JSON.parse(data);
+        data = JSON.parse(data);
       } catch (e) {
-         // keep as text
+        // keep as text
       }
     }
-    
+
     if (!response.ok) {
-        return NextResponse.json(
-            { error: `N8N responded with ${response.status}`, details: data },
-            { status: response.status }
-        );
+      return NextResponse.json(
+        { error: `N8N responded with ${response.status}`, details: data },
+        { status: response.status }
+      );
     }
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Proxy error:', error);
     return NextResponse.json(
       { error: 'Failed to process request' },
       { status: 500 }

@@ -25,7 +25,6 @@ export default function NSGNews() {
         const response = await api.get(`/news/search?date=${dateString}`);
         setNews(response.data);
       } catch (error) {
-        console.error("Error fetching news:", error);
         showToast("Error al cargar las noticias", "error");
       } finally {
         setLoading(false);

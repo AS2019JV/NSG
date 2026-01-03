@@ -30,14 +30,13 @@ export async function POST(request: Request) {
     // Clean up temp file
     await unlink(tempPath);
 
-    return Response.json({ 
-      status: "success", 
+    return Response.json({
+      status: "success",
       fileUri: uploadResponse.file.uri,
-      name: uploadResponse.file.name 
+      name: uploadResponse.file.name
     });
 
   } catch (error: any) {
-    console.error("Upload failed:", error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 }

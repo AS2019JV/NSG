@@ -101,7 +101,6 @@ export default function NSGHorizon() {
           }
         }
       } catch (error) {
-        console.error('Error checking Fathom connection:', error);
       }
     };
 
@@ -138,7 +137,6 @@ export default function NSGHorizon() {
         showToast('Error desconectando Fathom', 'error');
       }
     } catch (error) {
-      console.error('Error disconnecting Fathom:', error);
       showToast('Error desconectando Fathom', 'error');
     }
   };
@@ -165,9 +163,7 @@ export default function NSGHorizon() {
         });
 
         if (!response.ok) {
-          const errorText = await response.text();
-          console.error("NSG Horizon API Error:", response.status, errorText);
-          throw new Error(`Failed to fetch data: ${response.status} ${errorText}`);
+          throw new Error(`Failed to fetch data: ${response.status}`);
         }
 
         const jsonResponse = await response.json();
@@ -241,7 +237,6 @@ export default function NSGHorizon() {
         setFolders(mappedFolders);
 
       } catch (error) {
-        console.error("Error loading Horizon data:", error);
         showToast("Error cargando datos de Horizon", "error");
       } finally {
         setIsLoading(false);
@@ -302,7 +297,6 @@ export default function NSGHorizon() {
       }
 
     } catch (error) {
-      console.error("Error generando análisis:", error);
       showToast("Error al generar el análisis. Inténtalo de nuevo.", "error");
     } finally {
       setIsAnalyzing(false);
@@ -342,7 +336,6 @@ export default function NSGHorizon() {
           }
         }
       } catch (error) {
-        console.error("Error checking existing analysis:", error);
       }
     };
 
@@ -381,7 +374,6 @@ export default function NSGHorizon() {
       });
       showToast("Progreso guardado", "success");
     } catch (error) {
-      console.error("Error saving steps:", error);
     }
   };
 

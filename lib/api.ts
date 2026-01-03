@@ -3,7 +3,7 @@ import axios from 'axios';
 // Backend URL is now hardcoded below
 
 const api = axios.create({
-  baseURL: 'https://nsg-backend.onrender.com',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -12,15 +12,11 @@ const api = axios.create({
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
-    // Log the request to the console
-    // Simplified request logging
-    console.log(`🚀 Sending ${config.method?.toUpperCase()} request to ${config.url}`);
-
     // Add Authorization header if token exists
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('token');
       if (token) {
-        config.headers.Authorization = `${token}`;
+        config.headers.Authorization = `Bearer ${token}`;
       }
     }
     return config;
@@ -33,12 +29,9 @@ api.interceptors.request.use(
 // Response interceptor
 api.interceptors.response.use(
   (response) => {
-    console.log(`API Response from ${response.config.url}:`, response.data);
     return response;
   },
   (error) => {
-    // Handle global errors here, e.g., logging or redirecting to login on 401
-    console.error('API Error:', error.response?.data || error.message);
     return Promise.reject(error);
   }
 );

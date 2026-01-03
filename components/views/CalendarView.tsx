@@ -43,7 +43,6 @@ export default function CalendarView() {
           setEvents(data);
         }
       } catch (error) {
-        console.error("Error checking calendar connection:", error);
       }
     };
     checkConnection();
@@ -63,7 +62,6 @@ export default function CalendarView() {
       }
     } catch (error) {
       showToast('Error al obtener eventos', 'error');
-      console.error(error);
     } finally {
       setIsLoading(false);
     }
@@ -84,7 +82,6 @@ export default function CalendarView() {
         }
       } catch (error) {
         showToast('Error al desconectar', 'error');
-        console.error(error);
       }
       return;
     }
@@ -100,7 +97,6 @@ export default function CalendarView() {
       }
     } catch (error) {
       showToast('Error al iniciar autenticación', 'error');
-      console.error(error);
     }
   };
 
