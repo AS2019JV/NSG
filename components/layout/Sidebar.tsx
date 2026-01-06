@@ -33,7 +33,6 @@ export default function Sidebar() {
           setUsername(data.user.username);
         }
       } catch (error) {
-        console.error("Failed to fetch user info", error);
       }
     };
     fetchUser();

@@ -26,8 +26,7 @@ export default function Settings() {
           setUserId(data.user.id);
         }
       } catch (error) {
-        // Silent fail or log
-        console.error("Settings: Failed to fetch user session", error);
+        // Silent fail
       }
     };
     fetchUser();
@@ -79,12 +78,8 @@ export default function Settings() {
       formData.append('timestamp', new Date().toISOString());
       formData.append('userId', userId);
 
-      console.log('Uploading PDF (multipart):', selectedFile.name);
-
       // Remove manual Content-Type header to allow browser to set boundary automatically
       const response = await axios.post('/api/chat', formData);
-
-      console.log('Upload response:', response.data);
 
       setUploadStatus('success');
 
@@ -105,7 +100,6 @@ export default function Settings() {
       showToast('Documento subido correctamente', 'success');
 
     } catch (error: any) {
-      console.error('Error uploading PDF:', error);
 
       let errorMessage = 'Error al subir el PDF';
       let debugInfo = '';

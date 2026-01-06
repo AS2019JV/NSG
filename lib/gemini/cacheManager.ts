@@ -19,7 +19,7 @@ export async function getOrCreateCache(role: keyof typeof SYSTEM_INSTRUCTIONS) {
   try {
     // List existing caches to find if one already exists for this role (optional optimization)
     // For now, we create a new one with a TTL.
-    
+
     const cache = await cacheManager.create({
       model,
       displayName: `nsg-cache-${role}`,
@@ -28,14 +28,12 @@ export async function getOrCreateCache(role: keyof typeof SYSTEM_INSTRUCTIONS) {
       ttlSeconds: 3600, // 1 hour
     });
 
-    console.log(`Created cache for ${role}: ${cache.name}`);
     if (cache.name) {
       activeCaches.set(role, cache.name);
       return cache.name;
     }
     return null;
   } catch (error) {
-    console.error("Failed to create cache:", error);
     return null;
   }
 }

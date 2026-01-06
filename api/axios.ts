@@ -4,21 +4,18 @@ import axios from "axios";
 const baseURL = '/api/n8n';
 
 const instance = axios.create({
-    baseURL: baseURL,
-    headers: {
-        'Content-Type': 'application/json',
-    }
+  baseURL: baseURL,
+  headers: {
+    'Content-Type': 'application/json',
+  }
 });
 
 // Add request interceptor for logging
 instance.interceptors.request.use(
   (config) => {
-    console.log('Sending request to:', config.url);
-    console.log('Request data:', config.data);
     return config;
   },
   (error) => {
-    console.error('Request error:', error);
     return Promise.reject(error);
   }
 );
@@ -26,11 +23,9 @@ instance.interceptors.request.use(
 // Add response interceptor for logging
 instance.interceptors.response.use(
   (response) => {
-    console.log('Response received:', response.status, response.statusText);
     return response;
   },
   (error) => {
-    console.error('Response error:', error.response?.status, error.message);
     return Promise.reject(error);
   }
 );
