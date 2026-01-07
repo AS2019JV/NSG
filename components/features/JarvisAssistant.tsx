@@ -40,6 +40,7 @@ export default function JarvisAssistant() {
 
   // --- VISUAL STATES ---
   const isActive = status !== 'IDLE';
+  // Hover state can be expensive if it triggers layout thrashing, keep it simple
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
@@ -94,49 +95,40 @@ export default function JarvisAssistant() {
       .trim();
   };
 
-  const speak = async (text: string) => {
-    if (isMuted) return;
-    setStatus('SPEAKING');
+  // --- OPTIMIZED SPEECH (Native Browser API for Max Speed & Compatibility) ---
+  const speak = (text: string) => {
+      if (isMuted) return;
+      setStatus('SPEAKING');
+      
+      // Cancel any ongoing speech for snappy response
+      window.speechSynthesis.cancel();
+      
+      const cleanText = cleanTextForSpeech(text);
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.lang = 'es-ES'; // Strictly force Spanish
+      
+      const voices = window.speechSynthesis.getVoices();
+      
+      // Smart Spanish Voice Selection (Prioritize Google -> Spain -> Any Spanish)
+      const preferredVoice = voices.find(v => v.lang === "es-ES" && v.name.includes("Google")) 
+                          || voices.find(v => v.lang === "es-ES") 
+                          || voices.find(v => v.lang.startsWith("es"));
 
-    const plainText = cleanTextForSpeech(text);
-
-    try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: plainText }] }],
-          systemInstruction: { parts: [{ text: `${BASE_SYSTEM_PROMPT} Te diriges al ejecutivo "${username}". RESPONDE SIEMPRE EN CASTELLANO (ESPAÑOL DE ESPAÑA). Sé extremadamente conciso. Habla fluido, sin mencionar signos de puntuación.` }] },
-          generationConfig: {
-            responseModalities: ["AUDIO"],
-            speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } } }
-          }
-        })
-      });
-
-      if (!response.ok) throw new Error("Audio Generation Failed");
-
-      const result = await response.json();
-      const audioData = result.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-      if (audioData) {
-        const binaryString = atob(audioData);
-        const pcmData = new Int16Array(binaryString.length / 2);
-        for (let i = 0; i < pcmData.length; i++) {
-          pcmData[i] = (binaryString.charCodeAt(i * 2 + 1) << 8) | binaryString.charCodeAt(i * 2);
-        }
-        const wavBlob = pcmToWav(pcmData, 24000);
-        const audio = new Audio(URL.createObjectURL(wavBlob));
-        audio.onended = () => setStatus('IDLE');
-        await audio.play();
-      } else {
-        fallbackSpeak(plainText);
+      if (preferredVoice) {
+          utterance.voice = preferredVoice;
       }
-    } catch (e) {
-      fallbackSpeak(plainText);
-    }
+      
+      // Tuned for natural, professional delivery
+      utterance.pitch = 1.0; 
+      utterance.rate = 1.1; // Slightly faster for "Executive" feel
+
+      utterance.onend = () => setStatus('IDLE');
+      utterance.onerror = () => setStatus('IDLE');
+      
+      window.speechSynthesis.speak(utterance);
   };
 
-  // Ensure voices are loaded
+  // Ensure voices are loaded proactively for mobile/slow browsers
   useEffect(() => {
     const loadVoices = () => {
       window.speechSynthesis.getVoices();
@@ -147,29 +139,6 @@ export default function JarvisAssistant() {
       window.speechSynthesis.onvoiceschanged = null;
     };
   }, []);
-
-  const fallbackSpeak = (text: string) => {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'es-ES'; // Strictly force Spanish locale
-      
-      const voices = window.speechSynthesis.getVoices();
-      
-      // Robust Spanish Voice Selection
-      const preferredVoice = voices.find(v => v.lang === "es-ES" && v.name.includes("Google")) // 1. Google Direct
-                          || voices.find(v => v.lang === "es-ES") // 2. Any Spain Spanish
-                          || voices.find(v => v.lang.startsWith("es")); // 3. Any Spanish (LATAM etc)
-
-      if (preferredVoice) {
-          utterance.voice = preferredVoice;
-      }
-      
-      // Lower pitch/rate for more "serious" tone if possible
-      utterance.pitch = 0.9;
-      utterance.rate = 1.0;
-
-      utterance.onend = () => setStatus('IDLE');
-      window.speechSynthesis.speak(utterance);
-  };
 
   const handleAction = async (userQuery: string) => {
     if (!userQuery.trim()) return;
@@ -305,7 +274,7 @@ export default function JarvisAssistant() {
   return (
     <div
       className={clsx(
-         "relative w-full h-[400px] group/desktop select-none antialiased text-slate-800 cursor-pointer transition-all duration-500 cubic-bezier(0.32, 0.72, 0, 1)",
+         "relative w-full h-[400px] group/desktop select-none antialiased text-slate-800 cursor-pointer transition-transform duration-300 cubic-bezier(0.2, 0, 0, 1)",
          // Removed visual styles from here to allow children to overflow
       )}
       onClick={() => { if (!isActive) toggleListening(); }}
@@ -316,8 +285,8 @@ export default function JarvisAssistant() {
       
       {/* 1. VISUAL CONTAINER (Clipped Backgrounds & Borders) */}
       <div className={clsx(
-         "absolute inset-0 rounded-3xl overflow-hidden bg-white border border-slate-200 shadow-xl transition-all duration-500",
-         isActive ? "shadow-[0_0_80px_rgba(59,130,246,0.15)] ring-2 ring-blue-500/20" : "group-hover/desktop:shadow-2xl group-hover/desktop:border-blue-200"
+         "absolute inset-0 rounded-3xl overflow-hidden bg-white border border-slate-200 shadow-xl transition-shadow duration-300",
+         isActive ? "shadow-[0_0_40px_rgba(59,130,246,0.15)] ring-2 ring-blue-500/20" : "group-hover/desktop:shadow-2xl group-hover/desktop:border-blue-200"
       )}>
           {/* Subtle Grid Pattern - Apple Style */}
           <div className="absolute inset-0 opacity-[0.03] transition-opacity duration-500 group-hover/desktop:opacity-[0.06]" 
@@ -326,36 +295,36 @@ export default function JarvisAssistant() {
           {/* Vignette for depth (Light Mode) */}
           <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,rgba(255,255,255,0.8)_100%)]" />
 
-          {/* THE PRO BORDER GLOW (Optimized for Light) */}
-          <div className={`absolute inset-0 z-10 pointer-events-none transition-opacity duration-500 ${isActive ? 'opacity-100' : 'opacity-0'}`}>
-             <div className="absolute inset-0 rounded-3xl border border-blue-500/10 shadow-[0_0_60px_-10px_rgba(59,130,246,0.1)]" />
+          {/* THE PRO BORDER GLOW (Optimized) */}
+          <div className={`absolute inset-0 z-10 pointer-events-none transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0'}`}>
+             <div className="absolute inset-0 rounded-3xl border border-blue-500/10 shadow-[0_0_30px_-5px_rgba(59,130,246,0.1)]" />
           </div>
       </div>
 
       {/* ==============================================
           PRO BRAND ATOM (Centered Top)
          ============================================== */}
-      <div className={`relative flex flex-col items-center justify-center h-full z-20 transition-all duration-700 cubic-bezier(0.32, 0.72, 0, 1) 
+      <div className={`relative flex flex-col items-center justify-center h-full z-20 transition-transform duration-500 cubic-bezier(0.2, 0, 0, 1) 
                       ${isActive ? 'scale-[1.05]' : 'scale-100'}
-                      ${showNotification ? 'opacity-20 blur-md scale-90 grayscale-[0.5]' : 'opacity-100'}`}
+                      ${showNotification ? 'opacity-20 scale-95 grayscale-[0.5]' : 'opacity-100'}`} // Removed blur from here for performance
            onClick={(e) => { e.stopPropagation(); toggleListening(); }}
-           style={{ willChange: "transform, opacity, filter" }}
+           style={{ willChange: "transform, opacity" }}
       >
-        {/* Apple Intelligence Multi-Ripple */}
+        {/* Apple Intelligence Multi-Ripple (Reduced complexity) */}
         {isActive && (
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 rounded-full border border-cyan-400/30 opacity-0 animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite]" />
+                {/* Removed extra ping layers for performance */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border border-purple-400/30 opacity-0 animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite]" style={{ animationDelay: '0.6s' }} />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 rounded-full border border-pink-400/30 opacity-0 animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite]" style={{ animationDelay: '1.2s' }} />
             </div>
         )}
 
-        {/* Siri Aura Glow */}
-        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full blur-[80px] transition-all duration-700 
-            ${isActive ? 'opacity-20 bg-linear-to-r from-cyan-500 via-blue-500 to-purple-600' : isHovered ? 'opacity-5 bg-blue-400' : 'opacity-0'}`} />
+        {/* Siri Aura Glow (Performance Optimized) */}
+        <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 rounded-full blur-[40px] transition-all duration-500 
+            ${isActive ? 'opacity-20 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600' : isHovered ? 'opacity-5 bg-blue-400' : 'opacity-0'}`} />
 
         <div className="w-56 h-56 flex items-center justify-center animate-atom-breathe relative">
-          <svg viewBox="0 0 100 100" className={`w-full h-full overflow-visible transition-all duration-500 ${isActive ? 'drop-shadow-[0_0_30px_rgba(34,211,238,0.3)]' : 'drop-shadow-none'}`}>
+          <svg viewBox="0 0 100 100" className={`w-full h-full overflow-visible transition-all duration-500 ${isActive ? 'drop-shadow-[0_0_20px_rgba(34,211,238,0.3)]' : 'drop-shadow-none'}`}>
             <defs>
               <linearGradient id="proBlueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#2563EB" stopOpacity="0.8" />
@@ -399,14 +368,14 @@ export default function JarvisAssistant() {
             {/* Electron */}
             {isActive && (
                 <g style={{ transformOrigin: '50px 50px' }} className="animate-[spin_2s_linear_infinite]">
-                   <circle cx="50" cy="8" r="3.5" fill="#22d3ee" className="drop-shadow-[0_0_10px_rgba(34,211,238,0.8)]" />
+                   <circle cx="50" cy="8" r="3.5" fill="#22d3ee" className="drop-shadow-[0_0_5px_rgba(34,211,238,0.8)]" />
                 </g>
             )}
 
             {/* Core */}
             {isActive ? (
                 <>
-                    <circle cx="50" cy="50" r="14" fill="url(#siriMesh)" className="filter blur-sm opacity-80 animate-pulse-fast" />
+                    <circle cx="50" cy="50" r="14" fill="url(#siriMesh)" className="filter blur-[2px] opacity-80 animate-pulse-fast" />
                     <circle cx="50" cy="50" r="12" fill="url(#siriMesh)" />
                     <circle cx="50" cy="50" r="12" fill="url(#activeGlass)" className="mix-blend-overlay" />
                     <circle cx="50" cy="50" r="12" fill="none" stroke="white" strokeOpacity="0.8" strokeWidth="0.5" />
@@ -416,18 +385,18 @@ export default function JarvisAssistant() {
                         fill="url(#glassSphere)"
                         stroke="rgba(255,255,255,0.2)"
                         strokeWidth="0.5"
-                        className={`transition-all duration-700 ease-out origin-center ${isHovered ? 'scale-110' : 'scale-100'}`}
+                        className={`transition-all duration-300 ease-out origin-center ${isHovered ? 'scale-110' : 'scale-100'}`}
                         style={{ transformBox: 'fill-box' }} />
             )}
           </svg>
         </div>
 
         {/* Labels */}
-        <div className={`mt-12 transition-all duration-1000 cubic-bezier(0.34, 1.56, 0.64, 1) 
+        <div className={`mt-12 transition-all duration-500 cubic-bezier(0.2, 0, 0, 1) 
             ${isActive ? 'opacity-0 translate-y-8 scale-90' : 'opacity-100 group-hover/desktop:-translate-y-4'}`}>
-            <div className="px-6 py-2 rounded-full bg-[#0B1121]/80 backdrop-blur-md border border-[#1e293b]/50 shadow-xl flex items-center gap-2 group-hover/desktop:border-[#3B82F6]/40 group-hover/desktop:shadow-[#3B82F6]/20 transition-all duration-500">
-                <div className={`w-1.5 h-1.5 rounded-full transition-colors duration-500 ${isHovered ? 'bg-[#60A5FA] animate-pulse' : 'bg-[#94A3B8]'}`} />
-                <span className={`text-[10px] font-bold tracking-[0.2em] uppercase transition-colors duration-500 ${isHovered ? 'text-white' : 'text-[#94A3B8]'}`}>
+            <div className="px-6 py-2 rounded-full bg-navy-900/80 backdrop-blur-md border border-[#1e293b]/50 shadow-xl flex items-center gap-2 group-hover/desktop:border-[#3B82F6]/40 group-hover/desktop:shadow-[#3B82F6]/20 transition-all duration-300">
+                <div className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${isHovered ? 'bg-[#60A5FA] animate-pulse' : 'bg-[#94A3B8]'}`} />
+                <span className={`text-[10px] font-bold tracking-[0.2em] uppercase transition-colors duration-300 ${isHovered ? 'text-white' : 'text-[#94A3B8]'}`}>
                     {status === 'IDLE' ? 'Neural Engine' : 
                      status === 'LISTENING' ? 'Escuchando' :
                      status === 'THINKING' ? 'Procesando' :
@@ -441,23 +410,24 @@ export default function JarvisAssistant() {
       <AnimatePresence>
         {showNotification && (
           <motion.div 
-             initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
+             initial={{ opacity: 0, scale: 0.95, filter: "blur(4px)" }}
              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-             exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
-             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+             exit={{ opacity: 0, scale: 0.95, filter: "blur(4px)" }}
+             transition={{ duration: 0.3, ease: [0.2, 0, 0, 1] }} // Snappier transition
              className="absolute top-6 bottom-28 left-1/2 -translate-x-1/2 w-full max-w-[440px] z-40 flex flex-col pointer-events-none"
           >
               <div 
                   onClick={(e) => e.stopPropagation()}
-                  className="bg-[#030712]/85 backdrop-blur-[50px] backdrop-saturate-200 border border-white/10 w-full h-full rounded-[24px] shadow-[0_20px_80px_-10px_rgba(0,0,0,0.6)] flex flex-col overflow-hidden relative pointer-events-auto ring-1 ring-white/5"
+                  className="bg-[#030712]/90 backdrop-blur-xl border border-white/10 w-full h-full rounded-[24px] shadow-[0_15px_60px_-10px_rgba(0,0,0,0.6)] flex flex-col overflow-hidden relative pointer-events-auto ring-1 ring-white/5"
               >
-                  <div className="absolute inset-x-0 top-0 h-[200px] bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.1),transparent_70%)] pointer-events-none" />
-                  <div className="h-[2px] w-full bg-linear-to-r from-transparent via-cyan-400 via-purple-500 to-transparent opacity-70" />
+                  {/* Reduced gradient complexity */}
+                  <div className="absolute inset-x-0 top-0 h-[150px] bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.08),transparent_70%)] pointer-events-none" />
+                  <div className="h-[1px] w-full bg-linear-to-r from-transparent via-cyan-400 via-purple-500 to-transparent opacity-50" />
 
                   <div className="flex justify-between items-center px-8 py-4 border-b border-white/5 bg-white/[0.01] relative z-20 shrink-0">
                       <div className="flex items-center gap-3">
                          <div className="relative w-6 h-6 flex items-center justify-center">
-                             <div className="absolute inset-0 bg-blue-500 rounded-full blur-[10px] opacity-20 animate-pulse" />
+                             <div className="absolute inset-0 bg-blue-500 rounded-full blur-[8px] opacity-20 animate-pulse" />
                              <Bot size={14} className="text-cyan-300 relative z-10" />
                          </div>
                          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest pl-1">NSG Intelligence</span>
@@ -468,17 +438,16 @@ export default function JarvisAssistant() {
                   </div>
                   
                   {/* Content - Scrollable Area */}
-                  {/* Content - Scrollable Area */}
                   <div className="flex-1 overflow-y-auto custom-scroll p-6 relative z-30 scroll-smooth overscroll-contain">
                       <div className="prose prose-invert prose-sm active:prose-base transition-all max-w-none leading-relaxed font-normal tracking-wide text-slate-200 break-words marker:text-cyan-400/70">
                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
                                {lastResponse || ''}
                            </ReactMarkdown>
-                           {isProcessing && <span className="inline-block w-2.5 h-5 ml-1.5 bg-gradient-to-t from-cyan-400 via-blue-500 to-purple-500 animate-pulse align-sub rounded-full shadow-[0_0_15px_rgba(34,211,238,0.5)]" />}
+                           {isProcessing && <span className="inline-block w-2 h-4 ml-1.5 bg-cyan-500 animate-pulse align-sub rounded-full opacity-70" />}
                       </div>
                   </div>
                   
-                  <div className="absolute bottom-0 left-0 right-0 h-12 bg-linear-to-t from-[#030712] to-transparent pointer-events-none z-20 opacity-90" />
+                  <div className="absolute bottom-0 left-0 right-0 h-8 bg-linear-to-t from-[#030712] to-transparent pointer-events-none z-20 opacity-80" />
               </div>
           </motion.div>
         )}
@@ -490,8 +459,8 @@ export default function JarvisAssistant() {
              className={`pointer-events-auto transition-all duration-500 cubic-bezier(0.16, 1, 0.3, 1) ${isActive || input.length > 0 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
              onClick={(e) => e.stopPropagation()}
           >
-              <div className="flex items-center gap-4 px-6 py-3 bg-[#0B1121]/90 backdrop-blur-xl rounded-full shadow-[0_4px_24px_-1px_rgba(0,0,0,0.3)] border border-white/10 min-w-[420px] max-w-2xl hover:border-white/20 transition-all group-input relative z-[60]">
-                  <div className="relative flex-shrink-0">
+              <div className="flex items-center gap-4 px-6 py-3 bg-navy-900/90 backdrop-blur-md rounded-full shadow-[0_4px_20px_-2px_rgba(0,0,0,0.3)] border border-white/10 min-w-[420px] max-w-2xl hover:border-white/20 transition-all group-input relative z-[60]">
+                  <div className="relative shrink-0">
                       <div className={clsx("w-2 h-2 rounded-full transition-all duration-300", 
                           status === 'LISTENING' ? "bg-red-500 animate-pulse scale-125" : 
                           status === 'THINKING' ? "bg-amber-400 animate-bounce" :

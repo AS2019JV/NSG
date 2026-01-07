@@ -6,6 +6,7 @@ import BrandAtom from "@/components/ui/BrandAtom";
 import { Lock, ChevronLeft, User, Mail, ArrowRight } from "lucide-react";
 import Link from 'next/link';
 import { authService } from '@/lib/auth';
+import { translateAuthError } from '@/lib/error-translator';
 
 function RegisterContent() {
   const router = useRouter();
@@ -52,7 +53,7 @@ function RegisterContent() {
         router.push(`/auth/login?role=${role || 'manager'}`);
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || "Error al registrarse. Intenta nuevamente.");
+      setError(translateAuthError(err.response?.data?.message || err.message) || "Error al registrarse. Intenta nuevamente.");
     } finally {
       setIsAnimating(false);
     }

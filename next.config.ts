@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
     config.output.devtoolModuleFilenameTemplate = 'nsg:///[resource-path]';
     return config;
   },
-
+  turbopack: {},
 };
 
 export default nextConfig;

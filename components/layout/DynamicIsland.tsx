@@ -31,7 +31,7 @@ export default function DynamicIsland({ currentMode, setMode, selectedModel, set
   ];
 
   return (
-    <div className="relative z-50 flex flex-col items-center justify-start pt-0 md:pt-4 transition-all duration-500 ease-out gap-4 md:gap-6 w-full" ref={containerRef}>
+    <div className="relative z-50 flex flex-col items-center justify-start pt-0 md:pt-4 gap-4 md:gap-6 w-full" ref={containerRef}>
       
       {/* 1. System Status Indicator (Apple Pro Label) */}
       <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/50 backdrop-blur-md border border-white/60 shadow-sm animate-fade-in group cursor-default">
@@ -45,7 +45,7 @@ export default function DynamicIsland({ currentMode, setMode, selectedModel, set
       <div className="relative flex items-center justify-center w-full max-w-[95vw] md:max-w-3xl mx-auto">
         <div className={clsx(
             "flex flex-nowrap items-center p-1.5 gap-1",
-            "bg-[#020617] supports-[backdrop-filter]:bg-[#020617]/90 backdrop-blur-3xl", // Ultra-dark Navy/Black for max contrast
+            "bg-[#020617] supports-[backdrop-filter]:bg-[#020617]/90 backdrop-blur-xl", // Ultra-dark Navy/Black for max contrast
             "border border-white/10 ring-1 ring-white/5",
             "rounded-[2rem] shadow-[0_8px_24px_-6px_rgba(0,0,0,0.3)]", // Reduced, smoother "Pro" shadow
             "overflow-x-auto scrollbar-hide",

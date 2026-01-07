@@ -8,6 +8,7 @@ import BrandAtom from "@/components/ui/BrandAtom";
 import clsx from "clsx";
 import { Lock, ChevronLeft } from "lucide-react";
 import { authService } from '@/lib/auth';
+import { translateAuthError } from '@/lib/error-translator';
 
 function LoginContent() {
     const router = useRouter();
@@ -61,7 +62,7 @@ function LoginContent() {
             router.push("/dashboard");
         } catch (err: unknown) {
             const error = err as any;
-            setError(error.response?.data?.message || "Credenciales inválidas. Intenta nuevamente.");
+            setError(translateAuthError(error.response?.data?.message || error.message) || "Credenciales inválidas. Intenta nuevamente.");
         } finally {
             setIsAnimating(false);
         }
