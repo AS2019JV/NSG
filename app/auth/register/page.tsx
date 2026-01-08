@@ -39,6 +39,7 @@ function RegisterContent() {
       username: formData.name,
       email: formData.email.toLowerCase(),
       password: formData.password,
+      role: role || "patient",
     };
 
     try {
@@ -95,12 +96,12 @@ function RegisterContent() {
 
           {/* Register Form */}
           <div className="w-full relative">
-            <form 
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    handleRegister();
-                }}
-                className="space-y-5"
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleRegister();
+              }}
+              className="space-y-5"
             >
 
               {/* Name */}

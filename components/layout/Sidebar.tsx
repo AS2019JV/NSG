@@ -13,7 +13,7 @@ import BrandAtom from "@/components/ui/BrandAtom";
 
 export default function Sidebar() {
   // 1. Merge State Management
-  const { currentRole } = useAppStore();
+  const { currentRole, setRole } = useAppStore();
   const { isSidebarOpen, toggleSidebar } = useUIStore(); // Controls mobile state
   const pathname = usePathname();
   const router = useRouter();
@@ -31,6 +31,12 @@ export default function Sidebar() {
         // Correctly access 'user' (lowercase) based on API response
         if (data?.user?.username) {
           setUsername(data.user.username);
+        }
+        if (data?.user?.role) {
+          // We might want to only set it if it's different to avoid loops, 
+          // but zustand is usually smart. 
+          // Also casting to any because of potential type mismatch string vs RoleType
+          setRole(data.user.role as any);
         }
       } catch (error) {
       }

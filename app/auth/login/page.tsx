@@ -58,7 +58,11 @@ function LoginContent() {
                 setUserId(data.user.id);
             }
 
-            setRole(selectedRole);
+            if (data.user?.role) {
+                setRole(data.user.role as RoleType);
+            } else {
+                setRole(selectedRole);
+            }
             router.push("/dashboard");
         } catch (err: unknown) {
             const error = err as any;
@@ -85,7 +89,7 @@ function LoginContent() {
                     {/* Header Section */}
                     <div className="flex flex-col items-center text-center mb-6">
                         <BrandAtom className="w-12 h-12 mb-2" variant="colored" />
-                        
+
                         <div className="space-y-1">
                             <h1 className="font-display font-medium text-slate-900 text-2xl tracking-tight">
                                 Bienvenido
@@ -96,8 +100,8 @@ function LoginContent() {
                         </div>
                     </div>
 
-                     {/* Error Message */}
-                     {error && (
+                    {/* Error Message */}
+                    {error && (
                         <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl text-center">
                             {error}
                         </div>
@@ -105,7 +109,7 @@ function LoginContent() {
 
                     {/* Login Form */}
                     <div className="w-full relative">
-                        <form 
+                        <form
                             onSubmit={(e) => {
                                 e.preventDefault();
                                 handleLogin();
@@ -117,7 +121,7 @@ function LoginContent() {
                                     <label className="text-xs font-bold text-slate-500 ml-1 uppercase tracking-wider">Usuario / Email</label>
                                     <div className="relative group">
                                         <div className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors flex items-center justify-center font-bold text-[10px]">@</div>
-                                        <input 
+                                        <input
                                             type="text"
                                             value={email}
                                             onChange={(e) => {
@@ -134,7 +138,7 @@ function LoginContent() {
                                     <label className="text-xs font-bold text-slate-500 ml-1 uppercase tracking-wider">Contraseña</label>
                                     <div className="relative group">
                                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                                        <input 
+                                        <input
                                             type="password"
                                             value={password}
                                             onChange={(e) => {
@@ -149,14 +153,14 @@ function LoginContent() {
                             </div>
 
                             <div className="flex items-center justify-between pt-2">
-                                <button 
+                                <button
                                     type="button"
                                     onClick={handleBack}
                                     className="text-slate-500 hover:text-slate-800 text-sm font-medium transition-colors flex items-center gap-1 pl-1 cursor-pointer"
                                 >
                                     <ChevronLeft className="w-4 h-4" /> Atrás
                                 </button>
-                                <button 
+                                <button
                                     type="submit"
                                     disabled={isAnimating}
                                     className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-2.5 px-6 rounded-xl shadow-lg shadow-blue-600/20 hover:shadow-blue-600/30 transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
@@ -165,10 +169,10 @@ function LoginContent() {
                                 </button>
                             </div>
 
-                             {/* Register Link */}
-                             <div className="mt-8 pt-6 border-t border-slate-100 flex justify-center text-sm">
+                            {/* Register Link */}
+                            <div className="mt-8 pt-6 border-t border-slate-100 flex justify-center text-sm">
                                 <span className="text-slate-500 mr-1">¿No tienes cuenta?</span>
-                                <a 
+                                <a
                                     href={`/auth/register?role=${selectedRole || 'manager'}`}
                                     className="text-blue-600 font-semibold hover:text-blue-700 transition-colors cursor-pointer"
                                 >
