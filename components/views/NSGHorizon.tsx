@@ -11,7 +11,7 @@ import {
   PenTool, ArrowUpRight, CheckSquare, ListTodo, PlusCircle,
   Folder, ArrowLeft, MoreHorizontal, Loader2,
   Zap, Activity, ChevronRight, CheckCircle, Trash2, Sparkles, X, Search, ChevronDown, ChevronUp,
-  Mic, Music, UploadCloud, Headphones, PlayCircle, Clock
+  Mic, Music, UploadCloud, Headphones, PlayCircle, Clock, DownloadCloud
 } from "lucide-react";
 import clsx from "clsx";
 import ReactMarkdown from 'react-markdown';
@@ -954,7 +954,7 @@ export default function NSGHorizon() {
     >
 
       {/* 1. HEADER */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white p-4 sm:p-6 rounded-2xl sm:rounded-[2rem] border border-slate-200 shadow-sm shrink-0 mx-4 sm:mx-0">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white p-4 sm:p-6 rounded-2xl sm:rounded-4xl border border-slate-200 shadow-sm shrink-0 mx-4 sm:mx-0">
         <div className="flex items-center gap-3 sm:gap-4 w-full lg:w-auto">
           <button
             onClick={() => setSelectedFolder(null)}
@@ -965,7 +965,7 @@ export default function NSGHorizon() {
 
           <div className="w-px h-8 sm:h-10 bg-slate-200 mx-1 sm:mx-2 hidden xs:block"></div>
 
-          <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-900 shrink-0 shadow-lg hidden sm:flex">
+          <div className="w-14 h-14 bg-slate-50 rounded-2xl hidden sm:flex items-center justify-center text-slate-900 shrink-0 shadow-lg">
             <Layers className="w-7 h-7" />
           </div>
           <div className="overflow-hidden">
@@ -980,7 +980,23 @@ export default function NSGHorizon() {
             onClick={() => setShowTranscription(true)}
             className="px-3 sm:px-6 py-2.5 sm:py-3 bg-slate-50 text-navy-900 text-xs sm:text-sm font-bold rounded-xl hover:bg-slate-100 transition border border-slate-200 flex items-center justify-center gap-2 cursor-pointer no-underline"
           >
-            <FileText className="w-3.5 h-3.5 sm:w-4 h-4" /> <span className="hidden md:inline">Ver</span> Transc.
+            <FileText className="w-5 h-5 sm:w-6 h-6" /> <span className="hidden md:inline">Ver</span> Transc.
+          </button>
+          <button
+            onClick={() => {
+              if (!selectedFolder.aiInfo) return;
+              const info = selectedFolder.aiInfo;
+              const report = `REPORTE ESTRATÉGICO: ${selectedFolder.title}\n\n` +
+                `FACTOR 1: ${info.punto_de_dolor?.titulo}\n${info.punto_de_dolor?.descripcion}\n\n` +
+                `FACTOR 2: ${info.oportunidad?.titulo}\n${info.oportunidad?.descripcion}\n\n` +
+                `FACTOR 3: ${info.herramienta?.nombre}\n${info.herramienta?.descripcion}`;
+              navigator.clipboard.writeText(report);
+              showToast("Reporte copiado al portapapeles", "success");
+            }}
+            disabled={!selectedFolder.aiInfo}
+            className="px-3 sm:px-6 py-2.5 sm:py-3 bg-white text-navy-900 text-xs sm:text-sm font-bold rounded-xl hover:bg-slate-50 transition border border-slate-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+          >
+            <Sparkles className="w-4 h-4 text-blue-500" /> <span className="hidden md:inline">Copiar</span> Reporte
           </button>
           <a
             href={selectedFolder.shareUrl}
@@ -989,8 +1005,23 @@ export default function NSGHorizon() {
             onClick={() => showToast('Abriendo sesión...', 'info')}
             className="px-3 sm:px-6 py-2.5 sm:py-3 bg-slate-50 text-navy-900 text-xs sm:text-sm font-bold rounded-xl hover:bg-slate-100 transition border border-slate-200 flex items-center justify-center gap-2 cursor-pointer no-underline"
           >
-            <Play className="w-3.5 h-3.5 sm:w-4 h-4" /> <span className="hidden md:inline">Ver</span> Sesión
+            <Play className="w-4 h-4" /> <span className="hidden md:inline">Ver</span> Sesión
           </a>
+          <button
+            onClick={() => {
+              const text = selectedFolder.transcripts?.map(t => `[${t.time}] ${t.speakerName}: ${t.text}`).join('\n');
+              const blob = new Blob([text || ""], { type: 'text/plain' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `Transcripcion_${selectedFolder.title}.txt`;
+              a.click();
+              showToast("Iniciando descarga...", "info");
+            }}
+            className="px-3 sm:px-6 py-2.5 sm:py-3 bg-slate-50 text-navy-900 text-xs sm:text-sm font-bold rounded-xl hover:bg-slate-100 transition border border-slate-200 flex items-center justify-center gap-2 cursor-pointer no-underline"
+          >
+            <DownloadCloud className="w-4 h-4" /> <span className="hidden md:inline">Bajar</span> TXT
+          </button>
           <button
             onClick={() => showToast('Exportando PDF...', 'success')}
             className="flex-1 lg:flex-none px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition shadow-lg shadow-blue-200 flex items-center justify-center gap-2 cursor-pointer"
@@ -1061,19 +1092,19 @@ export default function NSGHorizon() {
               {/* Quick Insights Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="bg-rose-500/10 p-5 rounded-2xl border border-rose-500/20 backdrop-blur-sm group hover:bg-rose-500/15 transition-all">
-                  <p className="text-[10px] font-black text-rose-400 uppercase mb-2 tracking-widest">Punto de Dolor</p>
+                  <p className="text-[10px] font-black text-rose-400 uppercase mb-2 tracking-widest">Factor 1</p>
                   <p className="text-sm font-bold text-white leading-snug">
                     {selectedFolder.aiInfo?.punto_de_dolor?.titulo || "Analizando..."}
                   </p>
                 </div>
                 <div className="bg-emerald-500/10 p-5 rounded-2xl border border-emerald-500/20 backdrop-blur-sm group hover:bg-emerald-500/15 transition-all">
-                  <p className="text-[10px] font-black text-emerald-400 uppercase mb-2 tracking-widest">Oportunidad</p>
+                  <p className="text-[10px] font-black text-emerald-400 uppercase mb-2 tracking-widest">Factor 2</p>
                   <p className="text-sm font-bold text-white leading-snug">
                     {selectedFolder.aiInfo?.oportunidad?.titulo || "Analizando..."}
                   </p>
                 </div>
                 <div className="bg-purple-500/10 p-5 rounded-2xl border border-purple-500/20 backdrop-blur-sm group hover:bg-purple-500/15 transition-all">
-                  <p className="text-[10px] font-black text-purple-400 uppercase mb-2 tracking-widest">Herramienta</p>
+                  <p className="text-[10px] font-black text-purple-400 uppercase mb-2 tracking-widest">Factor 3</p>
                   <p className="text-sm font-bold text-white leading-snug">
                     {selectedFolder.aiInfo?.herramienta?.nombre || "Analizando..."}
                   </p>
@@ -1095,7 +1126,7 @@ export default function NSGHorizon() {
                       <Activity className="w-7 h-7" />
                     </div>
                     <div>
-                      <h5 className="font-bold text-navy-900 text-xl">Análisis del Punto de Dolor</h5>
+                      <h5 className="font-bold text-navy-900 text-xl">Análisis del Factor 1</h5>
                       <p className="text-xs text-slate-500 font-medium tracking-wide uppercase">Detección de Fricción</p>
                     </div>
                   </div>
@@ -1121,14 +1152,14 @@ export default function NSGHorizon() {
                       <Zap className="w-7 h-7" />
                     </div>
                     <div>
-                      <h5 className="font-bold text-navy-900 text-xl">Nueva Oportunidad Estratégica</h5>
+                      <h5 className="font-bold text-navy-900 text-xl">Nuevo Factor 2 Estratégico</h5>
                       <p className="text-xs text-slate-500 font-medium tracking-wide uppercase">Potencial de Transformación</p>
                     </div>
                   </div>
                   <p className="text-base text-slate-700 leading-relaxed mb-8 relative z-10 font-medium">
                     {selectedFolder.aiInfo.oportunidad.descripcion}
                   </p>
-                  <div className="p-6 bg-emerald-50/50 rounded-[2rem] border border-emerald-100 relative z-10 flex gap-4 items-center">
+                  <div className="p-6 bg-emerald-50/50 rounded-4xl border border-emerald-100 relative z-10 flex gap-4 items-center">
                     <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center shrink-0">
                       <Sparkles className="w-6 h-6 text-emerald-500" />
                     </div>
@@ -1146,7 +1177,7 @@ export default function NSGHorizon() {
 
                   <div className="flex items-start justify-between mb-10 relative z-10">
                     <div className="flex items-center gap-6">
-                      <div className="w-20 h-20 bg-blue-600 rounded-[2rem] flex items-center justify-center text-slate-900 shadow-2xl shadow-blue-200">
+                      <div className="w-20 h-20 bg-blue-600 rounded-4xl flex items-center justify-center text-slate-900 shadow-2xl shadow-blue-200">
                         <ListTodo className="w-10 h-10" />
                       </div>
                       <div>
@@ -1227,7 +1258,7 @@ export default function NSGHorizon() {
               <div className="max-w-md">
                 <h5 className="text-2xl font-bold text-navy-900 mb-2">Análisis Profundo en Proceso</h5>
                 <p className="text-slate-500 leading-relaxed font-medium">
-                  Generando estrategias tácticas, identificación de puntos de dolor y planes de acción personalizados con nuestro Context Engine...
+                  Generando estrategias tácticas, identificación de factores clave y planes de acción personalizados con nuestro Context Engine...
                 </p>
               </div>
               <button
@@ -1258,7 +1289,7 @@ export default function NSGHorizon() {
 
       {/* --- TRANSCRIPTION SIDE DRAWER --- */}
       {showTranscription && (
-        <div className="fixed inset-0 z-[100] flex justify-end animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-100 flex justify-end animate-in fade-in duration-300">
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-slate-50/40 backdrop-blur-sm"
