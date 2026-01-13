@@ -9,7 +9,12 @@ import {
     ArrowUp,
     Loader2,
     X,
-    FileText
+    FileText,
+    Zap,
+    Layers,
+    Scale,
+    ChevronDown,
+    BrainCircuit
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -21,6 +26,7 @@ import BrandAtom from '@/components/ui/BrandAtom';
 import AtomEffect from '@/components/ui/AtomEffect';
 import NewsAnalysisResult from './NewsAnalysisResult';
 import axios from 'axios';
+import { AnimatePresence, motion } from 'framer-motion';
 
 // Extended Message Type to support your Analysis Cards AND standard text
 export interface Message {
@@ -229,13 +235,15 @@ export default function ChatInterface() {
     const [mode, setMode] = useState('standard');
     const [selectedModel, setSelectedModel] = useState('Chat GPT');
 
+    const [intelligenceMode, setIntelligenceMode] = useState<'pulse' | 'compare' | 'fusion' | 'deep'>('pulse');
+    const [isModeOpen, setIsModeOpen] = useState(false);
+
     // Attachment & Audio State
     const [attachment, setAttachment] = useState<File | null>(null);
     const [isRecording, setIsRecording] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-
 
 
     // Derived state for current view
@@ -388,9 +396,15 @@ export default function ChatInterface() {
             let requestData;
             let headers = { 'Content-Type': 'application/json' };
 
+            // Determine Role String (Map logic to backend expectations)
+            let sendingRole = currentRole as string;
+            if (currentRole === 'manager') sendingRole = 'ceo';
+            // if (currentRole === 'admin') sendingRole = 'student'; // Optional: If verified
+
             const contextData = {
-                role: currentRole,
-                mode: activeMode,
+                role: sendingRole,
+                tab: activeMode,
+                mode: intelligenceMode,
                 cacheName: cacheName,
                 messageHistory: [...activeMessages, userMessage].map(m => ({
                     role: m.role,
@@ -496,6 +510,8 @@ export default function ChatInterface() {
                     setMode={setMode} 
                     selectedModel={selectedModel}
                     setSelectedModel={setSelectedModel}
+                    intelligenceMode={intelligenceMode}
+                    setIntelligenceMode={setIntelligenceMode}
                 />
             </div>
         </div>
@@ -602,6 +618,70 @@ export default function ChatInterface() {
                                     >
                                         <Mic className="w-5 h-5" />
                                     </button>
+
+                                    {/* SEPARATOR */}
+                                    <div className="w-px h-5 bg-slate-200 mx-1" />
+
+                                    {/* INTELLIGENCE MODE SELECTOR (Gemini Style) */}
+                                    <div className="relative">
+                                        <button
+                                            type="button"
+                                            onClick={() => setIsModeOpen(!isModeOpen)}
+                                            className={clsx(
+                                                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 border",
+                                                isModeOpen || intelligenceMode !== 'pulse'
+                                                    ? "bg-blue-50 border-blue-200 text-blue-700 shadow-sm" 
+                                                    : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50 hover:border-slate-300 shadow-sm"
+                                            )}
+                                        >
+                                            {intelligenceMode === 'pulse' && <Zap className="w-3.5 h-3.5 text-amber-500" />}
+                                            {intelligenceMode === 'compare' && <Layers className="w-3.5 h-3.5 text-blue-500" />}
+                                            {intelligenceMode === 'fusion' && <Scale className="w-3.5 h-3.5 text-purple-500" />}
+                                            
+                                            <span>
+                                                {intelligenceMode === 'pulse' ? 'Pulso' : 
+                                                 intelligenceMode === 'compare' ? 'Comparar' : 'Fusión'}
+                                            </span>
+                                            <ChevronDown className={clsx("w-3 h-3 opacity-50 transition-transform duration-200", isModeOpen && "rotate-180")} />
+                                        </button>
+
+                                        <AnimatePresence>
+                                            {isModeOpen && (
+                                                <motion.div
+                                                    initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                    exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                                                    className="absolute bottom-full left-0 mb-3 w-48 p-1 bg-white rounded-2xl shadow-xl border border-slate-100 flex flex-col gap-0.5 z-50 overflow-hidden ring-1 ring-slate-400/10"
+                                                >
+                                                    {[
+                                                        { id: 'pulse', label: 'Pulso', icon: Zap, color: 'text-amber-500', desc: 'Rápido' },
+                                                        { id: 'compare', label: 'Comparar', icon: Layers, color: 'text-blue-600', desc: 'Paralelo' },
+                                                        { id: 'fusion', label: 'Fusión', icon: Scale, color: 'text-purple-600', desc: 'Consenso' },
+                                                    ].map(m => (
+                                                        <button
+                                                            key={m.id}
+                                                            type="button"
+                                                            onClick={() => { setIntelligenceMode(m.id as any); setIsModeOpen(false); }}
+                                                            className={clsx(
+                                                                "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors text-left group",
+                                                                intelligenceMode === m.id ? "bg-slate-50" : "hover:bg-slate-50"
+                                                            )}
+                                                        >
+                                                            <div className={clsx("p-1.5 rounded-full bg-white border border-slate-100 shadow-sm group-hover:shadow-md transition-shadow", m.color)}>
+                                                                <m.icon className="w-3.5 h-3.5" />
+                                                            </div>
+                                                            <div className="flex flex-col">
+                                                                <span className={clsx("text-[13px] font-semibold", intelligenceMode === m.id ? "text-slate-900" : "text-slate-700")}>
+                                                                    {m.label}
+                                                                </span>
+                                                            </div>
+                                                            {intelligenceMode === m.id && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-500" />}
+                                                        </button>
+                                                    ))}
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
                                 </div>
 
                                 <button

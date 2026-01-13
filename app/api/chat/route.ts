@@ -8,29 +8,53 @@ const BASE_URL = "https://personal-n8n.suwsiw.easypanel.host/webhook";
 
 export async function POST(req: Request) {
   try {
-    if (!BASE_URL) {
-      return NextResponse.json({ error: "Server Configuration Error: Missing Webhook URL" }, { status: 500 });
-    }
-
     // 1. Determine Request Type & Target Path
     const contentType = req.headers.get('content-type') || '';
     const isMultipart = contentType.includes('multipart/form-data');
 
-    // Logic: Files -> nsg-documents, everything else -> nsg-chat
-    const endpointPath = isMultipart ? 'nsg-documents' : 'nsg-chat';
+    // 2. Parse Body & Determine Target Path
+    let bodyData: any;
+    let fetchOptions: RequestInit = { method: 'POST' };
 
-    // 2. Prepare Fetch Options
-    const fetchOptions: RequestInit = { method: 'POST' };
+    let intelligenceMode = 'pulse'; // Default
 
     if (isMultipart) {
-      // FormData: Boundary is automatically set by fetch
-      fetchOptions.body = await req.formData();
+      // FormData: Parse to extract mode, then forward
+      const formData = await req.formData();
+      bodyData = formData; // Keep as FormData for forwarding
+      
+      const contextStr = formData.get('context') as string;
+      if (contextStr) {
+          try {
+              const context = JSON.parse(contextStr);
+              if (context.mode) intelligenceMode = context.mode;
+          } catch (e) {
+              // ignore parse error, use default
+          }
+      }
+      
+      // FormData body is set directly
+      fetchOptions.body = formData; 
     } else {
-      // JSON: Manual content-type
-      fetchOptions.body = JSON.stringify(await req.json());
+      // JSON: Parse to extract mode, then forward
+      bodyData = await req.json();
+      
+      if (bodyData.context?.mode) {
+          intelligenceMode = bodyData.context.mode;
+      }
+      
+      fetchOptions.body = JSON.stringify(bodyData);
       fetchOptions.headers = { 'Content-Type': 'application/json' };
     }
-
+    
+    // Map mode to path (secure fallback)
+    const validModes = ['pulse', 'compare', 'fusion', 'deep'];
+    // User requested 'ai/pulse', 'ai/compare', 'ai/fusion'. Assuming 'deep' maps to ai/deep or fallback.
+    // Let's sanitize to be safe.
+    const cleanMode = validModes.includes(intelligenceMode) ? intelligenceMode : 'pulse';
+    
+    const endpointPath = `ai/${cleanMode}`;
+    
     // 3. Execution
     // User manages the mode (test vs prod) via the env variable
     // We expect BASE_URL to be the common path, e.g. "https://domain.com/webhook"
