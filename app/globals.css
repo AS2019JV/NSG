@@ -275,6 +275,72 @@ body {
     }
 }
 
+/* --- MOBILE-FIRST OPTIMIZATIONS --- */
+/* iPhone-specific safe areas and touch optimization */
+@media (max-width: 428px) {
+    /* Safe area insets for iPhone with notch */
+    .safe-ios {
+        padding-left: max(env(safe-area-inset-left), 1rem);
+        padding-right: max(env(safe-area-inset-right), 1rem);
+        padding-top: max(env(safe-area-inset-top), 0px);
+        padding-bottom: max(env(safe-area-inset-bottom), 0px);
+    }
+
+    /* Touch-friendly buttons - Apple HIG recommendation */
+    button,
+    a[role="button"],
+    .btn,
+    .clickable {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    /* Reduce animation duration for better performance */
+    * {
+        animation-duration: 0.25s !important;
+    }
+
+    /* Optimize scrolling for mobile */
+    .custom-scroll {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+
+    /* Prevent zoom on focus for inputs */
+    input,
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+
+    /* Better modal experience on small screens */
+    [role="dialog"],
+    .modal {
+        max-width: calc(100vw - 2rem);
+        max-height: calc(100vh - 2rem);
+    }
+}
+
+/* Small iPhones (SE, 12 mini) */
+@media (max-width: 375px) {
+    /* Reduce padding for very small screens */
+    .container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+
+    /* Compact typography */
+    h1 {
+        font-size: 1.75rem;
+    }
+    h2 {
+        font-size: 1.5rem;
+    }
+    h3 {
+        font-size: 1.25rem;
+    }
+}
+
 .toast {
     pointer-events: auto;
     background: rgba(15, 23, 42, 0.95);

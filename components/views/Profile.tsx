@@ -189,62 +189,62 @@ export default function Profile() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8 animate-fade-in-up pb-10 px-4 sm:px-0">
+    <div className="max-w-6xl mx-auto space-y-4 xs:space-y-6 sm:space-y-8 animate-fade-in-up pb-10 px-3 xs:px-4 sm:px-0">
       
       {/* Dark Header Banner - Clarity Style */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-navy-950 via-navy-900 to-navy-950 px-8 py-6 rounded-3xl border border-navy-800/50 shadow-xl">
+      <div className="relative overflow-hidden bg-gradient-to-r from-navy-950 via-navy-900 to-navy-950 px-5 xs:px-6 sm:px-8 py-5 xs:py-6 rounded-2xl xs:rounded-3xl border border-navy-800/50 shadow-xl">
         <div className="relative z-10">
-          <h2 className="font-display font-bold text-2xl lg:text-3xl tracking-tight">
+          <h2 className="font-display font-bold text-xl xs:text-2xl lg:text-3xl tracking-tight">
             <span className="text-white">Gestión de </span>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Mi Perfil</span>
             <span className="text-white">.</span>
           </h2>
-          <p className="text-slate-300 text-sm mt-2 max-w-3xl leading-relaxed">
+          <p className="text-slate-300 text-xs xs:text-sm mt-2 max-w-3xl leading-relaxed">
             Administra tu información personal, credenciales de acceso y configuración de cuenta. Panel de usuario ejecutándose.
           </p>
         </div>
       </div>
 
       {/* Profile Card */}
-      <div className="bg-white p-8 rounded-3xl shadow-card border border-slate-200">
+      <div className="bg-white p-5 xs:p-6 sm:p-8 rounded-2xl xs:rounded-3xl shadow-card border border-slate-200">
         {/* Avatar Section */}
-        <div className="flex flex-col sm:flex-row items-center gap-8 mb-10 p-6 bg-slate-50/50 rounded-3xl border border-slate-100 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-100/30 rounded-full blur-3xl -mr-32 -mt-32 opacity-60"></div>
+        <div className="flex flex-col sm:flex-row items-center gap-5 xs:gap-6 sm:gap-8 mb-6 xs:mb-8 sm:mb-10 p-4 xs:p-5 sm:p-6 bg-slate-50/50 rounded-2xl xs:rounded-3xl border border-slate-100 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-48 xs:w-64 h-48 xs:h-64 bg-blue-100/30 rounded-full blur-3xl -mr-24 xs:-mr-32 -mt-24 xs:-mt-32 opacity-60"></div>
           
           <div className="relative">
-            <div className="w-32 h-32 bg-linear-to-br from-blue-600 to-indigo-700 rounded-full flex items-center justify-center text-white font-bold text-5xl shadow-xl shadow-blue-200 relative overflow-hidden">
+            <div className="w-24 h-24 xs:w-28 xs:h-28 sm:w-32 sm:h-32 bg-linear-to-br from-blue-600 to-indigo-700 rounded-full flex items-center justify-center text-white font-bold text-4xl xs:text-5xl shadow-xl shadow-blue-200 relative overflow-hidden">
               <span className="relative z-10">{username ? username.substring(0, 2).toUpperCase() : 'US'}</span>
             </div>
             <button 
               onClick={() => showToast('Funcionalidad en desarrollo', 'info')}
-              className="absolute -bottom-2 -right-2 bg-white p-3 rounded-full shadow-lg border border-slate-200 hover:bg-blue-50 transition cursor-pointer group/btn"
+              className="absolute -bottom-1 -right-1 xs:-bottom-2 xs:-right-2 bg-white p-2 xs:p-3 rounded-full shadow-lg border border-slate-200 hover:bg-blue-50 transition cursor-pointer group/btn min-w-[40px] min-h-[40px] flex items-center justify-center"
             >
-              <Camera className="w-4 h-4 text-slate-600 group-hover/btn:text-blue-600" />
+              <Camera className="w-3.5 h-3.5 xs:w-4 xs:h-4 text-slate-600 group-hover/btn:text-blue-600" />
             </button>
-            <div className="absolute -bottom-2 -left-2 bg-white p-2 rounded-full shadow-lg border border-slate-100">
-              <div className="bg-emerald-500 w-5 h-5 rounded-full border-2 border-white animate-pulse"></div>
+            <div className="absolute -bottom-1 -left-1 xs:-bottom-2 xs:-left-2 bg-white p-1.5 xs:p-2 rounded-full shadow-lg border border-slate-100">
+              <div className="bg-emerald-500 w-4 h-4 xs:w-5 xs:h-5 rounded-full border-2 border-white animate-pulse"></div>
             </div>
           </div>
 
           <div className="text-center sm:text-left relative z-10 flex-1">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
-              <h3 className="font-bold text-3xl text-navy-950">{username || 'Usuario Activo'}</h3>
-              <span className="inline-flex items-center px-3 py-1 rounded-lg bg-emerald-100 text-emerald-700 text-xs font-bold uppercase w-fit mx-auto sm:mx-0">
-                <CheckCircle2 className="w-3 h-3 mr-1" />
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 xs:gap-3 mb-2 xs:mb-3">
+              <h3 className="font-bold text-2xl xs:text-3xl text-navy-950">{username || 'Usuario Activo'}</h3>
+              <span className="inline-flex items-center px-2.5 xs:px-3 py-1 rounded-lg bg-emerald-100 text-emerald-700 text-[10px] xs:text-xs font-bold uppercase w-fit mx-auto sm:mx-0">
+                <CheckCircle2 className="w-2.5 h-2.5 xs:w-3 xs:h-3 mr-1" />
                 Verificado
               </span>
             </div>
-            <p className="text-slate-500 mb-4">{email || 'usuario@nsg.com'}</p>
-            <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-bold uppercase">
+            <p className="text-slate-500 mb-3 xs:mb-4 text-sm xs:text-base">{email || 'usuario@nsg.com'}</p>
+            <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
+              <span className="px-2.5 xs:px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-[10px] xs:text-xs font-bold uppercase">
                 Role: {role || 'User'}
               </span>
-              <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs font-bold">
+              <span className="px-2.5 xs:px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-[10px] xs:text-xs font-bold">
                 ID: {userId || 'N/A'}
               </span>
               {telegramId && (
-                <span className="px-3 py-1 bg-[#0088cc]/10 text-[#0088cc] rounded-lg text-xs font-bold flex items-center gap-1">
-                  <svg viewBox="0 0 24 24" className="w-3 h-3 fill-current">
+                <span className="px-2.5 xs:px-3 py-1 bg-[#0088cc]/10 text-[#0088cc] rounded-lg text-[10px] xs:text-xs font-bold flex items-center gap-1">
+                  <svg viewBox="0 0 24 24" className="w-2.5 h-2.5 xs:w-3 xs:h-3 fill-current">
                     <path d="M11.944 0C5.352 0 0 5.352 0 11.944c0 6.592 5.352 11.944 11.944 11.944c6.592 0 11.944-5.352 11.944-11.944C23.888 5.352 18.536 0 11.944 0zm5.66 8.16l-1.928 9.096c-.144.644-.528.804-1.068.5l-2.936-2.164l-1.416 1.364c-.156.156-.288.288-.588.288l.212-3.04l5.524-4.992c.24-.212-.052-.332-.372-.12l-6.828 4.3l-2.948-.92c-.64-.2-.652-.64.132-.948l11.524-4.44c.532-.2.996.12.804.976z" />
                   </svg>
                   Telegram: {telegramId}
@@ -533,13 +533,13 @@ interface ModalProps {
 
 function Modal({ title, children, onClose }: ModalProps) {
   return (
-    <div className="fixed inset-0 bg-navy-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
-      <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl animate-scale-in">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="font-display font-bold text-2xl text-navy-900">{title}</h3>
+    <div className="fixed inset-0 bg-navy-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 xs:p-4 animate-fade-in">
+      <div className="bg-white rounded-2xl xs:rounded-3xl max-w-md w-full p-5 xs:p-6 shadow-2xl animate-scale-in">
+        <div className="flex items-center justify-between mb-5 xs:mb-6">
+          <h3 className="font-display font-bold text-xl xs:text-2xl text-navy-900">{title}</h3>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-slate-100 rounded-xl transition cursor-pointer"
+            className="p-2 hover:bg-slate-100 rounded-xl transition cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center"
           >
             <X className="w-5 h-5 text-slate-400" />
           </button>

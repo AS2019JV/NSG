@@ -90,14 +90,14 @@ export default function Sidebar() {
 
       {/* Main Sidebar Container */}
       <aside className={clsx(
-        "fixed lg:static inset-y-0 left-0 w-72 bg-navy-950 flex flex-col text-slate-400 border-r border-navy-900 shadow-2xl z-90 transition-transform duration-300 ease-in-out transform h-full",
+        "fixed lg:static inset-y-0 left-0 w-full xs:w-64 sm:w-72 bg-navy-950 flex flex-col text-slate-400 border-r border-navy-900 shadow-2xl z-90 transition-transform duration-300 ease-in-out transform h-full",
         isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
 
         {/* HEADER */}
-        <div className="h-20 flex items-center px-6 border-b border-navy-900 justify-between bg-navy-950/50 backdrop-blur-md sticky top-0 z-10 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 relative shrink-0 atom-container">
+        <div className="h-16 xs:h-20 flex items-center px-4 xs:px-6 border-b border-navy-900 justify-between bg-navy-950/50 backdrop-blur-md sticky top-0 z-10 shrink-0">
+          <div className="flex items-center gap-2 xs:gap-3">
+            <div className="w-6 h-6 xs:w-8 xs:h-8 relative shrink-0 atom-container">
               <div className="w-full h-full atom-breathe">
                 <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible">
                   <defs><linearGradient id="sidebarGrad" x1="0" y1="0" x2="100" y2="100"><stop offset="0" stopColor="#60A5FA" /><stop offset="1" stopColor="#FFFFFF" /></linearGradient></defs>
@@ -108,16 +108,16 @@ export default function Sidebar() {
                 </svg>
               </div>
             </div>
-            <span className="font-display font-bold text-white text-lg tracking-tight">NSG <span className="font-normal text-blue-400">Intelligence</span></span>
+            <span className="font-display font-bold text-white text-base xs:text-lg tracking-tight">NSG <span className="font-normal text-blue-400">Intelligence</span></span>
           </div>
 
-          <button className="lg:hidden p-2 text-slate-500 hover:text-white transition cursor-pointer" onClick={toggleSidebar}>
+          <button className="lg:hidden p-2 text-slate-500 hover:text-white transition cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center" onClick={toggleSidebar}>
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* USER PROFILE with Dropdown */}
-        <div className="px-6 py-4 shrink-0 relative">
+        <div className="px-4 xs:px-6 py-3 xs:py-4 shrink-0 relative">
           <div
             className="flex items-center gap-3 bg-white/5 p-2.5 rounded-xl border border-white/5 group transition-all hover:bg-white/10 cursor-pointer"
             onClick={() => setShowUserMenu(!showUserMenu)}

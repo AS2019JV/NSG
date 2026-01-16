@@ -54,26 +54,17 @@ export default function LandingPage() {
             </div>
 
             {/* MAIN CONTENT CONTAINER - Reduced top padding from pt-32 to pt-24 */}
-            <div className="flex-1 flex flex-col items-center justify-start pt-14 lg:pt-20 pb-20 relative z-10 w-full max-w-5xl lg:max-w-6xl mx-auto px-6 lg:px-12 safe-bottom-scroll">
+            <div className="flex-1 flex flex-col items-center justify-start pt-10 xs:pt-14 lg:pt-20 pb-16 xs:pb-20 relative z-10 w-full max-w-5xl lg:max-w-6xl mx-auto px-4 xs:px-6 lg:px-12 safe-bottom-scroll">
 
                 {/* 1. IDENTITY SECTION */}
                 <div className="w-full text-center flex flex-col items-center animate-fade-in-up">
 
                     {/* LANDING ATOM - Significantly increased size */}
-                    <div className="w-56 h-56 md:w-72 md:h-72 lg:w-80 lg:h-80 mb-8 lg:mb-10 relative atom-container">
-                        <div className="absolute inset-0 bg-blue-600/5 blur-[100px] rounded-full scale-125 animate-pulse-slow"></div>
+                    <div className="w-44 h-44 xs:w-56 xs:h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 mb-6 xs:mb-8 lg:mb-10 relative atom-container">
+                        <div className="absolute inset-0 bg-blue-600/5 blur-[80px] xs:blur-[100px] rounded-full scale-125 animate-pulse-slow"></div>
                         <div className="w-full h-full atom-breathe">
                             <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible drop-shadow-2xl">
-                                <defs>
-                                    <linearGradient id="landingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" stopColor="#2563EB" />
-                                        <stop offset="100%" stopColor="#6366f1" />
-                                    </linearGradient>
-                                    <radialGradient id="coreLanding" cx="50%" cy="50%" r="50%">
-                                        <stop offset="0%" stopColor="#FFFFFF" />
-                                        <stop offset="100%" stopColor="#3B82F6" />
-                                    </radialGradient>
-                                </defs>
+                                <defs><linearGradient id="landingGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#2563EB" /><stop offset="100%" stopColor="#6366f1" /></linearGradient><radialGradient id="coreLanding" cx="50%" cy="50%" r="50%"><stop offset="0%" stopColor="#FFFFFF" /><stop offset="100%" stopColor="#3B82F6" /></radialGradient></defs>
                                 <circle cx="50" cy="50" r="45" className="morph-orbit orbit-1 landing-orbit" stroke="url(#landingGrad)" />
                                 <circle cx="50" cy="50" r="45" className="morph-orbit orbit-2 landing-orbit" stroke="url(#landingGrad)" style={{ transform: 'rotate(60deg) scaleY(0.45)' }} />
                                 <circle cx="50" cy="50" r="45" className="morph-orbit orbit-3 landing-orbit" stroke="url(#landingGrad)" style={{ transform: 'rotate(120deg) scaleY(0.45)' }} />
@@ -84,20 +75,20 @@ export default function LandingPage() {
                     </div>
 
                     {/* PRECISE COPY - Strengthened Title */}
-                    <div className="space-y-6 lg:space-y-6 max-w-3xl lg:max-w-4xl mx-auto">
-                        <p className="text-[0.65rem] md:text-xs lg:text-xs font-bold text-slate-400 tracking-[0.3em] uppercase pl-1">NSG SYSTEM OS • Enterprise</p>
-                        <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-black tracking-tighter text-navy-950 leading-[1.05] drop-shadow-sm">
+                    <div className="space-y-4 xs:space-y-6 lg:space-y-6 max-w-3xl lg:max-w-4xl mx-auto">
+                        <p className="text-[0.6rem] xs:text-[0.65rem] md:text-xs lg:text-xs font-bold text-slate-400 tracking-[0.25em] xs:tracking-[0.3em] uppercase pl-1">NSG SYSTEM OS • Enterprise</p>
+                        <h1 className="font-display text-4xl xs:text-5xl sm:text-6xl lg:text-7xl font-black tracking-tighter text-navy-950 leading-[1.05] drop-shadow-sm px-2 xs:px-0">
                             Sistema personalizado <br /><span className="text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-indigo-600">de inteligencia profesional.</span>
                         </h1>
-                        <div className="relative pl-6 border-l-4 border-blue-100 text-left mx-auto max-w-md md:max-w-lg lg:max-w-xl mt-6 lg:mt-8">
-                            <p className="text-lg md:text-xl lg:text-xl text-slate-600 font-system font-normal leading-relaxed italic">
+                        <div className="relative pl-4 xs:pl-6 border-l-4 border-blue-100 text-left mx-auto max-w-md md:max-w-lg lg:max-w-xl mt-5 xs:mt-6 lg:mt-8">
+                            <p className="text-base xs:text-lg md:text-xl lg:text-xl text-slate-600 font-system font-normal leading-relaxed italic">
                                 &quot;Transformamos datos clínicos y corporativos en estrategias inteligentes.&quot;
                             </p>
                         </div>
                     </div>
 
                     {/* CERTIFICATE */}
-                    <div className="mt-12 lg:mt-16 w-full max-w-lg lg:max-w-xl mx-auto transform transition-all hover:scale-[1.02] duration-500">
+                    <div className="mt-10 xs:mt-12 lg:mt-16 w-full max-w-lg lg:max-w-xl mx-auto transform transition-all hover:scale-[1.02] duration-500">
                         <div className="bg-white/95 backdrop-blur-xl border border-slate-200/80 p-1 rounded-2xl shadow-sovereign w-full text-left">
                             <div className="bg-gradient-to-br from-white to-slate-50 rounded-xl p-5 sm:p-6 lg:p-8 flex flex-col sm:flex-row items-center gap-6 relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-blue-50/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
@@ -123,60 +114,60 @@ export default function LandingPage() {
                 </div>
 
                 {/* 2. ROLE SELECTION */}
-                <div className="w-full animate-fade-in-up mt-16 lg:mt-24" style={{ animationDelay: '0.15s' }}>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 lg:gap-6 w-full">
+                <div className="w-full animate-fade-in-up mt-12 xs:mt-16 lg:mt-24" style={{ animationDelay: '0.15s' }}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 xs:gap-5 lg:gap-6 w-full">
                         {/* Consultor */}
-                        <button onClick={() => selectProfile('consultant')} className="group bg-white p-6 lg:p-8 rounded-[2rem] text-left border border-slate-100 hover:border-blue-200 hover:shadow-precision transition-all duration-500 transform hover:-translate-y-1 cursor-pointer">
-                            <div className="flex justify-between mb-5 lg:mb-6">
-                                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-slate-50 text-navy-950 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:text-blue-600 group-hover:bg-blue-50">
-                                    <Briefcase className="w-6 h-6 lg:w-7 lg:h-7" />
+                        <button onClick={() => selectProfile('consultant')} className="group bg-white p-5 xs:p-6 lg:p-8 rounded-3xl xs:rounded-[2rem] text-left border border-slate-100 hover:border-blue-200 hover:shadow-precision transition-all duration-500 transform hover:-translate-y-1 cursor-pointer min-h-[140px] xs:min-h-auto">
+                            <div className="flex justify-between mb-4 xs:mb-5 lg:mb-6">
+                                <div className="w-10 h-10 xs:w-12 xs:h-12 lg:w-14 lg:h-14 bg-slate-50 text-navy-950 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:text-blue-600 group-hover:bg-blue-50">
+                                    <Briefcase className="w-5 h-5 xs:w-6 xs:h-6 lg:w-7 lg:h-7" />
                                 </div>
-                                <ArrowRight className="w-5 h-5 lg:w-6 lg:h-6 text-slate-300 group-hover:text-blue-600 transition-transform group-hover:translate-x-1" />
+                                <ArrowRight className="w-4 h-4 xs:w-5 xs:h-5 lg:w-6 lg:h-6 text-slate-300 group-hover:text-blue-600 transition-transform group-hover:translate-x-1" />
                             </div>
-                            <h3 className="font-system font-semibold text-lg lg:text-xl text-navy-900">Consultor</h3>
-                            <p className="text-xs lg:text-sm text-slate-500 mt-1 font-system font-normal">Gestión de Activos & Data Strategy</p>
+                            <h3 className="font-system font-semibold text-base xs:text-lg lg:text-xl text-navy-900">Consultor</h3>
+                            <p className="text-[11px] xs:text-xs lg:text-sm text-slate-500 mt-1 font-system font-normal">Gestión de Activos & Data Strategy</p>
                         </button>
 
                         {/* Psicologo */}
-                        <button onClick={() => selectProfile('psychologist')} className="group bg-white p-6 lg:p-8 rounded-[2rem] text-left border border-slate-100 hover:border-sky-200 hover:shadow-precision transition-all duration-500 transform hover:-translate-y-1 cursor-pointer">
-                            <div className="flex justify-between mb-5 lg:mb-6">
-                                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-slate-50 text-navy-950 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:text-sky-600 group-hover:bg-sky-50">
-                                    <Brain className="w-6 h-6 lg:w-7 lg:h-7" />
+                        <button onClick={() => selectProfile('psychologist')} className="group bg-white p-5 xs:p-6 lg:p-8 rounded-3xl xs:rounded-[2rem] text-left border border-slate-100 hover:border-sky-200 hover:shadow-precision transition-all duration-500 transform hover:-translate-y-1 cursor-pointer min-h-[140px] xs:min-h-auto">
+                            <div className="flex justify-between mb-4 xs:mb-5 lg:mb-6">
+                                <div className="w-10 h-10 xs:w-12 xs:h-12 lg:w-14 lg:h-14 bg-slate-50 text-navy-950 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:text-sky-600 group-hover:bg-sky-50">
+                                    <Brain className="w-5 h-5 xs:w-6 xs:h-6 lg:w-7 lg:h-7" />
                                 </div>
-                                <ArrowRight className="w-5 h-5 lg:w-6 lg:h-6 text-slate-300 group-hover:text-sky-600 transition-transform group-hover:translate-x-1" />
+                                <ArrowRight className="w-4 h-4 xs:w-5 xs:h-5 lg:w-6 lg:h-6 text-slate-300 group-hover:text-sky-600 transition-transform group-hover:translate-x-1" />
                             </div>
-                            <h3 className="font-system font-semibold text-lg lg:text-xl text-navy-900">Psicólogo</h3>
-                            <p className="text-xs lg:text-sm text-slate-500 mt-1 font-system font-normal">Clínica & Análisis de Conducta</p>
+                            <h3 className="font-system font-semibold text-base xs:text-lg lg:text-xl text-navy-900">Psicólogo</h3>
+                            <p className="text-[11px] xs:text-xs lg:text-sm text-slate-500 mt-1 font-system font-normal">Clínica & Análisis de Conducta</p>
                         </button>
 
                         {/* Directivo */}
-                        <button onClick={() => selectProfile('manager')} className="group bg-white p-6 lg:p-8 rounded-[2rem] text-left border border-slate-100 hover:border-emerald-200 hover:shadow-precision transition-all duration-500 transform hover:-translate-y-1 cursor-pointer">
-                            <div className="flex justify-between mb-5 lg:mb-6">
-                                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-slate-50 text-navy-950 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:text-emerald-600 group-hover:bg-emerald-50">
-                                    <Building2 className="w-6 h-6 lg:w-7 lg:h-7" />
+                        <button onClick={() => selectProfile('manager')} className="group bg-white p-5 xs:p-6 lg:p-8 rounded-3xl xs:rounded-[2rem] text-left border border-slate-100 hover:border-emerald-200 hover:shadow-precision transition-all duration-500 transform hover:-translate-y-1 cursor-pointer min-h-[140px] xs:min-h-auto">
+                            <div className="flex justify-between mb-4 xs:mb-5 lg:mb-6">
+                                <div className="w-10 h-10 xs:w-12 xs:h-12 lg:w-14 lg:h-14 bg-slate-50 text-navy-950 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:text-emerald-600 group-hover:bg-emerald-50">
+                                    <Building2 className="w-5 h-5 xs:w-6 xs:h-6 lg:w-7 lg:h-7" />
                                 </div>
-                                <ArrowRight className="w-5 h-5 lg:w-6 lg:h-6 text-slate-300 group-hover:text-emerald-600 transition-transform group-hover:translate-x-1" />
+                                <ArrowRight className="w-4 h-4 xs:w-5 xs:h-5 lg:w-6 lg:h-6 text-slate-300 group-hover:text-emerald-600 transition-transform group-hover:translate-x-1" />
                             </div>
-                            <h3 className="font-system font-semibold text-lg lg:text-xl text-navy-900">CEO / Directivo</h3>
-                            <p className="text-xs lg:text-sm text-slate-500 mt-1 font-system font-normal">Inteligencia de Datos & KPIs</p>
+                            <h3 className="font-system font-semibold text-base xs:text-lg lg:text-xl text-navy-900">CEO / Directivo</h3>
+                            <p className="text-[11px] xs:text-xs lg:text-sm text-slate-500 mt-1 font-system font-normal">Inteligencia de Datos & KPIs</p>
                         </button>
 
                         {/* Paciente */}
-                        <button onClick={() => selectProfile('patient')} className="group bg-white p-6 lg:p-8 rounded-[2rem] text-left border border-slate-100 hover:border-teal-200 hover:shadow-precision transition-all duration-500 transform hover:-translate-y-1 cursor-pointer">
-                            <div className="flex justify-between mb-5 lg:mb-6">
-                                <div className="w-12 h-12 lg:w-14 lg:h-14 bg-slate-50 text-navy-950 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:text-teal-600 group-hover:bg-teal-50">
-                                    <HeartPulse className="w-6 h-6 lg:w-7 lg:h-7" />
+                        <button onClick={() => selectProfile('patient')} className="group bg-white p-5 xs:p-6 lg:p-8 rounded-3xl xs:rounded-[2rem] text-left border border-slate-100 hover:border-teal-200 hover:shadow-precision transition-all duration-500 transform hover:-translate-y-1 cursor-pointer min-h-[140px] xs:min-h-auto">
+                            <div className="flex justify-between mb-4 xs:mb-5 lg:mb-6">
+                                <div className="w-10 h-10 xs:w-12 xs:h-12 lg:w-14 lg:h-14 bg-slate-50 text-navy-950 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:text-teal-600 group-hover:bg-teal-50">
+                                    <HeartPulse className="w-5 h-5 xs:w-6 xs:h-6 lg:w-7 lg:h-7" />
                                 </div>
-                                <ArrowRight className="w-5 h-5 lg:w-6 lg:h-6 text-slate-300 group-hover:text-teal-600 transition-transform group-hover:translate-x-1" />
+                                <ArrowRight className="w-4 h-4 xs:w-5 xs:h-5 lg:w-6 lg:h-6 text-slate-300 group-hover:text-teal-600 transition-transform group-hover:translate-x-1" />
                             </div>
-                            <h3 className="font-system font-semibold text-lg lg:text-xl text-navy-900">Paciente</h3>
-                            <p className="text-xs lg:text-sm text-slate-500 mt-1 font-system font-normal">Bienestar Integral & Tracking</p>
+                            <h3 className="font-system font-semibold text-base xs:text-lg lg:text-xl text-navy-900">Paciente</h3>
+                            <p className="text-[11px] xs:text-xs lg:text-sm text-slate-500 mt-1 font-system font-normal">Bienestar Integral & Tracking</p>
                         </button>
                     </div>
                 </div>
 
                 {/* FOOTER */}
-                <div className="mt-20 lg:mt-24 w-full pt-10 pb-8 text-center flex flex-col items-center gap-6 border-t border-slate-100/50">
+                <div className="mt-16 xs:mt-20 lg:mt-24 w-full pt-8 xs:pt-10 pb-6 xs:pb-8 text-center flex flex-col items-center gap-4 xs:gap-6 border-t border-slate-100/50">
                     <div><p className="text-[0.65rem] font-system font-medium text-slate-400 uppercase tracking-widest">&copy; 2024 NSG Intelligence. All rights reserved.</p></div>
                     <div className="flex items-center gap-6 text-[0.7rem] font-system font-medium text-slate-500">
                         <Link href="/politica-de-privacidad" className="hover:text-blue-600 transition">Política de Privacidad</Link>

@@ -568,7 +568,7 @@ export default function NSGHorizon() {
                   <p className="text-xs text-slate-500">Conecta Fathom para sincronizar tus reuniones</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pb-20">
+                <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 xs:gap-4 pb-20">
                   {folders.map((folder, index) => {
                     const hasAnalysis = !!folder.aiInfo;
                     const animationDelay = `${index * 50}ms`;
@@ -578,50 +578,50 @@ export default function NSGHorizon() {
                         key={folder.id}
                         onClick={() => setSelectedFolder(folder)}
                         style={{ animationDelay }}
-                        className="bg-white rounded-3xl p-6 border border-slate-200 hover:border-blue-300 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-500 cursor-pointer group flex flex-col h-full animate-fade-in-up relative overflow-hidden"
+                        className="bg-white rounded-2xl xs:rounded-3xl p-5 xs:p-6 border border-slate-200 hover:border-blue-300 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-500 cursor-pointer group flex flex-col h-full animate-fade-in-up relative overflow-hidden min-h-[180px]"
                       >
                         {/* Status Badge */}
                         {hasAnalysis && (
-                          <div className="absolute top-4 right-4">
-                            <div className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-black uppercase flex items-center gap-1">
-                              <Sparkles className="w-3 h-3" />
+                          <div className="absolute top-3 xs:top-4 right-3 xs:right-4">
+                            <div className="px-1.5 xs:px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[9px] xs:text-[10px] font-black uppercase flex items-center gap-1">
+                              <Sparkles className="w-2.5 h-2.5 xs:w-3 xs:h-3" />
                               AI
                             </div>
                           </div>
                         )}
 
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-50 to-violet-50 text-blue-600 flex items-center justify-center group-hover:from-blue-600 group-hover:to-violet-600 group-hover:text-white transition-all duration-300 shadow-md group-hover:shadow-lg group-hover:scale-110">
-                            <Headphones className="w-7 h-7" />
+                        <div className="flex justify-between items-start mb-3 xs:mb-4">
+                          <div className="w-12 h-12 xs:w-14 xs:h-14 rounded-2xl bg-gradient-to-br from-blue-50 to-violet-50 text-blue-600 flex items-center justify-center group-hover:from-blue-600 group-hover:to-violet-600 group-hover:text-white transition-all duration-300 shadow-md group-hover:shadow-lg group-hover:scale-110">
+                            <Headphones className="w-6 h-6 xs:w-7 xs:h-7" />
                           </div>
                         </div>
 
-                        <h4 className="font-bold text-navy-900 text-lg mb-2 group-hover:text-blue-600 transition line-clamp-2">
+                        <h4 className="font-bold text-navy-900 text-base xs:text-lg mb-2 group-hover:text-blue-600 transition line-clamp-2">
                           {folder.title}
                         </h4>
 
-                        <p className="text-sm text-slate-500 mb-4 line-clamp-2 flex-1 font-medium leading-relaxed">
+                        <p className="text-xs xs:text-sm text-slate-500 mb-3 xs:mb-4 line-clamp-2 flex-1 font-medium leading-relaxed">
                           {folder.description}
                         </p>
 
-                        <div className="pt-4 border-t border-slate-100 space-y-3">
+                        <div className="pt-3 xs:pt-4 border-t border-slate-100 space-y-2 xs:space-y-3">
                           {/* Progress indicator */}
                           {hasAnalysis && (
                             <div className="flex items-center gap-2 mb-2">
                               <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                                 <div className="h-full bg-gradient-to-r from-blue-500 to-violet-500 rounded-full" style={{ width: '75%' }}></div>
                               </div>
-                              <span className="text-[10px] font-bold text-slate-500">75%</span>
+                              <span className="text-[9px] xs:text-[10px] font-bold text-slate-500">75%</span>
                             </div>
                           )}
                           
-                          <div className="flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider">
-                            <span className="flex items-center gap-1.5">
-                              <Calendar className="w-3.5 h-3.5" />
+                          <div className="flex items-center justify-between text-[10px] xs:text-xs font-bold text-slate-400 uppercase tracking-wider">
+                            <span className="flex items-center gap-1 xs:gap-1.5">
+                              <Calendar className="w-3 h-3 xs:w-3.5 xs:h-3.5" />
                               {folder.date}
                             </span>
-                            <span className="flex items-center gap-1.5 text-blue-600 font-bold">
-                              <Clock className="w-3.5 h-3.5" />
+                            <span className="flex items-center gap-1 xs:gap-1.5 text-blue-600 font-bold">
+                              <Clock className="w-3 h-3 xs:w-3.5 xs:h-3.5" />
                               {folder.timeStr}
                             </span>
                           </div>
