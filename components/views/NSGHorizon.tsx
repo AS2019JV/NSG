@@ -10,13 +10,15 @@ import {
   Layers, Calendar, Play, FileCheck, FileText, Cpu,
   PenTool, ArrowUpRight, CheckSquare, ListTodo, PlusCircle,
   Folder, ArrowLeft, MoreHorizontal, Loader2,
-  Zap, Activity, ChevronRight, CheckCircle, Trash2, Sparkles, X, Search, ChevronDown, ChevronUp,
-  Mic, Music, UploadCloud, Headphones, PlayCircle, Clock, DownloadCloud, Sunrise
+  Zap, Activity, ChevronRight, CheckCircle, Trash2, X, Search, ChevronDown, ChevronUp,
+  Mic, Music, UploadCloud, Headphones, PlayCircle, Clock, DownloadCloud, Sunrise,
+  FolderOpen, Timer, FileType
 } from "lucide-react";
 import clsx from "clsx";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import AtomEffect from "@/components/ui/AtomEffect";
+import BrandAtom from "@/components/ui/BrandAtom";
 import { SkeletonCard } from "@/components/ui/Skeleton";
 
 // --- Types ---
@@ -78,7 +80,7 @@ export default function NSGHorizon() {
   const [isFathomLoading, setIsFathomLoading] = useState(false);
   const [checkedItems, setCheckedItems] = useState<number[]>([]);
   const [showFathomModal, setShowFathomModal] = useState(false);
-  
+
   // Initialize from localStorage for instant feedback
   const [isConnected, setIsConnected] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -86,7 +88,7 @@ export default function NSGHorizon() {
     }
     return false;
   });
-  
+
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   const [fathomToken, setFathomToken] = useState<string | null>(null);
@@ -113,17 +115,17 @@ export default function NSGHorizon() {
             setFathomToken('***');
             localStorage.setItem('fathom_connected', 'true');
           } else {
-             // If server says disconnected but local said connected, fix it
+            // If server says disconnected but local said connected, fix it
             if (localStorage.getItem('fathom_connected') === 'true') {
-               setIsConnected(false);
-               localStorage.removeItem('fathom_connected');
+              setIsConnected(false);
+              localStorage.removeItem('fathom_connected');
             }
           }
         }
       } catch (error) {
         console.error("Error checking Fathom connection:", error);
-         // Don't necessarily disconnect on error, could be network blip, 
-         // but if it persists the user will see error elsewhere
+        // Don't necessarily disconnect on error, could be network blip, 
+        // but if it persists the user will see error elsewhere
       }
     };
 
@@ -296,7 +298,7 @@ export default function NSGHorizon() {
 
       let response;
       if (selectedFolder.source === 'manual') {
-         response = await api.post('/transcriptions/generate-analysis', {
+        response = await api.post('/transcriptions/generate-analysis', {
           transcription_id: selectedFolder.id
         });
       } else {
@@ -317,9 +319,9 @@ export default function NSGHorizon() {
         // Forzar una recarga del análisis ahora que sabemos que existe
         let analysisResponse;
         if (selectedFolder.source === 'manual') {
-             analysisResponse = await api.get(`/transcriptions/analysis/${selectedFolder.id}`);
+          analysisResponse = await api.get(`/transcriptions/analysis/${selectedFolder.id}`);
         } else {
-             analysisResponse = await api.get(`/fathom/analysis/${selectedFolder.id}`);
+          analysisResponse = await api.get(`/fathom/analysis/${selectedFolder.id}`);
         }
 
         if (analysisResponse.status === 200) {
@@ -352,9 +354,9 @@ export default function NSGHorizon() {
       try {
         let response;
         if (selectedFolder.source === 'manual') {
-            response = await api.get(`/transcriptions/analysis/${selectedFolder.id}`);
+          response = await api.get(`/transcriptions/analysis/${selectedFolder.id}`);
         } else {
-            response = await api.get(`/fathom/analysis/${selectedFolder.id}`);
+          response = await api.get(`/fathom/analysis/${selectedFolder.id}`);
         }
 
         if (response.status === 200) {
@@ -402,13 +404,13 @@ export default function NSGHorizon() {
     // Save to backend
     try {
       if (selectedFolder.source === 'manual') {
-          await api.put(`/transcriptions/analysis/${selectedFolder.id}/steps`, { 
-            checked_steps: newCheckedItems 
-          });
+        await api.put(`/transcriptions/analysis/${selectedFolder.id}/steps`, {
+          checked_steps: newCheckedItems
+        });
       } else {
-          await api.put(`/fathom/analysis/${selectedFolder.id}/steps`, { 
-            checked_steps: newCheckedItems 
-          });
+        await api.put(`/fathom/analysis/${selectedFolder.id}/steps`, {
+          checked_steps: newCheckedItems
+        });
       }
       showToast("Progreso guardado", "success");
     } catch (error) {
@@ -422,14 +424,14 @@ export default function NSGHorizon() {
   if (!selectedFolder) {
     // Calculate metrics
     const totalSessions = activeTab === 'fathom' ? folders.length : manualRecordings.length;
-    const sessionsWithAnalysis = activeTab === 'fathom' 
-      ? folders.filter(f => f.aiInfo).length 
+    const sessionsWithAnalysis = activeTab === 'fathom'
+      ? folders.filter(f => f.aiInfo).length
       : 0; // Manual doesn't show analysis count in list
     const lastSync = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 
     return (
       <div className="flex flex-col min-h-screen gap-4 animate-fade-in-up pb-16 px-3 lg:px-4">
-        
+
         {/* Dark Header Banner - Clarity Style */}
         <div className="relative overflow-hidden bg-gradient-to-r from-navy-950 via-navy-900 to-navy-950 px-8 py-6 rounded-3xl border border-navy-800/50 shadow-xl">
           <div className="relative z-10">
@@ -443,10 +445,10 @@ export default function NSGHorizon() {
             </p>
           </div>
         </div>
-        
+
         {/* TAB NAVIGATION - Clarity Style */}
         <div className="flex p-1 bg-slate-50 rounded-xl w-full max-w-md shadow-inner border border-slate-100">
-          <button 
+          <button
             onClick={() => setActiveTab('fathom')}
             className={clsx(
               "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300",
@@ -456,7 +458,7 @@ export default function NSGHorizon() {
             <Activity className="w-3.5 h-3.5" />
             Fathom Sync
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('manual')}
             className={clsx(
               "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all duration-300",
@@ -476,7 +478,7 @@ export default function NSGHorizon() {
               <div className="w-full bg-linear-to-r from-navy-900 via-navy-800 to-blue-900 rounded-4xl p-8 sm:p-10 text-white relative overflow-hidden shadow-xl border border-navy-700/50">
                 {/* Decorational Elements */}
                 <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3 pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3 pointer-events-none"></div>
 
                 <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
                   <div className="space-y-4 max-w-2xl text-center md:text-left">
@@ -559,11 +561,11 @@ export default function NSGHorizon() {
               </div>
 
               {isFathomLoading ? (
-                 <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 xs:gap-4">
-                    {Array.from({ length: 8 }).map((_, i) => (
-                      <SkeletonCard key={i} />
-                    ))}
-                 </div>
+                <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 xs:gap-4">
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <SkeletonCard key={i} />
+                  ))}
+                </div>
               ) : folders.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-slate-400 border-2 border-dashed border-slate-200 rounded-3xl bg-slate-50/30">
                   <Folder className="w-12 h-12 mb-3 opacity-30" />
@@ -575,7 +577,7 @@ export default function NSGHorizon() {
                   {folders.map((folder, index) => {
                     const hasAnalysis = !!folder.aiInfo;
                     const animationDelay = `${index * 50}ms`;
-                    
+
                     return (
                       <div
                         key={folder.id}
@@ -587,14 +589,14 @@ export default function NSGHorizon() {
                         {hasAnalysis && (
                           <div className="absolute top-3 xs:top-4 right-3 xs:right-4">
                             <div className="px-1.5 xs:px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[9px] xs:text-[10px] font-black uppercase flex items-center gap-1">
-                              <Sparkles className="w-2.5 h-2.5 xs:w-3 xs:h-3" />
+                              <BrandAtom className="w-2.5 h-2.5 xs:w-3 xs:h-3" variant="colored" />
                               AI
                             </div>
                           </div>
                         )}
 
                         <div className="flex justify-between items-start mb-3 xs:mb-4">
-                          <div className="w-12 h-12 xs:w-14 xs:h-14 rounded-2xl bg-gradient-to-br from-blue-50 to-violet-50 text-blue-600 flex items-center justify-center group-hover:from-blue-600 group-hover:to-violet-600 group-hover:text-white transition-all duration-300 shadow-md group-hover:shadow-lg group-hover:scale-110">
+                          <div className="w-12 h-12 xs:w-14 xs:h-14 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 text-blue-600 flex items-center justify-center group-hover:from-blue-600 group-hover:to-indigo-600 group-hover:text-white transition-all duration-300 shadow-md group-hover:shadow-lg group-hover:scale-110">
                             <Headphones className="w-6 h-6 xs:w-7 xs:h-7" />
                           </div>
                         </div>
@@ -612,12 +614,12 @@ export default function NSGHorizon() {
                           {hasAnalysis && (
                             <div className="flex items-center gap-2 mb-2">
                               <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                <div className="h-full bg-gradient-to-r from-blue-500 to-violet-500 rounded-full" style={{ width: '75%' }}></div>
+                                <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full" style={{ width: '75%' }}></div>
                               </div>
                               <span className="text-[9px] xs:text-[10px] font-bold text-slate-500">75%</span>
                             </div>
                           )}
-                          
+
                           <div className="flex items-center justify-between text-[10px] xs:text-xs font-bold text-slate-400 uppercase tracking-wider">
                             <span className="flex items-center gap-1 xs:gap-1.5">
                               <Calendar className="w-3 h-3 xs:w-3.5 xs:h-3.5" />
@@ -631,7 +633,7 @@ export default function NSGHorizon() {
                         </div>
 
                         {/* Hover indicator */}
-                        <div className="absolute bottom-0 left-0 h-1 w-0 bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600 group-hover:w-full transition-all duration-700 ease-in-out rounded-b-3xl"></div>
+                        <div className="absolute bottom-0 left-0 h-1 w-0 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 group-hover:w-full transition-all duration-700 ease-in-out rounded-b-3xl"></div>
                       </div>
                     );
                   })}
@@ -642,7 +644,7 @@ export default function NSGHorizon() {
         ) : (
           /* NEURAL STUDIO TAB CONTENT */
           <div className="flex flex-col gap-6 animate-fade-in">
-            
+
             {/* Step-by-Step Guide */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
@@ -654,7 +656,7 @@ export default function NSGHorizon() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">2</div>
@@ -664,7 +666,7 @@ export default function NSGHorizon() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
                 <div className="flex items-start gap-3">
                   <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">3</div>
@@ -688,7 +690,7 @@ export default function NSGHorizon() {
                         <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">Neural Studio</span>
                       </div>
                     </div>
-                    
+
                     <h3 className="text-2xl font-display font-bold text-navy-900 mb-2">
                       Análisis Manual de Contenido
                     </h3>
@@ -703,24 +705,24 @@ export default function NSGHorizon() {
                       Paso 1: Selecciona el tipo de contenido
                     </label>
                     <div className="flex p-1.5 bg-slate-50 rounded-xl border border-slate-200">
-                      <button 
+                      <button
                         onClick={() => setManualInputType('audio')}
                         className={clsx(
                           "flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-bold transition-all",
-                          manualInputType === 'audio' 
-                            ? "bg-white text-blue-600 shadow-md" 
+                          manualInputType === 'audio'
+                            ? "bg-white text-blue-600 shadow-md"
                             : "text-slate-500 hover:text-slate-700"
                         )}
                       >
-                        <Music className="w-4 h-4" />
+                        <Mic className="w-4 h-4" />
                         Archivo de Audio
                       </button>
-                      <button 
+                      <button
                         onClick={() => setManualInputType('text')}
                         className={clsx(
                           "flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-bold transition-all",
-                          manualInputType === 'text' 
-                            ? "bg-white text-blue-600 shadow-md" 
+                          manualInputType === 'text'
+                            ? "bg-white text-blue-600 shadow-md"
                             : "text-slate-500 hover:text-slate-700"
                         )}
                       >
@@ -735,19 +737,31 @@ export default function NSGHorizon() {
                     {manualInputType === 'audio' ? (
                       <>
                         <div className="px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg">
-                          <p className="text-xs font-bold text-blue-700">📁 Formatos: MP3, WAV, M4A</p>
+                          <p className="text-xs font-bold text-blue-700 flex items-center gap-1.5">
+                            <FolderOpen className="w-3.5 h-3.5" />
+                            Formatos: MP3, WAV, M4A
+                          </p>
                         </div>
                         <div className="px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg">
-                          <p className="text-xs font-bold text-blue-700">⏱️ Duración: Hasta 2 horas</p>
+                          <p className="text-xs font-bold text-blue-700 flex items-center gap-1.5">
+                            <Timer className="w-3.5 h-3.5" />
+                            Duración: Hasta 2 horas
+                          </p>
                         </div>
                       </>
                     ) : (
                       <>
-                        <div className="px-3 py-2 bg-purple-50 border border-purple-100 rounded-lg">
-                          <p className="text-xs font-bold text-purple-700">📝 Sin límite de caracteres</p>
+                        <div className="px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg">
+                          <p className="text-xs font-bold text-blue-700 flex items-center gap-1.5">
+                            <FileType className="w-3.5 h-3.5" />
+                            Sin límite de caracteres
+                          </p>
                         </div>
-                        <div className="px-3 py-2 bg-purple-50 border border-purple-100 rounded-lg">
-                          <p className="text-xs font-bold text-purple-700">⚡ Análisis instantáneo</p>
+                        <div className="px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg">
+                          <p className="text-xs font-bold text-blue-700 flex items-center gap-1.5">
+                            <Zap className="w-3.5 h-3.5" />
+                            Análisis instantáneo
+                          </p>
                         </div>
                       </>
                     )}
@@ -759,25 +773,25 @@ export default function NSGHorizon() {
                   <label className="text-sm font-bold text-slate-700 mb-3 block">
                     Paso 2: {manualInputType === 'audio' ? 'Sube tu archivo de audio' : 'Escribe o pega tu texto'}
                   </label>
-                  
+
                   {manualInputType === 'audio' ? (
-                    <div 
+                    <div
                       onClick={() => fileInputRef.current?.click()}
                       className={clsx(
                         "relative border-3 border-dashed rounded-2xl p-12 transition-all duration-300 cursor-pointer flex flex-col items-center justify-center gap-4 text-center min-h-[340px]",
-                        selectedFile 
-                          ? "bg-blue-50 border-blue-500 shadow-lg" 
+                        selectedFile
+                          ? "bg-blue-50 border-blue-500 shadow-lg"
                           : "bg-slate-50 border-slate-300 hover:border-blue-400 hover:bg-blue-50/30 hover:shadow-xl"
                       )}
                     >
-                      <input 
-                        type="file" 
-                        ref={fileInputRef} 
-                        className="hidden" 
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
                         accept="audio/*"
                         onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
                       />
-                      
+
                       {selectedFile ? (
                         <>
                           <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
@@ -785,10 +799,13 @@ export default function NSGHorizon() {
                           </div>
                           <div>
                             <p className="text-navy-900 font-bold text-lg mb-1">{selectedFile.name}</p>
-                            <p className="text-blue-600 text-sm font-bold">✓ Listo para analizar</p>
+                            <p className="text-blue-600 text-sm font-bold flex items-center gap-1.5">
+                              <CheckCircle className="w-4 h-4" />
+                              Listo para analizar
+                            </p>
                           </div>
                           <div className="flex gap-3 mt-4">
-                            <button 
+                            <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setSelectedFile(null);
@@ -797,7 +814,7 @@ export default function NSGHorizon() {
                             >
                               Cambiar archivo
                             </button>
-                            <button 
+                            <button
                               onClick={async (e) => {
                                 e.stopPropagation();
                                 if (!selectedFile) return;
@@ -862,7 +879,7 @@ export default function NSGHorizon() {
                   ) : (
                     <div className="flex flex-col gap-4">
                       <div className="relative group/text">
-                        <textarea 
+                        <textarea
                           value={manualTextContent}
                           onChange={(e) => setManualTextContent(e.target.value)}
                           placeholder="Pega aquí el texto de la transcripción..."
@@ -872,7 +889,7 @@ export default function NSGHorizon() {
                           <div className="px-2 py-1 bg-blue-600 text-white text-[8px] font-black uppercase rounded shadow-lg">Analizador Activo</div>
                         </div>
                       </div>
-                      <button 
+                      <button
                         onClick={async () => {
                           if (!manualTextContent.trim()) {
                             showToast("Por favor ingresa algún texto", "error");
@@ -895,7 +912,7 @@ export default function NSGHorizon() {
                             if (response.status === 201) {
                               const savedT = response.data;
                               setManualRecordings(prev => [{
-                                id: savedT._id, 
+                                id: savedT._id,
                                 title: savedT.content.substring(0, 30) + "...",
                                 date: new Date(savedT.createdAt).toLocaleDateString(),
                                 type: 'text',
@@ -944,15 +961,15 @@ export default function NSGHorizon() {
 
               {manualRecordings.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 bg-slate-50/50 border-2 border-dashed border-slate-200 rounded-4xl text-slate-400">
-                  <Sparkles className="w-12 h-12 mb-4 opacity-30" />
+                  <BrandAtom className="w-12 h-12 mb-4 opacity-30" variant="colored" />
                   <p className="font-medium">Tu biblioteca está vacía.</p>
                   <p className="text-xs">Sube un audio o pega una transcripción para comenzar.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {manualRecordings.map((rec) => (
-                    <div 
-                      key={rec.id} 
+                    <div
+                      key={rec.id}
                       onClick={() => {
                         // Map manual recording to MeetingFolder structure to reuse the Detail View
                         const manualFolder: MeetingFolder = {
@@ -969,7 +986,7 @@ export default function NSGHorizon() {
                             {
                               speakerName: "Texto Original",
                               time: "",
-                              text: rec.fullContent || rec.title 
+                              text: rec.fullContent || rec.title
                             }
                           ]
                         };
@@ -980,8 +997,8 @@ export default function NSGHorizon() {
                       <div className="flex items-center gap-4 mb-4">
                         <div className={clsx(
                           "w-12 h-12 rounded-2xl flex items-center justify-center transition-all",
-                          rec.type === 'audio' 
-                            ? "bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white" 
+                          rec.type === 'audio'
+                            ? "bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white"
                             : "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white"
                         )}>
                           {rec.type === 'audio' ? <Music className="w-6 h-6" /> : <FileText className="w-6 h-6" />}
@@ -1085,7 +1102,7 @@ export default function NSGHorizon() {
             disabled={!selectedFolder.aiInfo}
             className="px-3 sm:px-6 py-2.5 sm:py-3 bg-white text-navy-900 text-xs sm:text-sm font-bold rounded-xl hover:bg-slate-50 transition border border-slate-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
-            <Sparkles className="w-4 h-4 text-blue-500" /> <span className="hidden md:inline">Copiar</span> Reporte
+            <BrandAtom className="w-4 h-4 text-blue-500" variant="colored" /> <span className="hidden md:inline">Copiar</span> Reporte
           </button>
           <a
             href={selectedFolder.shareUrl}
@@ -1149,7 +1166,7 @@ export default function NSGHorizon() {
               {/* Summary Box */}
               <div className="bg-white/5 backdrop-blur-md border border-white/10 p-6 sm:p-8 rounded-3xl mb-8 relative group hover:bg-white/[0.07] transition-all duration-300">
                 <div className="absolute top-0 right-0 p-4 opacity-20">
-                  <Sparkles className="w-5 h-5 text-blue-400" />
+                  <BrandAtom className="w-5 h-5 text-blue-400" variant="colored" />
                 </div>
                 <div className="relative">
                   <div className={clsx(
@@ -1192,8 +1209,8 @@ export default function NSGHorizon() {
                     {selectedFolder.aiInfo?.oportunidad?.titulo || "Analizando..."}
                   </p>
                 </div>
-                <div className="bg-purple-500/10 p-5 rounded-2xl border border-purple-500/20 backdrop-blur-sm group hover:bg-purple-500/15 transition-all">
-                  <p className="text-[10px] font-black text-purple-400 uppercase mb-2 tracking-widest">Factor 3</p>
+                <div className="bg-indigo-500/10 p-5 rounded-2xl border border-indigo-500/20 backdrop-blur-sm group hover:bg-indigo-500/15 transition-all">
+                  <p className="text-[10px] font-black text-indigo-400 uppercase mb-2 tracking-widest">Factor 3</p>
                   <p className="text-sm font-bold text-white leading-snug">
                     {selectedFolder.aiInfo?.herramienta?.nombre || "Analizando..."}
                   </p>
@@ -1250,7 +1267,7 @@ export default function NSGHorizon() {
                   </p>
                   <div className="p-6 bg-emerald-50/50 rounded-4xl border border-emerald-100 relative z-10 flex gap-4 items-center">
                     <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center shrink-0">
-                      <Sparkles className="w-6 h-6 text-emerald-500" />
+                      <BrandAtom className="w-6 h-6 text-emerald-500" variant="colored" />
                     </div>
                     <p className="text-sm text-emerald-900 italic font-bold leading-relaxed">
                       "{selectedFolder.aiInfo.oportunidad.nuevo_enfoque}"
@@ -1325,7 +1342,7 @@ export default function NSGHorizon() {
                   <div className="p-8 bg-slate-50 rounded-[2.5rem] text-slate-900 shadow-2xl relative z-10 flex items-center gap-8 border border-slate-200 overflow-hidden">
                     <div className="absolute top-0 right-0 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl"></div>
                     <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center shrink-0 relative z-10">
-                      <Sparkles className="w-8 h-8 text-blue-300" />
+                      <BrandAtom className="w-8 h-8 text-blue-300" variant="colored" />
                     </div>
                     <div className="relative z-10">
                       <p className="text-xs font-bold text-blue-300 uppercase tracking-[0.3em] mb-2">Recomendación Estratégica NSG</p>
@@ -1342,7 +1359,7 @@ export default function NSGHorizon() {
             // WAITING FOR API RESPONSE STATE
             <div className="w-full flex flex-col items-center justify-center p-12 border-2 border-dashed border-slate-200 rounded-[2.5rem] bg-slate-50/50 gap-6 text-center shadow-inner">
               <div className="w-20 h-20 bg-white rounded-full shadow-lg flex items-center justify-center animate-pulse">
-                <Sparkles className="w-10 h-10 text-blue-400" />
+                <BrandAtom className="w-10 h-10 text-blue-400" variant="colored" />
               </div>
               <div className="max-w-md">
                 <h5 className="text-2xl font-bold text-navy-900 mb-2">Análisis Profundo en Proceso</h5>

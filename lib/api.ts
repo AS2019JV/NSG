@@ -10,7 +10,7 @@ const isDevelopment = process.env.NEXT_PUBLIC_APP_ENV === "development" || proce
 // Validate API URL
 if (!process.env.NEXT_PUBLIC_API_URL && isDevelopment) {
     console.warn(
-        "⚠️ NEXT_PUBLIC_API_URL not set. Using default:",
+        "[WARNING] NEXT_PUBLIC_API_URL not set. Using default:",
         API_URL
     );
 }
@@ -26,7 +26,7 @@ const api = axios.create({
 
 // Log API URL on initialization (development only)
 if (isDevelopment && typeof window !== "undefined") {
-    console.info("🔗 API Base URL:", API_URL);
+    console.info("[API] Base URL:", API_URL);
 }
 
 // ============================================
@@ -44,7 +44,7 @@ api.interceptors.request.use(
 
         // Log request in development
         if (isDevelopment && typeof window !== "undefined") {
-            console.debug("📤 API Request:", {
+            console.debug("[API] Request:", {
                 method: config.method?.toUpperCase(),
                 url: config.url,
                 hasAuth: !!config.headers.Authorization,
@@ -55,7 +55,7 @@ api.interceptors.request.use(
     },
     (error) => {
         if (isDevelopment) {
-            console.error("❌ Request Error:", error);
+            console.error("[ERROR] Request Error:", error);
         }
         return Promise.reject(error);
     }
@@ -68,7 +68,7 @@ api.interceptors.response.use(
     (response) => {
         // Log response in development
         if (isDevelopment && typeof window !== "undefined") {
-            console.debug("📥 API Response:", {
+            console.debug("[API] Response:", {
                 status: response.status,
                 url: response.config.url,
             });
@@ -83,7 +83,7 @@ api.interceptors.response.use(
             const message = error.response.data?.message || error.message;
 
             if (isDevelopment) {
-                console.error("❌ API Error:", {
+                console.error("[ERROR] API Error:", {
                     status,
                     message,
                     url: error.config?.url,
@@ -94,20 +94,31 @@ api.interceptors.response.use(
             // Handle specific error cases
             switch (status) {
                 case 401:
-                    // Unauthorized - clear token and redirect to login
-                    if (typeof window !== "undefined") {
+                    // Unauthorized - Only redirect for authentication endpoints
+                    // Don't redirect for 401 on data endpoints (may be expected for new users)
+                    const url = error.config?.url || '';
+                    const isAuthEndpoint = url.includes('/auth/') || url.includes('/verify-token');
+
+                    if (typeof window !== "undefined" && isAuthEndpoint) {
                         localStorage.removeItem("nsg-token");
                         // Only redirect if not already on login page
                         if (!window.location.pathname.includes("/auth/login")) {
+                            console.log("[AUTH] Session expired, redirecting to login");
                             window.location.href = "/auth/login";
                         }
+                    } else if (!isAuthEndpoint) {
+                        // For non-auth endpoints, log but don't redirect
+                        console.log("[INFO] 401 on data endpoint - user may not have access to this resource");
                     }
                     break;
                 case 403:
                     console.error("Forbidden: You don't have permission to access this resource");
                     break;
                 case 404:
-                    console.error("Not Found: The requested resource doesn't exist");
+                    // Don't log 404 as errors - many are expected for new users
+                    if (isDevelopment) {
+                        console.log("[INFO] Resource not found:", error.config?.url);
+                    }
                     break;
                 case 500:
                     console.error("Server Error: Something went wrong on the server");
@@ -116,14 +127,14 @@ api.interceptors.response.use(
         } else if (error.request) {
             // Request made but no response received
             if (isDevelopment) {
-                console.error("❌ Network Error: No response from server", {
+                console.error("[ERROR] Network Error: No response from server", {
                     url: error.config?.url,
                 });
             }
         } else {
             // Something else happened
             if (isDevelopment) {
-                console.error("❌ Error:", error.message);
+                console.error("[ERROR] Error:", error.message);
             }
         }
 

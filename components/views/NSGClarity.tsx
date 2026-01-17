@@ -110,7 +110,7 @@ function TimelineItem({ id, time, title, status, color, desc, locked, isChecked,
   const styles: any = {
     emerald: { active: { bg: "bg-emerald-50/50", border: "border-emerald-500/30", text: "text-emerald-900", accent: "text-emerald-600", dot: "bg-emerald-500", iconBg: "bg-emerald-500/10", bar: "bg-emerald-500" }, inactive: { border: "border-slate-200", dotBorder: "border-slate-200" } },
     blue: { active: { bg: "bg-blue-50/50", border: "border-blue-500/30", text: "text-blue-900", accent: "text-blue-600", dot: "bg-blue-500", iconBg: "bg-blue-500/10", bar: "bg-blue-500" }, inactive: { border: "border-slate-200", dotBorder: "border-slate-200" } },
-    violet: { active: { bg: "bg-violet-50/50", border: "border-violet-500/30", text: "text-violet-900", accent: "text-violet-600", dot: "bg-violet-500", iconBg: "bg-violet-500/10", bar: "bg-violet-500" }, inactive: { border: "border-slate-200", dotBorder: "border-slate-200" } }
+    indigo: { active: { bg: "bg-indigo-50/50", border: "border-indigo-500/30", text: "text-indigo-900", accent: "text-indigo-600", dot: "bg-indigo-500", iconBg: "bg-indigo-500/10", bar: "bg-indigo-500" }, inactive: { border: "border-slate-200", dotBorder: "border-slate-200" } }
   };
   const style = styles[color] || styles.blue;
 
@@ -212,8 +212,14 @@ export default function NSGClarity() {
       if (response.status === 200) {
         setStrategies(response.data);
       }
-    } catch (e) {
-      console.error("Error fetching strategies:", e);
+    } catch (e: any) {
+      // For new users without strategies, this is expected - don't log as error
+      if (e.response?.status === 404 || e.response?.status === 401) {
+        console.log("[INFO] No strategies found for user (expected for new users)");
+        setStrategies([]);
+      } else {
+        console.error("Error fetching strategies:", e);
+      }
     } finally {
       setIsLoadingStrategies(false);
     }
@@ -238,56 +244,84 @@ export default function NSGClarity() {
     setIsLoadingMetrics(true);
     try {
       // Fetch streaks
-      const streaksResponse = await api.get(`/clarity/streaks/${userId}`);
-      if (streaksResponse.status === 200) {
-        setStreakData(streaksResponse.data.streaks);
+      try {
+        const streaksResponse = await api.get(`/clarity/streaks/${userId}`);
+        if (streaksResponse.status === 200) {
+          setStreakData(streaksResponse.data.streaks);
+        }
+      } catch (e: any) {
+        if (e.response?.status === 404) {
+          console.log("[INFO] No streak data found (expected for new users)");
+          setStreakData(null);
+        }
       }
 
       // Fetch metrics (monthly)
-      const metricsResponse = await api.get(`/clarity/metrics/${userId}?period=month`);
-      if (metricsResponse.status === 200) {
-        setMetricsData(metricsResponse.data.metrics);
+      try {
+        const metricsResponse = await api.get(`/clarity/metrics/${userId}?period=month`);
+        if (metricsResponse.status === 200) {
+          setMetricsData(metricsResponse.data.metrics);
+        }
+      } catch (e: any) {
+        if (e.response?.status === 404) {
+          console.log("[INFO] No metrics data found (expected for new users)");
+          setMetricsData(null);
+        }
       }
 
       // Fetch heatmap data
-      const heatmapResponse = await api.get(`/clarity/heatmap/${userId}?months=1`);
-      if (heatmapResponse.status === 200) {
-        setHeatmapData(heatmapResponse.data.heatmap);
+      try {
+        const heatmapResponse = await api.get(`/clarity/heatmap/${userId}?months=1`);
+        if (heatmapResponse.status === 200) {
+          setHeatmapData(heatmapResponse.data.heatmap);
+        }
+      } catch (e: any) {
+        if (e.response?.status === 404) {
+          console.log("[INFO] No heatmap data found (expected for new users)");
+          setHeatmapData([]);
+        }
       }
 
       // Fetch history for chart (last 7 days)
-      const today = new Date();
-      const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-      const startDate = sevenDaysAgo.toISOString().split('T')[0];
-      const endDate = today.toISOString().split('T')[0];
+      try {
+        const today = new Date();
+        const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const startDate = sevenDaysAgo.toISOString().split('T')[0];
+        const endDate = today.toISOString().split('T')[0];
 
-      const historyResponse = await api.get(`/clarity/history/${userId}?startDate=${startDate}&endDate=${endDate}`);
-      if (historyResponse.status === 200) {
-        // Transform data for chart
-        const completions = historyResponse.data.completions;
-        const chartMap: any = {};
+        const historyResponse = await api.get(`/clarity/history/${userId}?startDate=${startDate}&endDate=${endDate}`);
+        if (historyResponse.status === 200) {
+          // Transform data for chart
+          const completions = historyResponse.data.completions;
+          const chartMap: any = {};
 
-        // Initialize all 7 days
-        for (let i = 0; i < 7; i++) {
-          const date = new Date(sevenDaysAgo.getTime() + i * 24 * 60 * 60 * 1000);
-          const dateStr = date.toISOString().split('T')[0];
-          chartMap[dateStr] = {
-            date: dateStr,
-            morning_clarity: 0,
-            power_check: 0,
-            next_day_planning: 0
-          };
-        }
-
-        // Fill in completions
-        completions.forEach((c: any) => {
-          if (chartMap[c.date]) {
-            const protocolKey = c.protocol as 'morning_clarity' | 'power_check' | 'next_day_planning';
-            chartMap[c.date][protocolKey] = 1;
+          // Initialize all 7 days
+          for (let i = 0; i < 7; i++) {
+            const date = new Date(sevenDaysAgo.getTime() + i * 24 * 60 * 60 * 1000);
+            const dateStr = date.toISOString().split('T')[0];
+            chartMap[dateStr] = {
+              date: dateStr,
+              morning_clarity: 0,
+              power_check: 0,
+              next_day_planning: 0
+            };
           }
-        });
 
-        setChartData(Object.values(chartMap));
+          // Fill in completions
+          completions.forEach((c: any) => {
+            if (chartMap[c.date]) {
+              const protocolKey = c.protocol as 'morning_clarity' | 'power_check' | 'next_day_planning';
+              chartMap[c.date][protocolKey] = 1;
+            }
+          });
+
+          setChartData(Object.values(chartMap));
+        }
+      } catch (e: any) {
+        if (e.response?.status === 404) {
+          console.log("[INFO] No history data found (expected for new users)");
+          setChartData([]);
+        }
       }
 
     } catch (error) {
@@ -315,8 +349,13 @@ export default function NSGClarity() {
           return { ...t, isChecked };
         }));
       }
-    } catch (error) {
-      console.error("Error fetching today completions:", error);
+    } catch (error: any) {
+      // For new users, no completions is expected
+      if (error.response?.status === 404) {
+        console.log("[INFO] No completions data found (expected for new users)");
+      } else {
+        console.error("Error fetching today completions:", error);
+      }
     }
   };
 
@@ -379,7 +418,7 @@ export default function NSGClarity() {
   const [tasks, setTasks] = useState([
     { id: "1", time: "08:00 AM", title: "Morning Clarity", status: "Completado", color: "emerald", desc: "Establecimiento de la intención estratégica. Sincronización con la Hoja de Alineación y blindaje de prioridades para una ejecución de alto impacto.", locked: false, isChecked: true },
     { id: "2", time: "01:00 PM", title: "Power Check", status: "Pendiente", color: "blue", desc: "Sincronización táctica y control de flujo. Evaluación de hitos alcanzados y recalibración de energía para asegurar un cierre de jornada resolutivo.", locked: false, isChecked: false },
-    { id: "3", time: "08:00 PM", title: "Next Day Planning", status: "Bloqueado", color: "violet", desc: "Arquitectura del éxito anticipado. Auditoría de resultados daily, optimización de la Hoja de Alineación y diseño proactivo de la jornada de mañana.", locked: false, isChecked: false }
+    { id: "3", time: "08:00 PM", title: "Next Day Planning", status: "Bloqueado", color: "indigo", desc: "Arquitectura del éxito anticipado. Auditoría de resultados daily, optimización de la Hoja de Alineación y diseño proactivo de la jornada de mañana.", locked: false, isChecked: false }
   ]);
 
   const progress = (tasks.filter(t => t.isChecked).length / tasks.length) * 100;
@@ -487,27 +526,14 @@ export default function NSGClarity() {
       {/* 1. HERO BANNER */}
       <div
         onClick={() => syncObjectives(true)}
-        className="w-full relative group cursor-pointer mb-4 xs:mb-6 shrink-0"
+        className="relative overflow-hidden bg-gradient-to-r from-navy-950 via-navy-900 to-navy-950 px-8 py-6 rounded-3xl border border-navy-800/50 shadow-xl cursor-pointer group transition-all duration-700 hover:shadow-2xl mb-4 xs:mb-6 shrink-0"
         title="Clic para sincronizar objetivos"
       >
-        <div className="relative w-full h-[160px] xs:h-[180px] sm:h-[200px] rounded-2xl xs:rounded-3xl md:rounded-4xl overflow-hidden shadow-xl xs:shadow-2xl border border-white/10 transition-all duration-700 hover:shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
-          <div className="absolute inset-0 bg-linear-to-br from-navy-950 via-navy-900 to-blue-950"></div>
-          <div className="absolute inset-0 opacity-20 mix-blend-overlay bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center"></div>
-          <div className="absolute inset-0 bg-linear-to-t from-navy-950 via-transparent to-transparent"></div>
-          <div className="absolute -top-16 xs:-top-24 -right-16 xs:-right-24 w-48 xs:w-64 h-48 xs:h-64 bg-blue-600/20 rounded-full blur-[60px] xs:blur-[80px] group-hover:bg-blue-500/30 transition-all duration-700"></div>
-          <div className="absolute inset-0 flex flex-col justify-center p-4 xs:p-6 sm:p-8 sm:px-12">
-            <div className="overflow-hidden mb-1.5 xs:mb-2">
-              <span className="inline-flex items-center gap-1.5 xs:gap-2 px-2 xs:px-3 py-1 bg-blue-500/20 backdrop-blur-xl border border-blue-400/30 text-blue-200 text-[0.5rem] xs:text-[0.6rem] font-bold uppercase tracking-[0.2em] xs:tracking-[0.25em] rounded-lg">
-                <span className="relative flex h-1.5 w-1.5 xs:h-2 xs:w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 xs:h-2 xs:w-2 bg-blue-500"></span>
-                </span>
-                Protocolo de Alineación • Sistema Activo
-              </span>
-            </div>
-            <h2 className="text-xl xs:text-2xl sm:text-3xl lg:text-4xl font-display font-medium text-white mb-1.5 xs:mb-2 sm:mb-3 leading-tight tracking-tight">Sistema de <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-emerald-400 font-bold">Claridad y Eficiencia con IA</span></h2>
-            <p className="text-slate-300 text-[11px] xs:text-sm sm:text-base lg:text-lg leading-snug xs:leading-relaxed font-medium max-w-2xl line-clamp-2 xs:line-clamp-none">Sincronización neuronal activa diseñada para la precisión máxima y el alto rendimiento continuo. Protocolo de alineación estratégica ejecutándose.</p>
-          </div>
+        <div className="relative z-10">
+          <h2 className="font-display font-bold text-2xl lg:text-3xl tracking-tight mb-2">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Claridad y Eficiencia con IA</span>
+          </h2>
+          <p className="text-slate-300 text-sm max-w-3xl leading-relaxed">Sincronización neuronal activa diseñada para la precisión máxima y el alto rendimiento continuo. Protocolo de alineación estratégica ejecutándose.</p>
         </div>
       </div>
 
@@ -518,8 +544,8 @@ export default function NSGClarity() {
             <Zap className="w-3 xs:w-3.5 h-3 xs:h-3.5 text-blue-600" />
             <span className="text-[9px] xs:text-[10px] font-bold text-slate-500 uppercase tracking-widest">Sincronización de Ecosistema</span>
           </div>
-          <button 
-            onClick={() => syncObjectives(true)} 
+          <button
+            onClick={() => syncObjectives(true)}
             className="group flex items-center gap-1.5 px-2 xs:px-2.5 py-1 xs:py-1.5 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-all active:scale-95"
             disabled={isLoadingTelegramData}
           >
@@ -544,13 +570,13 @@ export default function NSGClarity() {
             <div className={clsx(
               "w-8 h-8 xs:w-9 xs:h-9 rounded-lg xs:rounded-xl flex items-center justify-center transition-all duration-300 relative overflow-hidden shrink-0",
               telegramId
-                ? "bg-white text-emerald-500 shadow-sm ring-1 ring-emerald-100"
+                ? "bg-white ring-2 ring-emerald-200 shadow-sm"
                 : "bg-[#0088cc]/10 text-[#0088cc] group-hover:bg-[#0088cc] group-hover:text-white group-hover:ring-2 group-hover:ring-[#0088cc]/30"
             )}>
-              {telegramId && <div className="absolute inset-0 bg-emerald-100/50 animate-pulse"></div>}
               <svg viewBox="0 0 24 24" className="w-4 h-4 sm:w-5 sm:h-5 fill-current relative z-10" xmlns="http://www.w3.org/2000/svg">
                 <path d="M11.944 0C5.352 0 0 5.352 0 11.944c0 6.592 5.352 11.944 11.944 11.944c6.592 0 11.944-5.352 11.944-11.944C23.888 5.352 18.536 0 11.944 0zm5.66 8.16l-1.928 9.096c-.144.644-.528.804-1.068.5l-2.936-2.164l-1.416 1.364c-.156.156-.288.288-.588.288l.212-3.04l5.524-4.992c.24-.212-.052-.332-.372-.12l-6.828 4.3l-2.948-.92c-.64-.2-.652-.64.132-.948l11.524-4.44c.532-.2.996.12.804.976z" />
               </svg>
+              {telegramId && <div className="absolute inset-0 bg-emerald-500/5 animate-pulse"></div>}
             </div>
             <div className="text-left">
               <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500 leading-none mb-1">Telegram</p>
@@ -562,16 +588,16 @@ export default function NSGClarity() {
           <button
             onClick={() => handleConnect("Calendar")}
             className={clsx(
-              "w-full sm:w-auto group relative flex items-center gap-3 px-4 sm:px-5 py-2 sm:py-2.5 border rounded-4xl transition-all duration-500 min-h-[44px]",
+              "w-full sm:w-auto group relative flex items-center gap-2 xs:gap-3 px-3 xs:px-4 sm:px-5 py-2.5 xs:py-3 sm:py-2.5 border rounded-2xl xs:rounded-3xl sm:rounded-4xl transition-all duration-500 min-h-[44px]",
               isConnected
-                ? "bg-blue-50/60 border-blue-200 shadow-sm cursor-default"
+                ? "bg-emerald-50/60 border-emerald-200 shadow-sm cursor-default"
                 : "bg-white border-slate-300 hover:shadow-md hover:border-blue-400 cursor-pointer shadow-sm hover:bg-blue-50/30"
             )}
           >
             <div className={clsx(
-              "w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center transition-all duration-300 relative overflow-hidden shrink-0",
+              "w-8 h-8 xs:w-9 xs:h-9 rounded-lg xs:rounded-xl flex items-center justify-center transition-all duration-300 relative overflow-hidden shrink-0",
               isConnected
-                ? "bg-white ring-2 ring-blue-200 shadow-sm"
+                ? "bg-white ring-2 ring-emerald-200 shadow-sm"
                 : "bg-slate-50 group-hover:bg-white group-hover:ring-2 group-hover:ring-blue-200"
             )}>
               <svg viewBox="0 0 24 24" className="w-4 h-4 sm:w-5 sm:h-5">
@@ -580,7 +606,7 @@ export default function NSGClarity() {
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
               </svg>
-              {isConnected && <div className="absolute inset-0 bg-blue-500/5 animate-pulse"></div>}
+              {isConnected && <div className="absolute inset-0 bg-emerald-500/5 animate-pulse"></div>}
             </div>
             <div className="text-left">
               <p className="text-[9px] font-bold uppercase tracking-widest text-slate-500 leading-none mb-1">Calendar</p>
@@ -593,7 +619,7 @@ export default function NSGClarity() {
       {/* METRICS TOGGLE BUTTON */}
       <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between mb-4 xs:mb-6 gap-3 xs:gap-0">
         <div className="flex items-center gap-2 xs:gap-3">
-          <div className="w-8 h-8 xs:w-10 xs:h-10 bg-gradient-to-br from-blue-500 to-violet-500 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+          <div className="w-8 h-8 xs:w-10 xs:h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
             <BarChart3 className="w-4 h-4 xs:w-5 xs:h-5 text-white" />
           </div>
           <div>
@@ -722,18 +748,18 @@ export default function NSGClarity() {
       {showConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 xs:p-4 animate-fade-in">
           {/* Backdrop */}
-          <div 
+          <div
             className="absolute inset-0 bg-navy-950/60 backdrop-blur-sm"
             onClick={cancelCompletion}
           ></div>
-          
+
           {/* Modal */}
           <div className="relative bg-white rounded-2xl xs:rounded-3xl shadow-2xl border border-slate-200 max-w-md w-full p-6 xs:p-8 animate-scale-in">
             {/* Decorative gradient blob */}
             <div className="absolute -top-16 xs:-top-20 -right-16 xs:-right-20 w-32 xs:w-40 h-32 xs:h-40 bg-blue-500/20 rounded-full blur-3xl"></div>
-            
+
             {/* Icon */}
-            <div className="w-14 h-14 xs:w-16 xs:h-16 bg-gradient-to-br from-blue-500 to-violet-500 rounded-xl xs:rounded-2xl flex items-center justify-center mx-auto mb-5 xs:mb-6 shadow-lg shadow-blue-200">
+            <div className="w-14 h-14 xs:w-16 xs:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl xs:rounded-2xl flex items-center justify-center mx-auto mb-5 xs:mb-6 shadow-lg shadow-blue-200">
               <CheckCircle className="w-7 h-7 xs:w-8 xs:h-8 text-white" />
             </div>
 
@@ -757,7 +783,7 @@ export default function NSGClarity() {
               </button>
               <button
                 onClick={confirmCompletion}
-                className="flex-1 px-5 xs:px-6 py-3 bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 text-white rounded-xl xs:rounded-2xl font-bold text-sm transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-blue-200 min-h-[44px]"
+                className="flex-1 px-5 xs:px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-xl xs:rounded-2xl font-bold text-sm transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg shadow-blue-200 min-h-[44px]"
               >
                 Confirmar
               </button>

@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Bell, Shield, Moon, Settings as SettingsIcon, Zap, Globe, ExternalLink, Lock, Sparkles } from "lucide-react";
+import { Bell, Shield, Moon, Settings as SettingsIcon, Zap, Globe, ExternalLink, Lock } from "lucide-react";
+import BrandAtom from "@/components/ui/BrandAtom";
 import { useToast } from "@/components/ui/ToastProvider";
 import clsx from "clsx";
 import { useAppStore } from "@/store/useAppStore";
@@ -47,7 +48,7 @@ const INTEGRATIONS_CONFIG = {
     soon: false,
     icon: (
       <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
-        <path d="M3 3v18h18V3H3zm16 16H5V5h14v14zm-2-10h-3V7h3v2zm-4 0H6V7h7v2zm4 3h-3v-2h3v2zm-4 0H6v-2h7v2zm4 3h-3v-2h3v2zm-4 0H6v-2h7v2z"/>
+        <path d="M3 3v18h18V3H3zm16 16H5V5h14v14zm-2-10h-3V7h3v2zm-4 0H6V7h7v2zm4 3h-3v-2h3v2zm-4 0H6v-2h7v2zm4 3h-3v-2h3v2zm-4 0H6v-2h7v2z" />
       </svg>
     ),
     color: 'purple-600'
@@ -60,7 +61,7 @@ const INTEGRATIONS_CONFIG = {
     soon: true,
     icon: (
       <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
-        <path d="M6 15a2 2 0 0 1-2 2a2 2 0 0 1-2-2a2 2 0 0 1 2-2h2v2m1 0a2 2 0 0 1 2-2a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2a2 2 0 0 1-2-2v-5m2-8a2 2 0 0 1-2-2a2 2 0 0 1 2-2a2 2 0 0 1 2 2v2H9m0 1a2 2 0 0 1 2 2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2a2 2 0 0 1 2-2h5m8 2a2 2 0 0 1 2-2a2 2 0 0 1 2 2a2 2 0 0 1-2 2h-2v-2m-1 0a2 2 0 0 1-2 2a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2a2 2 0 0 1 2 2v5m-2 8a2 2 0 0 1 2 2a2 2 0 0 1-2 2a2 2 0 0 1-2-2v-2h2m0-1a2 2 0 0 1-2-2a2 2 0 0 1 2-2h5a2 2 0 0 1 2 2a2 2 0 0 1-2 2h-5z"/>
+        <path d="M6 15a2 2 0 0 1-2 2a2 2 0 0 1-2-2a2 2 0 0 1 2-2h2v2m1 0a2 2 0 0 1 2-2a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2a2 2 0 0 1-2-2v-5m2-8a2 2 0 0 1-2-2a2 2 0 0 1 2-2a2 2 0 0 1 2 2v2H9m0 1a2 2 0 0 1 2 2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2a2 2 0 0 1 2-2h5m8 2a2 2 0 0 1 2-2a2 2 0 0 1 2 2a2 2 0 0 1-2 2h-2v-2m-1 0a2 2 0 0 1-2 2a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2a2 2 0 0 1 2 2v5m-2 8a2 2 0 0 1 2 2a2 2 0 0 1-2 2a2 2 0 0 1-2-2v-2h2m0-1a2 2 0 0 1-2-2a2 2 0 0 1 2-2h5a2 2 0 0 1 2 2a2 2 0 0 1-2 2h-5z" />
       </svg>
     ),
     color: 'pink-600'
@@ -108,7 +109,7 @@ const PREFERENCES_CONFIG = {
     id: 'ai',
     title: 'Asistente IA Avanzado',
     desc: 'Sugerencias predictivas y automatización inteligente',
-    icon: Sparkles,
+    icon: BrandAtom,
     color: 'amber',
     roles: ['admin', 'consultant', 'manager'],
     soon: true
@@ -147,7 +148,7 @@ export default function Settings() {
       }
     };
     fetchUser();
-    
+
     // Check Google Calendar connection
     const checkCalendar = async () => {
       setIsCheckingCalendar(true);
@@ -242,7 +243,7 @@ export default function Settings() {
   const availableIntegrations = Object.values(INTEGRATIONS_CONFIG).filter(
     int => int.roles.includes(currentRole || 'patient')
   );
-  
+
   const availablePreferences = Object.values(PREFERENCES_CONFIG).filter(
     pref => pref.roles.includes(currentRole || 'patient')
   );
@@ -434,7 +435,7 @@ function ToggleItem({ icon: Icon, title, desc, color, active, soon, onClick }: T
           </span>
         </div>
       )}
-      
+
       <div className="flex items-center gap-4 flex-1">
         <div className={clsx("p-3 rounded-xl transition-all duration-300", currentStyle.iconBox)}>
           <Icon className="w-5 h-5" />
@@ -457,7 +458,7 @@ function ToggleItem({ icon: Icon, title, desc, color, active, soon, onClick }: T
           )} />
         </div>
       )}
-      
+
       {soon && (
         <div className="shrink-0 ml-3">
           <Lock className="w-5 h-5 text-slate-400" />
@@ -485,8 +486,8 @@ function IntegrationCard({ name, description, icon, color, connected, connectedT
     <div className={clsx(
       "relative p-5 rounded-2xl border transition-all group",
       soon ? "opacity-60 cursor-not-allowed" : "cursor-pointer hover:shadow-md",
-      connected 
-        ? "bg-blue-50/50 border-blue-200" 
+      connected
+        ? "bg-blue-50/50 border-blue-200"
         : "bg-slate-50 border-slate-200 hover:border-slate-300"
     )}>
       {soon && (

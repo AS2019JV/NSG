@@ -159,15 +159,15 @@ export default function MetricsPanel({ metrics, isLoading = false }: MetricsPane
             </div>
 
             {/* By Protocol */}
-            <div className="bg-white p-6 rounded-3xl border-2 border-slate-200 hover:border-violet-300 hover:shadow-lg transition-all duration-500 relative overflow-hidden group">
-                <div className="absolute -right-8 -top-8 w-24 h-24 bg-violet-100 rounded-full opacity-0 group-hover:opacity-100 blur-2xl transition-opacity duration-700"></div>
+            <div className="bg-white p-6 rounded-3xl border-2 border-slate-200 hover:border-indigo-300 hover:shadow-lg transition-all duration-500 relative overflow-hidden group">
+                <div className="absolute -right-8 -top-8 w-24 h-24 bg-indigo-100 rounded-full opacity-0 group-hover:opacity-100 blur-2xl transition-opacity duration-700"></div>
 
                 <div className="relative z-10">
                     <div className="flex items-center justify-between mb-3">
-                        <div className="w-10 h-10 bg-violet-50 rounded-xl flex items-center justify-center text-violet-600">
+                        <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
                             <Calendar className="w-5 h-5" />
                         </div>
-                        <div className="px-2 py-1 bg-violet-50 rounded-full text-[9px] font-black uppercase tracking-wider text-violet-600">
+                        <div className="px-2 py-1 bg-indigo-50 rounded-full text-[9px] font-black uppercase tracking-wider text-indigo-600">
                             Total
                         </div>
                     </div>
@@ -193,7 +193,7 @@ export default function MetricsPanel({ metrics, isLoading = false }: MetricsPane
                         </div>
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-violet-500"></div>
+                                <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
                                 <span className="text-xs font-medium text-slate-600">Next Day</span>
                             </div>
                             <span className="font-bold text-sm text-navy-950">{metrics.byProtocol.next_day_planning}</span>

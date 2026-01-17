@@ -1,4 +1,5 @@
-import { ArrowRight, Clock, Sparkles } from "lucide-react";
+import { ArrowRight, Clock } from "lucide-react";
+import BrandAtom from "@/components/ui/BrandAtom";
 
 interface NewsCardProps {
   source: string;
@@ -50,10 +51,10 @@ export function NewsCard({ source, title, tag, color, description, time, isAnaly
               {tag}
             </span>
           </div>
-          
+
           {isAnalyzed && (
             <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 border border-emerald-100 rounded-full animate-in fade-in zoom-in-95 duration-500">
-              <Sparkles className="w-3 h-3 text-emerald-600 fill-emerald-600" />
+              <BrandAtom className="w-3 h-3 text-emerald-600" variant="colored" />
               <span className="text-[0.6rem] font-bold text-emerald-700 uppercase tracking-wider">Analizado</span>
             </div>
           )}
@@ -78,11 +79,10 @@ export function NewsCard({ source, title, tag, color, description, time, isAnaly
               e.stopPropagation();
               onAnalyze();
             }}
-            className={`px-4 py-1.5 rounded-lg text-[0.6rem] font-bold uppercase tracking-widest transition-all duration-300 ${
-              isAnalyzed 
-                ? "bg-emerald-600 text-white shadow-md shadow-emerald-500/20" 
+            className={`px-4 py-1.5 rounded-lg text-[0.6rem] font-bold uppercase tracking-widest transition-all duration-300 ${isAnalyzed
+                ? "bg-emerald-600 text-white shadow-md shadow-emerald-500/20"
                 : "bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white"
-            }`}
+              }`}
           >
             {isAnalyzed ? "Ver Análisis" : "Solicitar Análisis"}
           </button>
