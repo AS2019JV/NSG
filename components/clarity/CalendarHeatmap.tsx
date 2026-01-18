@@ -195,7 +195,7 @@ export default function CalendarHeatmap({ data, isLoading = false }: CalendarHea
                                                             </span>
                                                         )}
                                                         {dayData.protocols.includes('next_day_planning') && (
-                                                            <span className="px-2 py-0.5 bg-violet-500/20 text-violet-300 rounded text-[10px] font-bold">
+                                                            <span className="px-2 py-0.5 bg-indigo-500/20 text-indigo-300 rounded text-[10px] font-bold">
                                                                 Next Day
                                                             </span>
                                                         )}

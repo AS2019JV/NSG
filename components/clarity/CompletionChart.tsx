@@ -171,7 +171,7 @@ export default function CompletionChart({ data, period = 'week', isLoading = fal
                 </div>
                 <div className="text-center">
                     <div className="flex items-center justify-center gap-1.5 mb-1">
-                        <div className="w-2 h-2 rounded-full bg-violet-500"></div>
+                        <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
                         <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Next Day</p>
                     </div>
                     <p className="font-bold text-lg text-navy-950">

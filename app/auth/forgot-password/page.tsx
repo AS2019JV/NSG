@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from "next/navigation";
 import BrandAtom from "@/components/ui/BrandAtom";
 import clsx from "clsx";
-import { Lock, Mail, ChevronLeft, ShieldCheck, Send, Sparkles } from "lucide-react";
+import { Lock, Mail, ChevronLeft, ShieldCheck, Send } from "lucide-react";
 import api from '@/lib/api';
 import { useToast } from "@/components/ui/ToastProvider";
 import confetti from "canvas-confetti";
@@ -12,7 +12,7 @@ import confetti from "canvas-confetti";
 export default function ForgotPasswordPage() {
     const router = useRouter();
     const { showToast } = useToast();
-    
+
     const [step, setStep] = useState(1); // 1: Email, 2: Code & New Password, 3: Success
     const [email, setEmail] = useState('');
     const [code, setCode] = useState('');
@@ -67,7 +67,7 @@ export default function ForgotPasswordPage() {
 
             <div className="relative w-full max-w-[448px]">
                 <div className="bg-white/80 backdrop-blur-xl border border-white/40 rounded-4xl shadow-xl shadow-slate-200/50 p-8 md:p-10">
-                    
+
                     {/* Progress Dots */}
                     <div className="flex justify-center gap-2 mb-8">
                         {[1, 2, 3].map((s) => (
@@ -104,7 +104,7 @@ export default function ForgotPasswordPage() {
                                         />
                                     </div>
                                 </div>
-                                
+
                                 <button
                                     onClick={handleSendCode}
                                     disabled={isLoading || !email}
@@ -116,7 +116,7 @@ export default function ForgotPasswordPage() {
                                         </>
                                     )}
                                 </button>
-                                
+
                                 <button onClick={() => router.push('/auth/login')} className="w-full text-slate-400 text-xs font-bold uppercase tracking-widest hover:text-slate-600 transition-colors"> Volver al login </button>
                             </div>
                         </div>
@@ -169,7 +169,7 @@ export default function ForgotPasswordPage() {
                                 >
                                     {isLoading ? "Firmando Protocolo..." : "Actualizar Contraseña"}
                                 </button>
-                                
+
                                 <button onClick={() => setStep(1)} className="w-full text-slate-400 text-xs font-bold uppercase tracking-widest hover:text-slate-600 transition-colors"> Solicitar nuevo código </button>
                             </div>
                         </div>
@@ -178,11 +178,11 @@ export default function ForgotPasswordPage() {
                     {step === 3 && (
                         <div className="text-center animate-fade-in py-6">
                             <div className="w-20 h-20 bg-emerald-50 rounded-3xl flex items-center justify-center mx-auto mb-6 text-emerald-500 shadow-xl shadow-emerald-500/10">
-                                <Sparkles className="w-10 h-10" />
+                                <BrandAtom className="w-10 h-10" variant="colored" />
                             </div>
                             <h2 className="font-display font-bold text-2xl text-slate-900 mb-2">¡Sincronización Exitosa!</h2>
                             <p className="text-slate-500 text-sm mb-10">Tu contraseña ha sido actualizada. Ya puedes acceder a tu Command Center.</p>
-                            
+
                             <button
                                 onClick={() => router.push('/auth/login')}
                                 className="w-full bg-navy-900 text-white font-bold py-4 rounded-2xl shadow-xl shadow-navy-900/20 hover:bg-blue-600 transition-all flex items-center justify-center gap-2"
