@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppStore } from "@/store/useAppStore";
-import { Sun, Moon, Zap, Laptop } from "lucide-react";
+import { Sun, Moon, Activity, Laptop } from "lucide-react";
 import { useEffect, useState } from "react";
 
 type Theme = "light" | "dark" | "neon" | "system";
@@ -29,7 +29,7 @@ const THEME_OPTIONS: ThemeOption[] = [
   {
     id: "neon",
     label: "Neon",
-    icon: Zap,
+    icon: Activity,
     description: "High Contrast",
   },
   {
@@ -108,8 +108,8 @@ export default function ThemeToggle() {
               <div className="h-2 bg-blue-500 rounded-full w-1/2"></div>
             </div>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
-            <Zap className="w-6 h-6 text-white" />
+          <div className="w-12 h-12 rounded-xl bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
+            <Activity className="w-6 h-6 text-white" />
           </div>
         </div>
       </div>

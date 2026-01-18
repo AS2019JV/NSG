@@ -11,7 +11,7 @@ import {
     Loader2,
     X,
     FileText,
-    Zap,
+    Activity,
     Layers,
     Scale,
     ChevronDown,
@@ -655,7 +655,7 @@ export default function ChatInterface() {
                                                     "bg-blue-50/80 border-blue-200 text-blue-600 ring-2 ring-blue-100/50"
                                                 )}
                                             >
-                                                {intelligenceMode === 'pulse' && <Zap className="w-4 h-4 transition-colors text-blue-500" />}
+                                                {intelligenceMode === 'pulse' && <Activity className="w-4 h-4 transition-colors text-blue-500" />}
                                                 {intelligenceMode === 'compare' && <Layers className="w-4 h-4 text-blue-500" />}
                                                 {intelligenceMode === 'fusion' && <Scale className="w-4 h-4 text-blue-500" />}
 
@@ -676,7 +676,7 @@ export default function ChatInterface() {
                                                         className="absolute bottom-full left-0 mb-3 w-64 p-2 bg-white/95 backdrop-blur-[24px] rounded-[20px] shadow-[0_20px_40px_-10px_rgba(0,0,0,0.15)] border border-white/60 flex flex-col gap-1 z-50 ring-1 ring-slate-900/5"
                                                     >
                                                         {[
-                                                            { id: 'pulse', label: 'Pulso', icon: Zap, desc: 'Respuesta instantánea' },
+                                                            { id: 'pulse', label: 'Pulso', icon: Activity, desc: 'Respuesta instantánea' },
                                                             { id: 'compare', label: 'Comparar', icon: Layers, desc: 'Ejecución en paralelo' },
                                                             { id: 'fusion', label: 'Fusión', icon: Scale, desc: 'Consenso de 3 modelos' },
                                                         ].map(m => (

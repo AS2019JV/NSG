@@ -1,5 +1,5 @@
 "use client";
-import { BrainCircuit, Zap, ArrowRight, Play } from "lucide-react";
+import { BrainCircuit, Activity, ArrowRight, Play } from "lucide-react";
 
 interface NewsAnalysisResultProps {
   tag?: string;
@@ -40,7 +40,7 @@ export default function NewsAnalysisResult({ tag, roleContext }: NewsAnalysisRes
           {/* Opportunity Highlight */}
           <div className="bg-indigo-50 p-5 rounded-2xl border border-indigo-100">
             <h5 className="font-bold text-indigo-900 text-sm flex items-center gap-2 mb-3">
-              <Zap className="w-4 h-4" /> Oportunidad Detectada
+              <Activity className="w-4 h-4" /> Oportunidad Detectada
             </h5>
             <p className="text-sm text-indigo-800 font-medium">
               Puedes apalancar esta tendencia para reducir la fricción operativa un 15% si aplicas la metodología inversa sugerida.

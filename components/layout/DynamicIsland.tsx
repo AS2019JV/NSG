@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppStore } from "@/store/useAppStore";
-import { Activity, ChevronDown, Zap, Layers, Scale, BrainCircuit } from "lucide-react";
+import { Activity, ChevronDown, Layers, Scale, BrainCircuit } from "lucide-react";
 import { CONTEXT, RoleType } from "@/data/context";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import clsx from "clsx";
