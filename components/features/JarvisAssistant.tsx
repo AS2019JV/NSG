@@ -140,8 +140,23 @@ export default function JarvisAssistant() {
     };
   }, []);
 
+  // --- MOBILE AUDIO FIX ---
+  const primeAudio = () => {
+    // Unlock iOS/Mobile audio contexts
+    if (typeof window !== 'undefined') {
+        window.speechSynthesis.resume(); // Fix for Chrome/Safari pausing
+        // Silent utterance to unlock the queue
+        const utterance = new SpeechSynthesisUtterance('');
+        utterance.volume = 0;
+        window.speechSynthesis.speak(utterance);
+    }
+  };
+
   const handleAction = async (userQuery: string) => {
     if (!userQuery.trim()) return;
+
+    // Prime audio immediately on user interaction
+    primeAudio();
 
     if (navigator.vibrate) navigator.vibrate(10);
 
@@ -210,11 +225,22 @@ export default function JarvisAssistant() {
   const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const toggleListening = () => {
+    // 1. If Speaking, just stop speaking
+    if (status === 'SPEAKING') {
+        window.speechSynthesis.cancel();
+        setStatus('IDLE');
+        return;
+    }
+
+    // 2. If Listening, stop listening
     if (status === 'LISTENING') {
       const recognition = recognitionRef.current;
       if (recognition) recognition.stop();
       return;
     }
+
+    // 3. Start Listening (Prime Audio First)
+    primeAudio();
 
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
@@ -250,11 +276,13 @@ export default function JarvisAssistant() {
         if (e.error !== 'aborted') {
           setStatus('IDLE');
           setIsListening(false);
+          // Optional: Verify permission error and show toast
         }
       };
 
       recognition.onend = () => {
         const msg = inputRef.current?.value || "";
+        // Only submit if we have substantial text
         if (msg.trim().length > 1) {
           handleAction(msg);
           setIsListening(false);
@@ -264,7 +292,13 @@ export default function JarvisAssistant() {
         }
       };
 
-      recognition.start();
+      try {
+          recognition.start();
+      } catch (err) {
+          console.warn("Recognition start failed (likely already active)", err);
+          // Try to reset if stuck
+          try { recognition.stop(); } catch(e){}
+      }
 
     } else {
       showToast("Speech Module Unavailable", "error");
@@ -315,13 +349,13 @@ export default function JarvisAssistant() {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 rounded-full border border-cyan-400/30 opacity-0 animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite]" />
                 {/* Removed extra ping layers for performance */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border border-purple-400/30 opacity-0 animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite]" style={{ animationDelay: '0.6s' }} />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border border-emerald-400/30 opacity-0 animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite]" style={{ animationDelay: '0.6s' }} />
             </div>
         )}
 
         {/* Siri Aura Glow (Performance Optimized) */}
         <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 rounded-full blur-[40px] transition-all duration-500 
-            ${isActive ? 'opacity-20 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600' : isHovered ? 'opacity-5 bg-blue-400' : 'opacity-0'}`} />
+            ${isActive ? 'opacity-20 bg-linear-to-r from-cyan-500 via-emerald-500 to-emerald-600' : isHovered ? 'opacity-5 bg-blue-400' : 'opacity-0'}`} />
 
         <div className="w-56 h-56 flex items-center justify-center animate-atom-breathe relative">
           <svg viewBox="0 0 100 100" className={`w-full h-full overflow-visible transition-all duration-500 ${isActive ? 'drop-shadow-[0_0_20px_rgba(34,211,238,0.3)]' : 'drop-shadow-none'}`}>
@@ -330,10 +364,10 @@ export default function JarvisAssistant() {
                 <stop offset="0%" stopColor="#2563EB" stopOpacity="0.8" />
                 <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.8" />
               </linearGradient>
-              <linearGradient id="siriMesh" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#22d3ee" /> 
-                  <stop offset="50%" stopColor="#818cf8" /> 
-                  <stop offset="100%" stopColor="#e879f9" /> 
+              <linearGradient id="jarvisSmartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#3b82f6" /> 
+                  <stop offset="50%" stopColor="#10b981" /> 
+                  <stop offset="100%" stopColor="#34d399" /> 
               </linearGradient>
               <radialGradient id="activeGlass" cx="30%" cy="30%" r="70%">
                   <stop offset="0%" stopColor="white" stopOpacity="0.9" />
@@ -341,42 +375,45 @@ export default function JarvisAssistant() {
                   <stop offset="100%" stopColor="white" stopOpacity="0" />
               </radialGradient>
               <radialGradient id="glassSphere" cx="30%" cy="30%" r="70%">
-                  <stop offset="0%" stopColor="white" stopOpacity="0.6" />
-                  <stop offset="50%" stopColor="#1e293b" stopOpacity="0.3" />
-                  <stop offset="100%" stopColor="#0B1121" stopOpacity="0.9" />
+                  <stop offset="0%" stopColor="#eff6ff" stopOpacity="0.6" />
+                  <stop offset="45%" stopColor="#3b82f6" stopOpacity="0.5" />
+                  <stop offset="100%" stopColor="#1e3a8a" stopOpacity="0.9" />
               </radialGradient>
             </defs>
 
-            {/* Orbits */}
-            <g className={`origin-center ${isActive ? 'animate-[spin_4s_linear_infinite]' : 'animate-[spin_12s_linear_infinite]'}`} style={{ transformBox: 'fill-box' }}>
-                {[0, 60, 120].map((angle, i) => (
-                     <circle 
-                        key={i}
-                        cx="50" cy="50" r="42" 
-                        fill="none" 
-                        strokeWidth={isActive ? 1.5 : 0.8}
-                        stroke={isActive ? "url(#siriMesh)" : "url(#proBlueGrad)"}
-                        className="transition-all duration-500 origin-center ease-out"
-                        style={{ 
-                            transform: isActive ? `rotate(${angle}deg) scale(1)` : `rotate(${angle}deg) scaleY(0.45)`,
-                            opacity: isActive ? 1 : 0.5
-                        }} 
-                    />
-                ))}
+            {/* ORBITS LAYER */}
+            {/* If Active: Use CSS-based 'orbit-N' animations for smooth breathing & Blue/Green color */}
+            {/* If Idle: Use standard rotation */}
+            <g className={`origin-center ${isActive ? '' : 'animate-[spin_12s_linear_infinite]'}`} style={{ transformBox: 'fill-box' }}>
+                {isActive ? (
+                    <>
+                         <circle cx="50" cy="50" r="42" className="morph-orbit orbit-1" stroke="url(#jarvisSmartGrad)" strokeWidth="1.5" />
+                         <circle cx="50" cy="50" r="42" className="morph-orbit orbit-2" stroke="url(#jarvisSmartGrad)" strokeWidth="1.5" style={{ transform: 'rotate(60deg) scaleY(0.45)' }} />
+                         <circle cx="50" cy="50" r="42" className="morph-orbit orbit-3" stroke="url(#jarvisSmartGrad)" strokeWidth="1.5" style={{ transform: 'rotate(120deg) scaleY(0.45)' }} />
+                    </>
+                ) : (
+                    [0, 60, 120].map((angle, i) => (
+                        <circle 
+                           key={i}
+                           cx="50" cy="50" r="42" 
+                           fill="none" 
+                           strokeWidth="0.8"
+                           stroke="url(#proBlueGrad)"
+                           className="transition-all duration-500 origin-center ease-out"
+                           style={{ 
+                               transform: `rotate(${angle}deg) scaleY(0.45)`,
+                               opacity: 0.5
+                           }} 
+                       />
+                   ))
+                )}
             </g>
-
-            {/* Electron */}
-            {isActive && (
-                <g style={{ transformOrigin: '50px 50px' }} className="animate-[spin_2s_linear_infinite]">
-                   <circle cx="50" cy="8" r="3.5" fill="#22d3ee" className="drop-shadow-[0_0_5px_rgba(34,211,238,0.8)]" />
-                </g>
-            )}
 
             {/* Core */}
             {isActive ? (
                 <>
-                    <circle cx="50" cy="50" r="14" fill="url(#siriMesh)" className="filter blur-[2px] opacity-80 animate-pulse-fast" />
-                    <circle cx="50" cy="50" r="12" fill="url(#siriMesh)" />
+                    <circle cx="50" cy="50" r="14" fill="url(#jarvisSmartGrad)" className="filter blur-[2px] opacity-80 animate-pulse-fast" />
+                    <circle cx="50" cy="50" r="12" fill="url(#jarvisSmartGrad)" />
                     <circle cx="50" cy="50" r="12" fill="url(#activeGlass)" className="mix-blend-overlay" />
                     <circle cx="50" cy="50" r="12" fill="none" stroke="white" strokeOpacity="0.8" strokeWidth="0.5" />
                 </>
@@ -422,7 +459,7 @@ export default function JarvisAssistant() {
               >
                   {/* Reduced gradient complexity */}
                   <div className="absolute inset-x-0 top-0 h-[150px] bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.08),transparent_70%)] pointer-events-none" />
-                  <div className="h-[1px] w-full bg-linear-to-r from-transparent via-cyan-400 via-purple-500 to-transparent opacity-50" />
+                  <div className="h-px w-full bg-linear-to-r from-transparent via-emerald-500 to-transparent opacity-50" />
 
                   <div className="flex justify-between items-center px-8 py-4 border-b border-white/5 bg-white/[0.01] relative z-20 shrink-0">
                       <div className="flex items-center gap-3">

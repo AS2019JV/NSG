@@ -55,9 +55,9 @@ export default function Sidebar() {
     if (!name) return "bg-blue-600";
     const colors = [
       "bg-blue-600",
-      "bg-purple-600",
+      "bg-teal-600",
       "bg-emerald-600",
-      "bg-pink-600",
+      "bg-green-600",
       "bg-orange-600",
       "bg-cyan-600"
     ];
@@ -97,17 +97,7 @@ export default function Sidebar() {
         {/* HEADER */}
         <div className="h-16 xs:h-20 flex items-center px-4 xs:px-6 border-b border-navy-900 justify-between bg-navy-950/50 backdrop-blur-md sticky top-0 z-10 shrink-0">
           <div className="flex items-center gap-2 xs:gap-3">
-            <div className="w-6 h-6 xs:w-8 xs:h-8 relative shrink-0 atom-container">
-              <div className="w-full h-full atom-breathe">
-                <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible">
-                  <defs><linearGradient id="sidebarGrad" x1="0" y1="0" x2="100" y2="100"><stop offset="0" stopColor="#60A5FA" /><stop offset="1" stopColor="#FFFFFF" /></linearGradient></defs>
-                  <circle cx="50" cy="50" r="42" className="morph-orbit orbit-1 sidebar-orbit" stroke="url(#sidebarGrad)" />
-                  <circle cx="50" cy="50" r="42" className="morph-orbit orbit-2 sidebar-orbit" stroke="url(#sidebarGrad)" style={{ transform: 'rotate(60deg) scaleY(0.45)' }} />
-                  <circle cx="50" cy="50" r="41" className="morph-orbit orbit-3 sidebar-orbit" stroke="url(#sidebarGrad)" style={{ transform: 'rotate(120deg) scaleY(0.45)' }} />
-                  <circle cx="50" cy="50" r="8" fill="#FFFFFF" />
-                </svg>
-              </div>
-            </div>
+            <BrandAtom className="w-6 h-6 xs:w-8 xs:h-8 shrink-0" />
             <span className="font-display font-bold text-white text-base xs:text-lg tracking-tight">NSG <span className="font-normal text-blue-400">Intelligence</span></span>
           </div>
 
@@ -216,7 +206,7 @@ export default function Sidebar() {
                       )} />
                       <span className="truncate flex-1">{item.label}</span>
                       {isComingSoon && (
-                        <span className="text-[0.55rem] font-black px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 uppercase tracking-wider">
+                        <span className="text-[0.55rem] font-black px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 uppercase tracking-wider">
                           Próximamente
                         </span>
                       )}
@@ -262,7 +252,7 @@ export default function Sidebar() {
                       )} />
                       <span className="truncate flex-1">{item.label}</span>
                       {isComingSoon && (
-                        <span className="text-[0.55rem] font-black px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 uppercase tracking-wider">
+                        <span className="text-[0.55rem] font-black px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 uppercase tracking-wider">
                           Próximamente
                         </span>
                       )}

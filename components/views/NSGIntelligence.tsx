@@ -37,7 +37,7 @@ export default function NSGIntelligence() {
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 p-8 bg-white/60 backdrop-blur-sm rounded-3xl border border-slate-200/60 shadow-sm">
             <div className="space-y-3 flex-1">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-violet-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
+                <div className="w-10 h-10 bg-linear-to-br from-blue-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
                   <Cpu className="w-5 h-5 text-white" />
                 </div>
                 <span className="text-xs font-bold tracking-[0.2em] text-blue-600 uppercase">Command Center</span>
@@ -127,7 +127,7 @@ function ModuleCard({ title, description, icon: Icon, onClick, index, isComingSo
       {/* Coming Soon Badge */}
       {isComingSoon && (
         <div className="absolute top-4 right-4 z-20">
-          <span className="px-3 py-1.5 bg-purple-100 text-purple-600 rounded-xl text-[0.65rem] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+          <span className="px-3 py-1.5 bg-emerald-100 text-emerald-600 rounded-xl text-[0.65rem] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
             <Lock className="w-3 h-3" />
             Próximamente
           </span>
@@ -151,7 +151,7 @@ function ModuleCard({ title, description, icon: Icon, onClick, index, isComingSo
           transition-all duration-500 shadow-md
           ${isComingSoon 
             ? 'bg-slate-100 border-slate-200 text-slate-400' 
-            : 'bg-white border-slate-200 text-slate-400 group-hover:bg-gradient-to-br group-hover:from-blue-500 group-hover:to-violet-500 group-hover:border-transparent group-hover:text-white group-hover:shadow-lg group-hover:shadow-blue-200'
+            : 'bg-white border-slate-200 text-slate-400 group-hover:bg-linear-to-br group-hover:from-blue-500 group-hover:to-emerald-500 group-hover:border-transparent group-hover:text-white group-hover:shadow-lg group-hover:shadow-blue-200'
           }
         `}>
           <Icon strokeWidth={1.5} className="w-8 h-8" />
@@ -187,7 +187,7 @@ function ModuleCard({ title, description, icon: Icon, onClick, index, isComingSo
         
         {/* Active Indicator Line */}
         {!isComingSoon && (
-          <div className="absolute -bottom-2 left-0 h-1 w-0 bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600 group-hover:w-full transition-all duration-700 ease-in-out rounded-full" />
+          <div className="absolute -bottom-2 left-0 h-1 w-0 bg-linear-to-r from-blue-600 via-emerald-600 to-teal-600 group-hover:w-full transition-all duration-700 ease-in-out rounded-full" />
         )}
       </div>
     </button>

@@ -41,6 +41,7 @@ export interface Message {
         tag?: string;
         roleContext?: string;
     };
+    targetModel?: string;
 }
 
 const MessageItem = React.memo(({ msg, selectedModel }: { msg: Message; selectedModel: string }) => {
@@ -56,28 +57,32 @@ const MessageItem = React.memo(({ msg, selectedModel }: { msg: Message; selected
                 const parsed = JSON.parse(msg.content);
                 
                 // 1. Try specific model
-                if (selectedModel === 'Chat GPT' && parsed.openAI_response) displayContent = parsed.openAI_response;
-                else if (selectedModel === 'Gemini' && parsed.gemini_response) displayContent = parsed.gemini_response;
-                else if (selectedModel === 'Claude' && parsed.claude_response) displayContent = parsed.claude_response;
+                // 1. Check for Fusion 'answer' (Priority)
+                if (parsed.answer) {
+                    displayContent = parsed.answer;
+                }
+                // 2. Try specific model (New Keys)
+                else if (selectedModel === 'Chat GPT' && (parsed.openai || parsed.openAI_response)) displayContent = parsed.openai || parsed.openAI_response;
+                else if (selectedModel === 'Gemini' && (parsed.gemini || parsed.gemini_response)) displayContent = parsed.gemini || parsed.gemini_response;
+                else if (selectedModel === 'Claude' && (parsed.claude || parsed.claude_response)) displayContent = parsed.claude || parsed.claude_response;
                 
-                // 2. Check for Unavailable Models (If incomplete parsed data)
-                // If we requested a specific model but it's missing, AND we have proof the request finished (other keys exist)
-                else if ((selectedModel === 'Claude' && (parsed.openAI_response || parsed.gemini_response)) ||
-                         (selectedModel === 'Gemini' && (parsed.openAI_response || parsed.claude_response)) ||
-                         (selectedModel === 'Chat GPT' && (parsed.gemini_response || parsed.claude_response))) {
+                // 3. Check for Unavailable Models (If incomplete parsed data)
+                else if ((selectedModel === 'Claude' && (parsed.openai || parsed.gemini || parsed.openAI_response || parsed.gemini_response)) ||
+                         (selectedModel === 'Gemini' && (parsed.openai || parsed.claude || parsed.openAI_response || parsed.claude_response)) ||
+                         (selectedModel === 'Chat GPT' && (parsed.gemini || parsed.claude || parsed.gemini_response || parsed.claude_response))) {
                     isComingSoon = true;
                     displayContent = '';
                 }
 
-                // 3. General Fallbacks
+                // 4. General Fallbacks
                 else if (parsed.response) displayContent = parsed.response;
                 else if (parsed.output) displayContent = parsed.output;
                 else if (parsed.text) displayContent = parsed.text;
                 
-                // 4. Cross-Model Fallbacks (Show *something* rather than nothing, if not explicitly filtered above)
-                else if (parsed.openAI_response) displayContent = parsed.openAI_response;
-                else if (parsed.gemini_response) displayContent = parsed.gemini_response;
-                else if (parsed.claude_response) displayContent = parsed.claude_response;
+                // 5. Cross-Model Fallbacks
+                else if (parsed.openai || parsed.openAI_response) displayContent = parsed.openai || parsed.openAI_response;
+                else if (parsed.gemini || parsed.gemini_response) displayContent = parsed.gemini || parsed.gemini_response;
+                else if (parsed.claude || parsed.claude_response) displayContent = parsed.claude || parsed.claude_response;
                 
             } catch (e) {
                 // JSON parse failed, keep original raw text
@@ -255,7 +260,7 @@ export default function ChatInterface() {
     const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
     // const [mode, setMode] = useState('standard');
     const { activeAIMode: mode, setAIMode: setMode } = useUIStore();
-    const [selectedModel, setSelectedModel] = useState('Chat GPT');
+    const [selectedModel, setSelectedModel] = useState('Claude');
 
     const [intelligenceMode, setIntelligenceMode] = useState<'pulse' | 'compare' | 'fusion' | 'deep'>('pulse');
     const [isModeOpen, setIsModeOpen] = useState(false);
@@ -268,9 +273,21 @@ export default function ChatInterface() {
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
 
-    // Derived state for current view
-    const messages = conversations[mode] || [];
-    const isLoading = loadingStates[mode] || false;
+    // Derived context key for separation (Pulse = specific model, Fusion = fusion, Compare = compare)
+    const contextKey = intelligenceMode === 'pulse' ? selectedModel : intelligenceMode;
+    const loadingKey = `${mode}-${contextKey}`;
+
+    // Derived state for current view (Filtered by Pulse Model, Fusion, or Compare)
+    const rawMessages = conversations[mode] || [];
+    const messages = React.useMemo(() => {
+        if (intelligenceMode === 'pulse') {
+             return rawMessages.filter(m => m.targetModel === selectedModel);
+        }
+        // Fusion and Compare have their own isolated history
+        return rawMessages.filter(m => m.targetModel === intelligenceMode || (!m.targetModel && intelligenceMode === 'compare')); 
+    }, [rawMessages, intelligenceMode, selectedModel]);
+
+    const isLoading = loadingStates[loadingKey] || false;
 
     // Helpers for Safe Updates (targeting specific modes)
     const updateMessages = (targetMode: string, action: Message[] | ((prev: Message[]) => Message[])) => {
@@ -281,8 +298,8 @@ export default function ChatInterface() {
         });
     };
 
-    const setLoading = (targetMode: string, status: boolean) => {
-        setLoadingStates(prev => ({ ...prev, [targetMode]: status }));
+    const setLoading = (key: string, status: boolean) => {
+        setLoadingStates(prev => ({ ...prev, [key]: status }));
     };
 
     const [input, setInput] = useState('');
@@ -308,20 +325,14 @@ export default function ChatInterface() {
     // Scroll to bottom on MODE switch (Context/Tab change) - Instant
     useEffect(() => {
         chatEndRef.current?.scrollIntoView({ behavior: "instant" });
-    }, [mode]);
+    }, [mode, selectedModel, intelligenceMode]); // Added selectedModel/intelligenceMode dependencies
 
     // Smart Auto-Scroll for Messages
     useEffect(() => {
         const lastMsg = messages[messages.length - 1];
         const isUserLast = lastMsg?.role === 'user';
-
-        // 1. If Loading (Thinking...) -> Scroll to show spinner
-        // 2. If User sent a message -> Scroll to confirm input
         const isAssistantAndEmpty = lastMsg?.role === 'assistant' && !lastMsg.content;
 
-        // 1. If Loading (Thinking...) -> Scroll to center (safe with spacer)
-        // 2. If User sent a message -> Scroll to center (safe with spacer)
-        // 3. If AI response arrives (content exists) -> DO NOT SCROLL (keeps reading position at top)
         if (isUserLast || (isLoading && isAssistantAndEmpty)) {
            chatEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
         }
@@ -380,9 +391,14 @@ export default function ChatInterface() {
     const handleSubmit = async (e: React.SyntheticEvent) => {
         e.preventDefault();
 
-        // Capture the mode at the start of the request to prevent race conditions if user switches tabs
+        // Capture state snapshots
         const activeMode = mode;
-        const activeMessages = messages; // Snapshot of current messages for context
+        const currentIntelligenceMode = intelligenceMode;
+        const currentSelectedModel = selectedModel;
+        
+        // Determine context key for this specific message (Pulse=Specific, Fusion=Fusion, Compare=Compare)
+        const msgTargetModel = currentIntelligenceMode === 'pulse' ? currentSelectedModel : currentIntelligenceMode;
+        const activeLoadingKey = `${activeMode}-${msgTargetModel}`;
 
         if ((!input.trim() && !attachment) || isLoading) {
             return;
@@ -394,13 +410,14 @@ export default function ChatInterface() {
             role: 'user',
             type: 'text',
             content: attachment ? `[Attached: ${attachment.name}] ${input.trim()}` : input.trim(),
+            targetModel: msgTargetModel
         };
 
         updateMessages(activeMode, prev => [...prev, userMessage]);
         setInput('');
         setAttachment(null); // Clear attachment immediately from UI (it's in the request now)
         if (fileInputRef.current) fileInputRef.current.value = '';
-        setLoading(activeMode, true);
+        setLoading(activeLoadingKey, true);
 
         try {
             // Create placeholder for AI response
@@ -409,6 +426,7 @@ export default function ChatInterface() {
                 role: 'assistant',
                 type: 'text',
                 content: '',
+                targetModel: msgTargetModel
             };
             updateMessages(activeMode, prev => [...prev, assistantMessage]);
 
@@ -418,41 +436,51 @@ export default function ChatInterface() {
             let requestData;
             let headers = { 'Content-Type': 'application/json' };
 
-            // Determine Role String (Map logic to backend expectations)
-            let sendingRole = currentRole as string;
-            if (currentRole === 'manager') sendingRole = 'ceo';
-            // if (currentRole === 'admin') sendingRole = 'student'; // Optional: If verified
-
-            const contextData = {
-                role: sendingRole,
-                tab: activeMode,
-                mode: intelligenceMode,
-                cacheName: cacheName,
-                messageHistory: [...activeMessages, userMessage].map(m => ({
-                    role: m.role,
-                    content: m.content,
-                    type: m.type,
-                    metadata: m.metadata
-                }))
+            // Map internal state to requested API payload structure
+            const fieldMap: Record<string, string> = {
+                'nsg_clarity': 'clarity',
+                'nsg_horizon': 'horizon',
+                'nsg_news': 'news',
+                'settings': 'settings'
             };
+            const field = fieldMap[activeMode] || activeMode.replace('nsg_', '');
 
-            // Styling prompt is now handled by N8N workflow
+            // Map models
+            const modelMap: Record<string, string> = {
+                'Chat GPT': 'openai',
+                'openai': 'openai',
+                'claude': 'claude',
+                'Claude': 'claude',
+                'gemini': 'gemini',
+                'Gemini': 'gemini'
+            };
+            const aiModel = modelMap[selectedModel] || 'claude';
+
             const finalMessage = input.trim();
+
+            const payload = {
+                userId: userId,
+                field: field,
+                message: finalMessage,
+                mode: intelligenceMode,
+                aiModel: aiModel,
+                attachments: [] as any[]
+            };
 
             if (attachment) {
                 const formData = new FormData();
+                formData.append('userId', payload.userId);
+                formData.append('field', payload.field);
+                formData.append('message', payload.message);
+                formData.append('mode', payload.mode);
+                formData.append('aiModel', payload.aiModel);
                 formData.append('file', attachment);
-                formData.append('message', finalMessage);
-                formData.append('userId', userId); // Send User ID
-                formData.append('context', JSON.stringify(contextData));
+                // We keep attachments array empty in JSON per spec, but send file via formData
+                
                 requestData = formData;
-                headers = { 'Content-Type': 'multipart/form-data' }; // axios sets boundary automatically usually, but good to be explicit or let axios handle it
+                headers = { 'Content-Type': 'multipart/form-data' };
             } else {
-                requestData = {
-                    message: finalMessage,
-                    userId: userId, // Send User ID
-                    context: contextData
-                };
+                requestData = payload;
             }
 
             const response = await axios.post(webhookUrl, requestData, {
@@ -477,7 +505,8 @@ export default function ChatInterface() {
                 }
 
                 // IMPROVED LOGIC: Check for model-specific keys first to enable dynamic switching
-                if (responseData.claude_response || responseData.gemini_response || responseData.openAI_response) {
+                if (responseData.claude_response || responseData.gemini_response || responseData.openAI_response || 
+                    responseData.openai || responseData.gemini || responseData.claude || responseData.answer) {
                      // If we have specific model responses, save the whole object as string
                      // so MessageItem can parse and select the right one based on selectedModel state
                      assistantContent = JSON.stringify(responseData);
@@ -539,7 +568,7 @@ export default function ChatInterface() {
         </div>
 
         {/* spacer to push chat body down below header area (Red Zone) */}
-        <div className="w-full h-44 md:h-52 shrink-0" />
+        <div className="w-full h-52 md:h-64 shrink-0" />
 
         {/* --- LAYER 2: CHAT BODY (Restricted to Yellow Zone) --- */}
         <div className="flex-1 min-h-0 overflow-y-auto custom-scroll p-4 md:p-6 lg:p-12 pb-12 space-y-6 md:space-y-8">
@@ -562,7 +591,7 @@ export default function ChatInterface() {
             )}
             
             {/* Spacer to guarantee scroll clearance above the fixed input area */}
-            <div className="w-full h-40 shrink-0" />
+            <div className="w-full h-48 md:h-56 shrink-0" />
             
             <div ref={chatEndRef} className="h-px w-full" />
         </div>
@@ -651,7 +680,7 @@ export default function ChatInterface() {
                                             type="button"
                                             onClick={() => setIsModeOpen(!isModeOpen)}
                                             className={clsx(
-                                                "flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold transition-all duration-300 border shadow-sm group",
+                                                "flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-semibold transition-all duration-300 border shadow-sm group",
                                                 "bg-blue-50/80 border-blue-200 text-blue-600 ring-2 ring-blue-100/50" 
                                             )}
                                         >
