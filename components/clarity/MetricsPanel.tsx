@@ -59,7 +59,7 @@ export default function MetricsPanel({ metrics, isLoading = false }: MetricsPane
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Productivity Score */}
             <div className={clsx(
-                "p-6 rounded-3xl border-2 relative overflow-hidden group hover:shadow-lg transition-all duration-500",
+                "p-6 rounded-[2rem] border-2 relative overflow-hidden group hover:shadow-lg transition-all duration-500",
                 scoreColors.bg, scoreColors.border
             )}>
                 <div className={clsx(

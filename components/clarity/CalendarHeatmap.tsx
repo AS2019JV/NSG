@@ -103,7 +103,7 @@ export default function CalendarHeatmap({ data, isLoading = false }: CalendarHea
     }
 
     return (
-        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-white p-6 sm:p-8 rounded-[2rem] border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <h4 className="font-display font-bold text-lg sm:text-xl text-navy-950 capitalize">

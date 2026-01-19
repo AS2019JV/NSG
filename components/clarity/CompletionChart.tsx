@@ -74,7 +74,7 @@ export default function CompletionChart({ data, period = 'week', isLoading = fal
 
     if (!chartData || chartData.length === 0) {
         return (
-            <div className="bg-white p-8 sm:p-12 rounded-3xl border-2 border-dashed border-slate-200 text-center">
+            <div className="bg-white p-8 sm:p-12 rounded-[2rem] border-2 border-dashed border-slate-200 text-center">
                 <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <Calendar className="w-8 h-8 text-slate-300" />
                 </div>
