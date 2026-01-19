@@ -15,9 +15,10 @@ interface DynamicIslandProps {
   setSelectedModel?: (model: string) => void;
   intelligenceMode?: 'pulse' | 'compare' | 'fusion' | 'deep';
   setIntelligenceMode?: (mode: 'pulse' | 'compare' | 'fusion' | 'deep') => void;
+  isThinking?: boolean;
 }
 
-export default function DynamicIsland({ currentMode, setMode, selectedModel, setSelectedModel, intelligenceMode = 'pulse', setIntelligenceMode }: DynamicIslandProps) {
+export default function DynamicIsland({ currentMode, setMode, selectedModel, setSelectedModel, intelligenceMode = 'pulse', setIntelligenceMode, isThinking = false }: DynamicIslandProps) {
   const { currentRole } = useAppStore();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -41,12 +42,28 @@ export default function DynamicIsland({ currentMode, setMode, selectedModel, set
     <div className="relative z-50 flex flex-col items-center justify-start pt-2 xs:pt-4 gap-3 xs:gap-4 md:gap-6 w-full" ref={containerRef}>
       
       {/* 1. System Status Indicator (Apple Pro Label) */}
-      <div className="flex items-center gap-1.5 xs:gap-2 px-2 xs:px-3 py-1 rounded-lg bg-white/50 backdrop-blur-md border border-white/60 shadow-sm animate-fade-in group cursor-default">
-         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-         <span className="text-[9px] xs:text-[10px] font-bold tracking-[0.15em] text-navy-900/70 uppercase font-display group-hover:text-navy-900 transition-colors">
-            System NSG Intelligence
+      {/* 1. System Status Indicator (Apple Pro Label) */}
+      <button 
+         onClick={() => intelligenceMode === 'fusion' && setSelectedModel && setSelectedModel('Super NSG')}
+         className={clsx(
+             "flex items-center gap-1.5 xs:gap-2 px-2 xs:px-3 py-1 rounded-lg backdrop-blur-md shadow-sm animate-fade-in group transition-all duration-300",
+             intelligenceMode === 'fusion' ? "cursor-pointer hover:bg-white/80" : "cursor-default bg-white/50 border border-white/60",
+             (intelligenceMode === 'fusion' && selectedModel === 'Super NSG') 
+                ? "bg-blue-50 border border-blue-200 ring-1 ring-blue-100" 
+                : "bg-white/50 border border-white/60"
+         )}
+      >
+         <div className={clsx(
+             "w-1.5 h-1.5 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]",
+             (intelligenceMode === 'fusion' && selectedModel === 'Super NSG') ? "bg-blue-500 shadow-blue-500/50" : "bg-emerald-500"
+         )}></div>
+         <span className={clsx(
+             "text-[9px] xs:text-[10px] font-bold tracking-[0.15em] uppercase font-display transition-colors",
+             (intelligenceMode === 'fusion' && selectedModel === 'NSG AI') ? "text-blue-700" : "text-navy-900/70 group-hover:text-navy-900"
+         )}>
+            {intelligenceMode === 'fusion' ? 'NSG AI' : 'System NSG Intelligence'}
          </span>
-      </div>
+      </button>
 
       {/* 2. Primary Dynamic Island (Navigation) */}
       <div className="relative flex items-center justify-center w-full max-w-[98vw] xs:max-w-[95vw] md:max-w-4xl mx-auto px-1 xs:px-0">
@@ -100,33 +117,23 @@ export default function DynamicIsland({ currentMode, setMode, selectedModel, set
             transition={{ type: "spring", stiffness: 500, damping: 35, mass: 0.5 }}
             className="flex items-center justify-center mt-2.5 z-40"
           >
-            {intelligenceMode === 'fusion' ? (
-              // FUSION MODE: Super NSG Animation
-              <div className="relative flex items-center gap-3 px-5 py-2 md:px-7 md:py-2.5 rounded-lg bg-navy-950/70 backdrop-blur-3xl border border-white/10 ring-1 ring-white/5 shadow-[0_12px_40px_-8px_rgba(0,0,0,0.5)] overflow-hidden group hover:scale-[1.02] transition-transform duration-500">
-                 {/* Subtle fusion gradient background */}
-                 <div className="absolute inset-0 bg-linear-to-r from-blue-600/10 via-emerald-500/10 to-blue-600/10 opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
-                 
-                 {/* Green Light Pro Indicator (ON State) */}
-                 <div className="relative flex items-center justify-center w-2 h-2 md:w-2.5 md:h-2.5">
-                     <span className="absolute inset-0 rounded-full bg-emerald-500/50 animate-ping opacity-75 duration-1000"></span>
-                     <div className="relative w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,1)] ring-1 ring-emerald-300/50 z-10"></div>
-                 </div>
-
-                 <span className="relative z-10 text-[11px] md:text-[13px] font-bold tracking-[0.15em] text-transparent bg-clip-text bg-linear-to-r from-blue-100 via-white to-blue-100 font-display uppercase drop-shadow-[0_0_12px_rgba(59,130,246,0.5)]">
-                    Super NSG
-                 </span>
-              </div>
-            ) : (
-                // PULSE/COMPARE MODE: Model Selection
                 <div className="flex items-center justify-center p-1 gap-1 md:p-1.5 md:gap-1.5 mx-auto rounded-2xl bg-white/40 backdrop-blur-2xl border border-white/20 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.1)]">
-                    {['Chat GPT', 'Gemini', 'Claude'].map((model) => {
+                    {(intelligenceMode === 'fusion' ? ['Chat GPT', 'Gemini', 'NSG AI', 'Claude'] : ['Chat GPT', 'Gemini', 'Claude']).map((model) => {
                         const isSelected = selectedModel === model;
+                        
+                        // Logic: 
+                        // 1. Thinking in Compare/Fusion -> All 3 Active
+                        // 2. Otherwise -> Only Selected is Active
+                        const isMultiActive = isThinking && (intelligenceMode === 'compare' || intelligenceMode === 'fusion'); 
+                        const activeState = isSelected || isMultiActive;
+                        const isBlinking = activeState && isThinking;
+
                         return (
                             <button
                                 key={model}
                                 onClick={() => setSelectedModel && setSelectedModel(model)}
                                 className={clsx(
-                                    "relative flex items-center justify-center px-4 py-1.5 md:px-6 md:py-2 rounded-xl transition-colors duration-300 whitespace-nowrap z-10",
+                                    "relative flex items-center justify-center px-3 py-1.5 md:px-5 md:py-2 rounded-xl transition-colors duration-300 whitespace-nowrap z-10 gap-2",
                                     !isSelected && "hover:bg-white/10"
                                 )}
                             >
@@ -137,10 +144,22 @@ export default function DynamicIsland({ currentMode, setMode, selectedModel, set
                                         transition={{ type: "spring", stiffness: 350, damping: 30 }}
                                     />
                                 )}
+                                
+                                {/* Pro Status Circle */}
+                                <div className={clsx(
+                                    "w-1.5 h-1.5 rounded-full transition-all duration-500 ease-out shadow-sm",
+                                    activeState 
+                                        ? (model === 'NSG AI' 
+                                            ? "bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)] scale-110" 
+                                            : "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)] scale-110")
+                                        : "bg-slate-300/50 scale-100 group-hover:bg-slate-400",
+                                    isBlinking && "animate-pulse"
+                                )} />
+
                                 <span className={clsx(
                                     "relative z-10 transition-colors duration-300 text-[11px] md:text-[13px] font-semibold", 
                                     isSelected 
-                                        ? "text-blue-600" 
+                                        ? (model === 'NSG AI' ? "text-blue-600" : "text-navy-900")
                                         : "text-slate-500/80 group-hover:text-slate-700"
                                 )}>
                                     {model}
@@ -149,7 +168,6 @@ export default function DynamicIsland({ currentMode, setMode, selectedModel, set
                         );
                     })}
                 </div>
-            )}
           </m.div>
         )}
       </AnimatePresence>

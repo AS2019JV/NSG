@@ -57,14 +57,19 @@ const MessageItem = React.memo(({ msg, selectedModel }: { msg: Message; selected
                 const parsed = JSON.parse(msg.content);
                 
                 // 1. Try specific model
-                // 1. Check for Fusion 'answer' (Priority)
-                if (parsed.answer) {
+                // 1. Strict Model Routing (Respects Selection)
+                if (selectedModel === 'NSG AI' && parsed.answer) {
                     displayContent = parsed.answer;
                 }
-                // 2. Try specific model (New Keys)
+                // 2. Specific Models
                 else if (selectedModel === 'Chat GPT' && (parsed.openai || parsed.openAI_response)) displayContent = parsed.openai || parsed.openAI_response;
                 else if (selectedModel === 'Gemini' && (parsed.gemini || parsed.gemini_response)) displayContent = parsed.gemini || parsed.gemini_response;
                 else if (selectedModel === 'Claude' && (parsed.claude || parsed.claude_response)) displayContent = parsed.claude || parsed.claude_response;
+                
+                // 3. Smart Fallback (If 'answer' exists but no specific model was matched/selected, use it)
+                else if (parsed.answer) {
+                    displayContent = parsed.answer;
+                }
                 
                 // 3. Check for Unavailable Models (If incomplete parsed data)
                 else if ((selectedModel === 'Claude' && (parsed.openai || parsed.gemini || parsed.openAI_response || parsed.gemini_response)) ||
@@ -97,7 +102,7 @@ const MessageItem = React.memo(({ msg, selectedModel }: { msg: Message; selected
     }
 
     return (
-        <div className={clsx("flex w-full animate-fade-in-up", msg.role === 'user' ? "justify-end" : "justify-start")}>
+        <div id={`msg-${msg.id}`} className={clsx("flex w-full animate-fade-in-up", msg.role === 'user' ? "justify-end" : "justify-start")}>
             
             {msg.role === 'user' ? (
             // USER MESSAGE - Apple Pro Blue Bubble
@@ -108,8 +113,14 @@ const MessageItem = React.memo(({ msg, selectedModel }: { msg: Message; selected
             // AI MESSAGE - Clean Pro Text
             <div className="flex gap-4 group w-full max-w-full items-start">
                 {/* Pro Apple Avatar */}
+                {/* Pro Apple Avatar - Swaps to Multicolor when Thinking */}
                 <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 bg-gradient-to-b from-white to-slate-50 border border-slate-200/60 shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
-                    <BrandAtom className="w-5 h-5" variant="colored" />
+                    {/* If waiting/thinking, show the lively multicolor atom. Otherwise standard BrandAtom */}
+                    {isWaiting ? (
+                        <BrandAtom className="w-6 h-6" variant="multicolor" />
+                    ) : (
+                        <BrandAtom className="w-5 h-5" variant="colored" />
+                    )}
                 </div>
                 
                 <div className="flex-1 min-w-0">
@@ -141,9 +152,12 @@ const MessageItem = React.memo(({ msg, selectedModel }: { msg: Message; selected
                                             h2: ({node, ...props}) => <h2 className="text-xl font-bold mt-5 mb-2 tracking-tight" {...props} />,
                                             h3: ({node, ...props}) => <h3 className="text-lg font-semibold mt-4 mb-2" {...props} />,
                                             p: ({node, ...props}) => <p className="mb-3 leading-relaxed" {...props} />,
+                                            span: ({node, ...props}) => <span {...props} />, // Explicit pass-through for inline styles (Notion colors)
                                             ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-3 space-y-1" {...props} />,
                                             ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-3 space-y-1" {...props} />,
                                             li: ({node, ...props}) => <li className="pl-1" {...props} />,
+                                            strong: ({node, ...props}) => <strong className="font-bold text-slate-900" {...props} />,
+                                            em: ({node, ...props}) => <em className="italic" {...props} />,
                                             code: ({node, inline, className, children, ...props}: React.ComponentPropsWithoutRef<'code'> & { inline?: boolean, node?: unknown }) => {
                                                 return inline ? (
                                                     <code className="bg-slate-100 px-1.5 py-0.5 rounded text-[13px] font-mono text-[#D12F2F] font-medium align-middle" {...props}>{children}</code>
@@ -226,10 +240,10 @@ const MessageItem = React.memo(({ msg, selectedModel }: { msg: Message; selected
                                     </ReactMarkdown>
                                 </div>
                             ) : (
-                                <div className="flex items-center gap-2 text-slate-400 mt-1 px-1 animate-pulse">
-                                     <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-75"></div>
-                                     <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-150"></div>
-                                     <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce delay-200"></div>
+                                <div className="mt-1 px-1">
+                                    <span className="text-[14px] md:text-[15px] font-medium tracking-wide bg-clip-text text-transparent bg-[linear-gradient(to_right,#64748b,#10B981,#0EA5E9,#64748b)] animate-[shimmer_1.5s_linear_infinite] bg-size-[300%_auto] font-display">
+                                        Procesamiento Avanzado...
+                                    </span>
                                 </div>
                             )}
                         </div>
@@ -264,6 +278,11 @@ export default function ChatInterface() {
 
     const [intelligenceMode, setIntelligenceMode] = useState<'pulse' | 'compare' | 'fusion' | 'deep'>('pulse');
     const [isModeOpen, setIsModeOpen] = useState(false);
+
+    // Enforce 'Standard' mode on initial entry
+    useEffect(() => {
+        setMode('standard');
+    }, []);
 
     // Attachment & Audio State
     const [attachment, setAttachment] = useState<File | null>(null);
@@ -322,12 +341,23 @@ export default function ChatInterface() {
         setCacheName('n8n-managed');
     }, [setContextCached]);
 
-    // Scroll to bottom on MODE switch (Context/Tab change) - Instant
+    // Scroll to Last User Message on MODE/MODEL switch
+    // This directs the user to the "blue chat icon" to see the new response context
     useEffect(() => {
-        chatEndRef.current?.scrollIntoView({ behavior: "instant" });
-    }, [mode, selectedModel, intelligenceMode]); // Added selectedModel/intelligenceMode dependencies
+        const userMsgs = messages.filter(m => m.role === 'user');
+        const lastUserMsg = userMsgs[userMsgs.length - 1];
 
-    // Smart Auto-Scroll for Messages
+        if (lastUserMsg) {
+            const el = document.getElementById(`msg-${lastUserMsg.id}`);
+            if (el) {
+                el.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        } else {
+             chatEndRef.current?.scrollIntoView({ behavior: "instant" });
+        }
+    }, [mode, selectedModel, intelligenceMode]);
+
+    // Smart Auto-Scroll for New Messages (Streaming/Typing)
     useEffect(() => {
         const lastMsg = messages[messages.length - 1];
         const isUserLast = lastMsg?.role === 'user';
@@ -387,12 +417,14 @@ export default function ChatInterface() {
         }
     };
 
+    const activeRequests = useRef<Record<string, number>>({});
+
     // 5. HANDLER (Merged Logic: UI Updates + API Stream)
     const handleSubmit = async (e: React.SyntheticEvent) => {
         e.preventDefault();
 
         // Capture state snapshots
-        const activeMode = mode;
+        const activeMode = mode || 'standard';
         const currentIntelligenceMode = intelligenceMode;
         const currentSelectedModel = selectedModel;
         
@@ -400,7 +432,7 @@ export default function ChatInterface() {
         const msgTargetModel = currentIntelligenceMode === 'pulse' ? currentSelectedModel : currentIntelligenceMode;
         const activeLoadingKey = `${activeMode}-${msgTargetModel}`;
 
-        if ((!input.trim() && !attachment) || isLoading) {
+        if (!input.trim() && !attachment) {
             return;
         }
 
@@ -417,6 +449,9 @@ export default function ChatInterface() {
         setInput('');
         setAttachment(null); // Clear attachment immediately from UI (it's in the request now)
         if (fileInputRef.current) fileInputRef.current.value = '';
+        
+        // TRACKING START
+        activeRequests.current[activeLoadingKey] = (activeRequests.current[activeLoadingKey] || 0) + 1;
         setLoading(activeLoadingKey, true);
 
         try {
@@ -438,6 +473,7 @@ export default function ChatInterface() {
 
             // Map internal state to requested API payload structure
             const fieldMap: Record<string, string> = {
+                'standard': 'standard', // Ensure default maps correctly
                 'nsg_clarity': 'clarity',
                 'nsg_horizon': 'horizon',
                 'nsg_news': 'news',
@@ -545,12 +581,16 @@ export default function ChatInterface() {
                     : m
             ));
         } finally {
-            setLoading(activeMode, false);
+            // TRACKING END
+            activeRequests.current[activeLoadingKey] = Math.max(0, (activeRequests.current[activeLoadingKey] || 1) - 1);
+            if (activeRequests.current[activeLoadingKey] === 0) {
+                 setLoading(activeLoadingKey, false);
+            }
         }
     };
 
     return (
-        <div className="flex flex-col h-full w-full relative overflow-hidden">
+        <div className="flex flex-col h-full w-full relative overflow-hidden bg-[#F8FAFF]">
         
         {/* --- LAYER 1: DYNAMIC ISLAND (Visuals) --- */}
         {/* Adjusted top padding to clear the "Volver" button on mobile but stay high */}
@@ -563,9 +603,13 @@ export default function ChatInterface() {
                     setSelectedModel={setSelectedModel}
                     intelligenceMode={intelligenceMode}
                     setIntelligenceMode={setIntelligenceMode}
+                    isThinking={isLoading}
                 />
             </div>
         </div>
+
+        {/* --- TOP GRADIENT FADE (Softly hiding text) --- */}
+        <div className="absolute top-0 left-0 w-full h-32 md:h-48 bg-gradient-to-b from-[#F8FAFF] via-[#F8FAFF]/80 to-transparent z-30 pointer-events-none" />
 
         {/* spacer to push chat body down below header area (Red Zone) */}
         <div className="w-full h-52 md:h-64 shrink-0" />
@@ -580,15 +624,7 @@ export default function ChatInterface() {
                 ))}
             </div>
 
-            {/* Loading State (Atom at Top/Center) */}
-            {isLoading && !messages[messages.length - 1]?.content && (
-                <div className={clsx("flex flex-col flex-1 items-center w-full gap-6 animate-fade-in-up", messages.length <= 2 ? "justify-start pt-0 md:pt-6" : "justify-center py-12")}>
-                    <div className="relative flex items-center justify-center scale-[1.5]">
-                        <AtomEffect className="w-20 h-20" />
-                    </div>
-                    <span className="text-sm font-medium text-slate-500 animate-pulse tracking-[0.2em] font-display uppercase">Pensando...</span>
-                </div>
-            )}
+            {/* Loading State - Handled by MessageItem now */}
             
             {/* Spacer to guarantee scroll clearance above the fixed input area */}
             <div className="w-full h-48 md:h-56 shrink-0" />
@@ -597,7 +633,7 @@ export default function ChatInterface() {
         </div>
 
         {/* --- LAYER 3: INPUT AREA (Stacked Gemini Style) --- */}
-        <div className="absolute bottom-0 left-0 w-full z-40 px-4 pb-6 md:pb-8 pt-12 bg-gradient-to-t from-[#F5F5F7] via-[#F5F5F7] via-60% to-transparent pointer-events-none">
+        <div className="absolute bottom-0 left-0 w-full z-40 px-4 pb-6 md:pb-8 pt-12 bg-gradient-to-t from-[#F8FAFF] via-[#F8FAFF] via-60% to-transparent pointer-events-none">
             <div className="max-w-3xl mx-auto pointer-events-auto">
                 {!isContextCached ? (
                     <div className="flex items-center justify-center gap-4 text-[15px] text-[#0b57d0] font-medium py-5 bg-white rounded-[24px] shadow-sm animate-pulse">
@@ -635,7 +671,6 @@ export default function ChatInterface() {
                                         handleSubmit(e);
                                     }
                                 }}
-                                disabled={isLoading}
                                 rows={1}
                                 className="w-full bg-transparent border-none pt-4 pb-2 px-6 font-normal text-[#1f1f1f] placeholder:text-slate-500 text-[16px] focus:ring-0 focus:outline-none disabled:opacity-50 resize-none custom-scroll"
                                 placeholder={isRecording ? "Grabando audio..." : (attachment ? "Añade un comentario..." : "Pregunta a NSG...")}
@@ -744,7 +779,7 @@ export default function ChatInterface() {
 
                                 <button
                                     type="submit"
-                                    disabled={isLoading || (!input.trim() && !attachment)}
+                                    disabled={!input.trim() && !attachment}
                                     className={`
                                 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300
                                 ${(input.trim() || attachment) ? 'bg-[#007AFF] text-white hover:bg-blue-600 cursor-pointer shadow-md' : 'bg-slate-100 text-slate-400 cursor-default'}

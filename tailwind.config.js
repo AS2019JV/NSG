@@ -90,12 +90,17 @@ module.exports = {
                 "spin-slow": "spin 6s linear infinite",
                 "spin-process": "spin 3s linear infinite",
                 "text-glow": "textGlow 1.5s ease-in-out infinite alternate",
+                shimmer: "shimmer 3s linear infinite",
             },
             backgroundImage: {
                 "grid-pattern":
                     "linear-gradient(to right, rgba(15, 23, 42, 0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(15, 23, 42, 0.03) 1px, transparent 1px)",
             },
             keyframes: {
+                shimmer: {
+                    "0%": { backgroundPosition: "200% center" },
+                    "100%": { backgroundPosition: "-200% center" },
+                },
                 fadeInUp: {
                     from: { opacity: 0, transform: "translateY(20px)" },
                     to: { opacity: 1, transform: "translateY(0)" },
