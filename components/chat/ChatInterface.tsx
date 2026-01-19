@@ -16,7 +16,8 @@ import {
     Scale,
     ChevronDown,
     BrainCircuit,
-    Clock
+    Clock,
+    Zap
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
