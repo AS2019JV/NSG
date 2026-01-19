@@ -152,7 +152,7 @@ const MessageItem = React.memo(({ msg, selectedModel }: { msg: Message; selected
                                             h2: ({node, ...props}) => <h2 className="text-xl font-bold mt-5 mb-2 tracking-tight" {...props} />,
                                             h3: ({node, ...props}) => <h3 className="text-lg font-semibold mt-4 mb-2" {...props} />,
                                             p: ({node, ...props}) => <p className="mb-3 leading-relaxed" {...props} />,
-                                            span: ({node, ...props}) => <span {...props} />, // Explicit pass-through for inline styles (Notion colors)
+
                                             ul: ({node, ...props}) => <ul className="list-disc pl-5 mb-3 space-y-1" {...props} />,
                                             ol: ({node, ...props}) => <ol className="list-decimal pl-5 mb-3 space-y-1" {...props} />,
                                             li: ({node, ...props}) => <li className="pl-1" {...props} />,
