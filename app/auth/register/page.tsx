@@ -227,8 +227,19 @@ function RegisterContent() {
               </div>
             </form>
 
+            {/* Login Link */}
+            <div className="mt-8 pt-6 border-t border-slate-100 flex justify-center text-sm">
+              <span className="text-slate-500 mr-1">¿Ya tienes cuenta?</span>
+              <Link
+                href="/auth/login"
+                className="text-blue-600 font-semibold hover:text-blue-700 transition-colors cursor-pointer"
+              >
+                Iniciar Sesión
+              </Link>
+            </div>
+
             {/* Terms */}
-            <div className="mt-8 pt-6 border-t border-slate-100 text-center">
+            <div className="mt-6 text-center">
               <p className="text-xs text-slate-400">
                 Al registrarte, aceptas nuestros <span className="text-blue-600 cursor-pointer hover:underline">Términos</span> y <span className="text-blue-600 cursor-pointer hover:underline">Privacidad</span>.
               </p>
