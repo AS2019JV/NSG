@@ -29,7 +29,7 @@ const slides = [
         title: "Horizon Planning",
         subtitle: "Arquitectura del Futuro",
         description: "Análisis profundo de reuniones y sesiones convertido en insights accionables mediante IA, creando hojas de ruta de implementación precisas.",
-        gradient: "from-indigo-400 to-purple-400",
+        gradient: "from-blue-500 to-cyan-500",
     },
     {
         id: 4,
@@ -37,7 +37,7 @@ const slides = [
         title: "Ecosystem Integration",
         subtitle: "Sincronización Total",
         description: "Integración perfecta con Telegram, Google Calendar, Fathom Analytics y más, centralizando tu ecosistema digital en un solo lugar.",
-        gradient: "from-violet-400 to-fuchsia-400",
+        gradient: "from-cyan-400 to-teal-400",
     },
     {
         id: 5,

@@ -32,8 +32,9 @@ export default function BrandAtom({ className, variant = 'white' }: BrandAtomPro
                         </linearGradient>
                    ) : isValues.colored ? (
                         <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stopColor="#0284C7" /> {/* Ocean Deep Blue */}
-                            <stop offset="100%" stopColor="#38BDF8" /> {/* Ocean Surface Blue */}
+                            <stop offset="0%" stopColor="#1d4ed8" /> {/* Enterprise Dark Blue */}
+                            <stop offset="50%" stopColor="#3b82f6" /> {/* Enterprise Mid Blue */}
+                            <stop offset="100%" stopColor="#60a5fa" /> {/* Enterprise Light Blue */}
                         </linearGradient>
                    ) : (
                         <linearGradient id={gradientId} x1="0" y1="0" x2="100" y2="100">
@@ -45,14 +46,14 @@ export default function BrandAtom({ className, variant = 'white' }: BrandAtomPro
                
                {/* Fast Smooth Spinning Group with Sharper Edges */}
                <g className={clsx("origin-center will-change-transform", isValues.multicolor ? "animate-[spin_0.8s_linear_infinite]" : "animate-[spin_4s_linear_infinite]")} style={{ transformBox: 'fill-box' }}>
-                   <circle cx="50" cy="50" r="38" className={clsx("morph-orbit opacity-90", orbitClass)} stroke={`url(#${gradientId})`} style={{ transform: 'rotate(0deg) scaleY(0.45)' }} />
-                   <circle cx="50" cy="50" r="38" className={clsx("morph-orbit opacity-90", orbitClass)} stroke={`url(#${gradientId})`} style={{ transform: 'rotate(60deg) scaleY(0.45)' }} />
-                   <circle cx="50" cy="50" r="38" className={clsx("morph-orbit opacity-90", orbitClass)} stroke={`url(#${gradientId})`} style={{ transform: 'rotate(120deg) scaleY(0.45)' }} />
+                   <circle cx="50" cy="50" r="38" className={clsx("morph-orbit opacity-90 orbit-1", orbitClass)} stroke={`url(#${gradientId})`} />
+                   <circle cx="50" cy="50" r="38" className={clsx("morph-orbit opacity-90 orbit-2", orbitClass)} stroke={`url(#${gradientId})`} />
+                   <circle cx="50" cy="50" r="38" className={clsx("morph-orbit opacity-90 orbit-3", orbitClass)} stroke={`url(#${gradientId})`} />
                </g>
                
                 {isActive ? (
                    <>
-                       <circle cx="50" cy="50" r="10" fill={isValues.multicolor ? `url(#${gradientId})` : "#0284C7"} className="filter drop-shadow-md" />
+                       <circle cx="50" cy="50" r="10" fill={`url(#${gradientId})`} className="filter drop-shadow-md" />
                        <circle cx="50" cy="50" r="4" fill="white" />
                    </>
                ) : (
