@@ -196,8 +196,20 @@ export default function LandingPage() {
                 </div>
             </section>
 
+            {/* SUPER INTELLIGENCE HERO */}
+            <section className="pt-32 pb-16 sm:pt-56 sm:pb-28 px-4 bg-white overflow-hidden flex justify-center items-center">
+                <div className="relative select-none">
+                    <span className="absolute -top-10 left-1 sm:-top-16 sm:left-2 text-3xl sm:text-5xl font-bold text-blue-600 tracking-tight animate-fade-in-up">
+                        Super
+                    </span>
+                    <h2 className="text-[13vw] sm:text-[15vw] leading-[0.8] font-display font-bold text-deep-900 tracking-tighter hover:scale-105 transition-transform duration-700 cursor-default">
+                        Intelligence
+                    </h2>
+                </div>
+            </section>
+
             {/* ONBOARDING STEPS */}
-            <section className="py-24 px-4 bg-white border-y border-slate-100">
+            <section className="pb-24 pt-12 sm:pt-24 px-4 bg-white border-b border-slate-100">
                 <div className="max-w-6xl mx-auto">
                     <div className="mb-20 max-w-2xl text-center md:text-left">
                         <h2 className="text-3xl sm:text-4xl font-display font-bold text-navy-950 tracking-tight mb-4">
