@@ -19,8 +19,8 @@ GOOGLE_GENERATIVE_AI_API_KEY=your_google_ai_api_key_here
 # Development (when running backend locally)
 # NEXT_PUBLIC_API_URL=http://localhost:3000
 
-# Production (Render)
-NEXT_PUBLIC_API_URL=https://nsg-backend.onrender.com
+# Production (Vercel)
+NEXT_PUBLIC_API_URL=https://nsg-backend.vercel.app
 
 # ============================================
 # ENVIRONMENT
@@ -53,7 +53,7 @@ NEXT_PUBLIC_APP_ENV=production
 -   **Purpose**: Backend API base URL
 -   **Values**:
     -   **Development**: `http://localhost:3000` (when running backend locally)
-    -   **Production**: `https://nsg-backend.onrender.com`
+    -   **Production**: `https://nsg-backend.vercel.app`
 -   **Note**: Must start with `NEXT_PUBLIC_` to be accessible in the browser
 
 ### 3. **NEXT_PUBLIC_APP_ENV**
@@ -78,7 +78,7 @@ NEXT_PUBLIC_APP_ENV=development
 
 ```env
 GOOGLE_GENERATIVE_AI_API_KEY=your_api_key
-NEXT_PUBLIC_API_URL=https://nsg-backend.onrender.com
+NEXT_PUBLIC_API_URL=https://nsg-backend.vercel.app
 NEXT_PUBLIC_APP_ENV=production
 ```
 
@@ -95,7 +95,7 @@ NEXT_PUBLIC_APP_ENV=production
 | Variable Name                  | Value                              | Environment                      |
 | ------------------------------ | ---------------------------------- | -------------------------------- |
 | `GOOGLE_GENERATIVE_AI_API_KEY` | Your API key                       | Production, Preview, Development |
-| `NEXT_PUBLIC_API_URL`          | `https://nsg-backend.onrender.com` | Production, Preview              |
+| `NEXT_PUBLIC_API_URL`          | `https://nsg-backend.vercel.app` | Production, Preview              |
 | `NEXT_PUBLIC_API_URL`          | `http://localhost:3000`            | Development                      |
 | `NEXT_PUBLIC_APP_ENV`          | `production`                       | Production                       |
 

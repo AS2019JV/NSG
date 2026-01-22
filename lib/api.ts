@@ -4,7 +4,7 @@ import axios from "axios";
 // API Configuration
 // ============================================
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://nsg-backend.onrender.com";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://nsg-backend.vercel.app";
 const isDevelopment = process.env.NEXT_PUBLIC_APP_ENV === "development" || process.env.NODE_ENV === "development";
 
 // Validate API URL

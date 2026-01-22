@@ -128,7 +128,7 @@ Create `.env.local` file (see [ENV_CONFIGURATION.md](./ENV_CONFIGURATION.md) for
 
 ```env
 GOOGLE_GENERATIVE_AI_API_KEY=your_api_key
-NEXT_PUBLIC_API_URL=https://nsg-backend.onrender.com
+NEXT_PUBLIC_API_URL=https://nsg-backend.vercel.app
 NEXT_PUBLIC_APP_ENV=production
 ```
 

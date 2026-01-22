@@ -1,36 +1,29 @@
-# URLs Actualizadas - Integración con Render
+# URLs Actualizadas - Backend en Vercel
 
 ## ✅ Cambios Realizados
 
-Se han actualizado todas las URLs del backend para usar **Render** en lugar de localhost:
+Se han actualizado todas las URLs del backend para usar **Vercel** en lugar de Render:
 
 ### Archivos Modificados:
 
-1. **FathomTokenModal.tsx**
+1. **lib/api.ts**
+    - Base URL: `https://nsg-backend.vercel.app`
 
-    - URL: `https://nsg-backend.onrender.com/fathom/token`
-
-2. **NSGHorizon.tsx**
-    - URL Status: `https://nsg-backend.onrender.com/fathom/status`
-    - URL Delete: `https://nsg-backend.onrender.com/fathom/token`
+2. **.env.local**
+    - Variable de entorno actualizada a Vercel
 
 ---
 
-## ⚠️ Importante: Render Sleep Mode
+## 🚀 Ventajas de Vercel
 
-**Render** pone los servicios gratuitos en modo "sleep" después de 15 minutos de inactividad.
+**Vercel** ofrece mejor rendimiento para el backend:
 
-### Síntomas:
+### Beneficios:
 
--   Primera petición tarda 30-60 segundos
--   Error de timeout en la primera conexión
--   Funciona normal después de "despertar"
-
-### Solución:
-
-1. **Espera 30-60 segundos** en la primera petición
-2. El servicio se "despierta" automáticamente
-3. Las siguientes peticiones son rápidas
+-   Despliegue automático más rápido
+-   No hay modo "sleep" como en Render
+-   Menor latencia en respuestas
+-   Mejor integración con Next.js frontend
 
 ---
 
@@ -45,10 +38,10 @@ Si prefieres usar el backend local durante desarrollo:
     npm run dev
     ```
 
-2. **Cambia las URLs** temporalmente a:
+2. **Cambia la variable de entorno** en `.env.local`:
 
-    ```typescript
-    "http://localhost:3000/fathom/...";
+    ```bash
+    NEXT_PUBLIC_API_URL=http://localhost:3000
     ```
 
 3. **Recuerda revertir** antes de hacer commit
@@ -57,7 +50,7 @@ Si prefieres usar el backend local durante desarrollo:
 
 ## 🚀 URLs Actuales
 
--   **Backend Producción**: `https://nsg-backend.onrender.com`
+-   **Backend Producción**: `https://nsg-backend.vercel.app`
 -   **Frontend Local**: `http://localhost:3001`
 -   **Frontend Producción**: (pendiente)
 
@@ -65,6 +58,6 @@ Si prefieres usar el backend local durante desarrollo:
 
 ## 📝 Notas
 
--   Las URLs están hardcodeadas por ahora
--   En el futuro, considera usar variables de entorno
--   Render puede tardar en despertar la primera vez
+-   Las URLs se gestionan mediante variables de entorno
+-   Vercel proporciona mejor tiempo de respuesta que Render
+-   El backend está siempre activo, sin tiempos de "despertar"
