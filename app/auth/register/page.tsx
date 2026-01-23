@@ -104,12 +104,34 @@ function RegisterContent() {
         // Typo Check for Common Domains
         const domain = normalizedEmailCheck.split('@')[1];
         const domainTypos: { [key: string]: string } = {
+            // Gmail
             'gmil.com': 'gmail.com',
             'gnail.com': 'gmail.com',
             'gmai.com': 'gmail.com',
+            'gamill.com': 'gmail.com', // Requested specific
+            'gmal.com': 'gmail.com',
+            'gmaill.com': 'gmail.com',
+            'gail.com': 'gmail.com',
+            'gmial.com': 'gmail.com',
+            
+            // Hotmail
             'hotmil.com': 'hotmail.com',
+            'hotmal.com': 'hotmail.com',
+            'hotmai.com': 'hotmail.com',
+            'hotmaill.com': 'hotmail.com',
+            
+            // Outlook
             'outlok.com': 'outlook.com',
-            'yhoo.com': 'yahoo.com'
+            'outook.com': 'outlook.com',
+            'outllok.com': 'outlook.com',
+            
+            // Yahoo
+            'yhoo.com': 'yahoo.com',
+            'yahooo.com': 'yahoo.com',
+            
+            // iCloud
+            'iclud.com': 'icloud.com',
+            'icoud.com': 'icloud.com'
         };
 
         if (domain && domainTypos[domain]) {
