@@ -812,25 +812,7 @@ export default function NSGClarity() {
 
     const progress =
         (tasks.filter((t) => t.isChecked).length / tasks.length) * 100;
-    const prevProgressRef = useRef(progress);
 
-    useEffect(() => {
-        if (progress === 100 && prevProgressRef.current < 100) {
-            setTimeout(() => {
-                playSound("success");
-                confetti({
-                    particleCount: 150,
-                    spread: 100,
-                    origin: { y: 0.6 },
-                });
-                showToast(
-                    "¡Excelente! Has completado todos los objetivos.",
-                    "success",
-                );
-            }, 300);
-        }
-        prevProgressRef.current = progress;
-    }, [progress, showToast]);
 
     const handleTaskToggle = async (id: string) => {
         const task = tasks.find((t) => t.id === id);
@@ -848,14 +830,34 @@ export default function NSGClarity() {
 
         // Optimistically update local state
         const originalTasks = [...tasks];
-        setTasks((prev) =>
-            prev.map((t) => {
-                if (t.id === id) {
-                    return { ...t, isChecked: !t.isChecked };
-                }
-                return t;
-            }),
-        );
+        const updatedTasks = tasks.map((t) => {
+            if (t.id === id) {
+                return { ...t, isChecked: !t.isChecked };
+            }
+            return t;
+        });
+
+        // Check if all tasks are completed after this toggle
+        // We only trigger if the user is checking a box (old state was unchecked) AND all result in true
+        const isChecking = !task.isChecked;
+        const allCompleted = updatedTasks.every((t) => t.isChecked);
+
+        if (isChecking && allCompleted) {
+            setTimeout(() => {
+                playSound("success");
+                confetti({
+                    particleCount: 150,
+                    spread: 100,
+                    origin: { y: 0.6 },
+                });
+                showToast(
+                    "¡Excelente! Has completado todos los objetivos.",
+                    "success",
+                );
+            }, 300);
+        }
+
+        setTasks(updatedTasks);
 
         try {
             // Call backend to toggle completion
