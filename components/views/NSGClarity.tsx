@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
     Target,
     ArrowRight,
@@ -331,7 +331,7 @@ function TimelineItem({
     );
 }
 
-function StrategyCard({ strategy }: { strategy: Strategy; }) {
+function StrategyCard({ strategy }: { strategy: Strategy }) {
     const parseAction = (text: string, index: number) => {
         const keywords = [
             { kw: "Quick Win", label: "Ejecución Inmediata", color: "emerald" },
@@ -664,7 +664,7 @@ export default function NSGClarity() {
 
                     // Fill in completions
                     completions.forEach(
-                        (c: { date: string; protocol: string; }) => {
+                        (c: { date: string; protocol: string }) => {
                             if (chartMap[c.date]) {
                                 const protocolKey = c.protocol as
                                     | "morning_clarity"
@@ -813,13 +813,12 @@ export default function NSGClarity() {
     const progress =
         (tasks.filter((t) => t.isChecked).length / tasks.length) * 100;
 
-
     const handleTaskToggle = async (id: string) => {
         const task = tasks.find((t) => t.id === id);
         if (!task || !userId) return;
 
         // Map task ID to protocol name
-        const protocolMap: { [key: string]: string; } = {
+        const protocolMap: { [key: string]: string } = {
             "1": "morning_clarity",
             "2": "power_check",
             "3": "next_day_planning",
@@ -920,15 +919,19 @@ export default function NSGClarity() {
                 title="Clic para sincronizar objetivos"
             >
                 <div className="relative z-10">
+                    <span className="text-[10px] font-bold tracking-[0.2em] text-blue-400 uppercase mb-2 block">
+                        Claridad en tus Objetivos
+                    </span>
                     <h2 className="font-display font-bold text-2xl lg:text-3xl tracking-tight mb-2">
                         <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-emerald-400">
-                            Tu Centro de Productividad IA
+                            NSG Clarity
                         </span>
                     </h2>
                     <p className="text-slate-300 text-sm max-w-3xl leading-relaxed">
-                        Optimiza tu flujo de trabajo diario con estrategias
-                        personalizadas y seguimiento de tus objetivos en tiempo
-                        real.
+                        Gestiona tus protocolos diarios de productividad y
+                        mantén el enfoque absoluto en tus metas de alto impacto.
+                        Sincroniza tus objetivos en tiempo real y optimiza tu
+                        ejecución estratégica.
                     </p>
                 </div>
             </div>
@@ -1247,7 +1250,7 @@ export default function NSGClarity() {
                                         className={clsx(
                                             "space-y-6",
                                             !telegramId &&
-                                            "pointer-events-none opacity-50",
+                                                "pointer-events-none opacity-50",
                                         )}
                                     >
                                         {strategies.map((strategy) => (

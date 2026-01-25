@@ -539,16 +539,20 @@ export default function NSGHorizon() {
                 {/* Dark Header Banner - Clarity Style */}
                 <div className="relative overflow-hidden bg-linear-to-r from-navy-950 via-navy-900 to-navy-950 px-4 py-5 xs:px-5 sm:px-8 sm:py-6 rounded-2xl xs:rounded-3xl border border-navy-800/50 shadow-xl mb-5 shrink-0">
                     <div className="relative z-10">
-                        <h2 className="font-display font-bold text-2xl lg:text-3xl tracking-tight">
-                            <span className="text-white">Diseño de </span>
+                        <span className="text-[10px] font-bold tracking-[0.2em] text-cyan-400 uppercase mb-2 block">
+                            Planificación y Proyección
+                        </span>
+                        <h2 className="font-display font-bold text-2xl lg:text-3xl tracking-tight mb-2">
                             <span className="text-transparent bg-clip-text bg-linear-to-r from-cyan-400 to-blue-500">
                                 NSG Horizon
                             </span>
                         </h2>
-                        <p className="text-slate-300 text-sm mt-2 max-w-3xl leading-relaxed">
+                        <p className="text-slate-300 text-sm max-w-3xl leading-relaxed">
+                            Analiza tus reuniones y grabaciones con inteligencia
+                            artificial para extraer insights estratégicos.
                             Planificación neuronal activa diseñada para la
-                            precisión máxima y el alto rendimiento continuo.
-                            Protocolo de proyección estratégica ejecutándose.
+                            precisión máxima y el éxito proyectado en cada
+                            objetivo.
                         </p>
                     </div>
                 </div>

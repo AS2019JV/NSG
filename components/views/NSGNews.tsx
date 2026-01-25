@@ -15,15 +15,20 @@ export default function NSGNews() {
                     {/* Hero Banner (Clarity Style) */}
                     <div className="relative overflow-hidden bg-linear-to-br from-navy-950 via-slate-900 to-navy-950 px-5 py-6 sm:px-8 sm:py-8 rounded-4xl border border-white/5 shadow-2xl group transition-all duration-700 hover:shadow-emerald-500/10 mb-8 shrink-0">
                         <div className="relative z-10">
+                            <span className="text-[10px] font-bold tracking-[0.2em] text-emerald-400 uppercase mb-2 block">
+                                Actualidad y Análisis Global
+                            </span>
                             <h2 className="font-display font-bold text-2xl lg:text-3xl tracking-tight mb-2">
                                 <span className="text-transparent bg-clip-text bg-linear-to-r from-emerald-400 to-blue-400">
-                                    NSG News Intelligence
+                                    NSG News
                                 </span>
                             </h2>
                             <p className="text-slate-300 text-sm max-w-3xl leading-relaxed">
-                                Sistema de Inteligencia de Noticias Globales.
-                                Mantente al día con análisis estratégicos de
-                                noticias y tendencias globales en tiempo real.
+                                Mantente al día con un feed de inteligencia
+                                diseñado para rastrear noticias globales y
+                                detectar tendencias estratégicas en tiempo real,
+                                permitiéndote tomar decisiones informadas con
+                                datos precisos.
                             </p>
                         </div>
 

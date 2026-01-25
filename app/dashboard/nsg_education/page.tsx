@@ -31,15 +31,19 @@ export default function NSGEducationPage() {
             {/* 1. HERO BANNER */}
             <div className="relative overflow-hidden bg-linear-to-br from-navy-950 via-slate-900 to-navy-950 px-5 py-6 sm:px-8 sm:py-8 rounded-4xl border border-white/5 shadow-2xl group transition-all duration-700 hover:shadow-indigo-500/10 mb-6 shrink-0">
                 <div className="relative z-10">
+                    <span className="text-[10px] font-bold tracking-[0.2em] text-indigo-400 uppercase mb-2 block">
+                        Estrategia y Aprendizaje
+                    </span>
                     <h2 className="font-display font-bold text-2xl lg:text-3xl tracking-tight mb-2">
                         <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-400 to-blue-400">
-                            Centro de Formación Estratégica
+                            NSG Education
                         </span>
                     </h2>
                     <p className="text-slate-300 text-sm max-w-3xl leading-relaxed">
-                        Potencia tus habilidades y conocimientos con planes de
-                        aprendizaje personalizados e inteligencia aplicada a tu
-                        crecimiento profesional.
+                        Accede a herramientas de diagnóstico asistido por IA,
+                        bibliotecas de contenido estratégico y planes de acción
+                        personalizados enfocados en potenciar tus habilidades y
+                        acelerar tu crecimiento profesional.
                     </p>
                 </div>
 
