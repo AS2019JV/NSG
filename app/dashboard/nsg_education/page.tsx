@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import OnboardingLayout from "@/components/education/onboarding/OnboardingLayout";
 import ContentLibrary from "@/components/education/library/ContentLibrary";
 import ActionPlanView from "@/components/education/plan/ActionPlanView";
@@ -8,10 +8,9 @@ import DiagnosticForm from "@/components/education/diagnostic/DiagnosticForm";
 import ProposalView from "@/components/education/diagnostic/ProposalView";
 import { GraduationCap, BookOpen, Layers, Zap } from "lucide-react";
 import clsx from "clsx";
-
-type EducationView = 'onboarding' | 'library' | 'plans' | 'diagnostic';
-
 import StrategyWidget from "@/components/education/onboarding/StrategyWidget";
+
+type EducationView = "onboarding" | "library" | "plans" | "diagnostic";
 
 export default function NSGEducationPage() {
     const [currentView, setCurrentView] = useState<EducationView>('library'); // Changed default to library
@@ -22,10 +21,10 @@ export default function NSGEducationPage() {
     const [isStrategyCompleted, setIsStrategyCompleted] = useState(false);
 
     // Initial load: Open strategy if not completed (simulated)
-    useState(() => {
+    useEffect(() => {
         // Here we would check DB if onboarding is done
         setIsStrategyOpen(true);
-    });
+    }, []);
 
     // Navigation for Demo Purposes (Removed 'Estrategia' from main views, moved to button action)
     const NAV_ITEMS: { id: EducationView; label: string; icon: any }[] = [
@@ -116,18 +115,19 @@ export default function NSGEducationPage() {
 // Wrapper to switch between form and proposal in Diagnostic view
 function DiagnosticWrapper() {
     const [showResult, setShowResult] = useState(false);
-    
+
     return (
         <div className="w-full h-full flex flex-col">
-             <div className="flex justify-end mb-4">
-                 <button 
-                    onClick={() => setShowResult(!showResult)} 
+            <div className="flex justify-end mb-4">
+                <button
+                    onClick={() => setShowResult(!showResult)}
                     className="text-xs text-blue-500 underline"
-                 >
-                    Alternar Vista (Demo): {showResult ? "Ver Formulario" : "Ver Resultado"}
-                 </button>
-             </div>
-             {showResult ? <ProposalView /> : <DiagnosticForm />}
+                >
+                    Alternar Vista (Demo):{" "}
+                    {showResult ? "Ver Formulario" : "Ver Resultado"}
+                </button>
+            </div>
+            {showResult ? <ProposalView /> : <DiagnosticForm />}
         </div>
-    )
+    );
 }
