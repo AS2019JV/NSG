@@ -45,6 +45,7 @@ export async function GET(req: Request) {
         { projection: { title: 1, sessionId: 1, lastUpdate: 1, _id: 0 } }
       )
       .sort({ lastUpdate: -1 })
+      .limit(50)
       .toArray();
 
     // 5. Map to User Spec Format
