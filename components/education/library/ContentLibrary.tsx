@@ -18,13 +18,16 @@ export default function ContentLibrary() {
     }
 
     return (
-        <div className="flex flex-col h-full gap-6 md:gap-8 p-4 md:p-6">
+        <div className="flex flex-col h-full gap-6 md:gap-8 p-6 md:p-8">
             {/* Header Area */}
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-6 border-b border-slate-200/50 pb-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-0">
-                     <h1 className="text-2xl md:text-3xl font-display font-bold text-navy-900 tracking-tight">Biblioteca de Conocimiento</h1>
-                     <button className="bg-navy-900 text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-navy-800 transition-all shadow-lg shadow-navy-900/20 active:scale-95 cursor-pointer">
-                        Importar Archivo
+                     <div className="flex flex-col gap-1">
+                        <h1 className="text-2xl md:text-3xl font-display font-bold text-navy-900 tracking-tight">Base de Conocimiento</h1>
+                        <p className="text-slate-500 text-sm font-medium">Gestión de Archivos Clasificados y Recursos Estratégicos</p>
+                     </div>
+                     <button className="bg-navy-900 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-navy-800 transition-all shadow-lg shadow-navy-900/20 active:scale-95 cursor-pointer flex items-center gap-2">
+                        <span className="text-lg leading-none">+</span> Ingresar Inteligencia
                      </button>
                 </div>
                 
@@ -40,7 +43,7 @@ export default function ContentLibrary() {
                             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-blue-500 transition-colors" />
                             <input 
                                 type="text" 
-                                placeholder="Buscar en tu biblioteca..." 
+                                placeholder="Buscar expediente o recurso..." 
                                 className="pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all w-full md:w-64"
                             />
                         </div>

@@ -20,7 +20,7 @@ export default function ContentChat({ item, onBack }: ContentChatProps) {
         {
             id: '1',
             role: 'system',
-            content: `Hola. Veo que te interesa "${item.title}". Para generar un reporte de aplicación práctica personalizado${strategyPreferences?.entregable ? ` (formato ${strategyPreferences.entregable})` : ''}, necesito saber: ¿Cuál es tu mayor desafío relacionado con este tema actualmente?`,
+            content: `Enlace establecido para "${item.title}". Para generar un informe de inteligencia personalizado${strategyPreferences?.entregable ? ` (formato ${strategyPreferences.entregable})` : ''}, solicito coordenadas: ¿Cuál es su desafío operativo actual referente a este objetivo?`,
             type: 'text'
         }
     ]);
@@ -81,7 +81,7 @@ export default function ContentChat({ item, onBack }: ContentChatProps) {
                         <h2 className="text-lg font-bold text-navy-900 leading-tight">{item.title}</h2>
                         <p className="text-xs font-medium text-slate-500 uppercase tracking-widest flex items-center gap-1.5 mt-0.5">
                             <Activity className="w-3 h-3 text-emerald-500" />
-                            Asistente Inteligente Activo
+                            Protocolo Diplomático Activo
                         </p>
                     </div>
                 </div>
@@ -173,8 +173,8 @@ export default function ContentChat({ item, onBack }: ContentChatProps) {
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleSend(input)}
-                            placeholder="Haz una pregunta o pide un análisis..."
-                            className="w-full bg-transparent py-3 text-navy-900 placeholder:text-slate-400 focus:outline-none font-medium text-base"
+                            placeholder="Ingrese coordenadas o solicite análisis..."
+                            className="w-full bg-transparent py-3 text-navy-900 placeholder:text-slate-500 focus:outline-none font-medium text-base"
                         />
                         <button 
                             onClick={() => handleSend(input)}
@@ -191,7 +191,7 @@ export default function ContentChat({ item, onBack }: ContentChatProps) {
             <div className="w-full lg:w-80 h-48 lg:h-full flex flex-col bg-white/60 backdrop-blur-2xl rounded-3xl md:rounded-[2.5rem] border border-white/60 shadow-lg relative overflow-hidden shrink-0">
                 <div className="p-6 border-b border-slate-100/50">
                     <h3 className="text-sm font-bold text-navy-900 uppercase tracking-wider flex items-center gap-2">
-                        Archivos IA
+                        Expedientes de Inteligencia
                     </h3>
                 </div>
                 
@@ -201,8 +201,8 @@ export default function ContentChat({ item, onBack }: ContentChatProps) {
                             <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-300">
                                 <FileText className="w-6 h-6" />
                             </div>
-                            <p className="text-sm text-slate-500 font-medium">No hay análisis generados aún.</p>
-                            <p className="text-xs text-slate-400 mt-1">Interactúa con el chat para generar documentos.</p>
+                            <p className="text-sm text-slate-500 font-medium">Sin expedientes generados.</p>
+                            <p className="text-xs text-slate-400 mt-1">Interactúe con el enlace para generar inteligencia.</p>
                         </div>
                     ) : (
                         documents.map((doc) => (
