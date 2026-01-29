@@ -44,6 +44,10 @@ export default function NSGEducationPage() {
         setIsStrategyMinimized(false);
     };
 
+    const handleOnboardingComplete = () => {
+        setIsStrategyCompleted(true);
+    };
+
     return (
         <div className="h-full flex flex-col p-4 md:p-6 gap-4 md:gap-6 relative">
             {/* Top Navigation Bar */}
@@ -120,6 +124,23 @@ export default function NSGEducationPage() {
 
 // ─── HELPER COMPONENTS ──────────────────────────────────────────────
 
+function DiagnosticWrapper() {
+    const [showResult, setShowResult] = useState(false);
+    return (
+        <div className="w-full">
+            <div className="flex justify-end mb-4">
+                 <button
+                    onClick={() => setShowResult(!showResult)}
+                    className="text-xs text-blue-500 underline"
+                >
+                    {showResult ? "Ver Formulario" : "Ver Resultado Demo"}
+                </button>
+            </div>
+            {showResult ? <ProposalView /> : <DiagnosticForm onComplete={() => setShowResult(true)} />}
+        </div>
+    );
+}
+
 function StrategyPill({
     icon: Icon,
     label,
@@ -144,36 +165,5 @@ function StrategyPill({
     );
 }
 
-function ActionCard({
-    title,
-    subtitle,
-    description,
-    icon: Icon,
-    accentColor,
-    onClick,
-}: {
-    title: string;
-    subtitle: string;
-    description: string;
-    icon: any;
-    accentColor: string;
-    onClick: () => void;
-}) {
-    return (
-        <div className="w-full h-full flex flex-col">
-            <div className="flex justify-end mb-4">
-                <button
-                    onClick={() => setShowResult(!showResult)}
-                    className="text-xs text-blue-500 underline"
-                >
-                    Alternar Vista (Demo):{" "}
-                    {showResult ? "Ver Formulario" : "Ver Resultado"}
-                </button>
-            </div>
-            <h3 className="text-lg font-bold text-slate-700 mb-2">{title}</h3>
-            <p className="text-sm text-slate-500 leading-relaxed">
-                {description}
-            </p>
-        </div>
-    );
-}
+
+
