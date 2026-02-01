@@ -42,7 +42,7 @@ export async function GET(req: Request) {
     const chats = await db.collection('conversation_threads')
       .find(
         { userId: userId }, 
-        { projection: { title: 1, sessionId: 1, lastUpdate: 1, _id: 0 } }
+        { projection: { title: 1, sessionId: 1, lastUpdate: 1, field: 1, _id: 0 } }
       )
       .sort({ lastUpdate: -1 })
       .limit(50)
@@ -56,7 +56,11 @@ export async function GET(req: Request) {
         date: chat.lastUpdate
     }));
 
-    return NextResponse.json(mappedChats);
+    return NextResponse.json(mappedChats, {
+        headers: {
+            'Cache-Control': 'private, no-cache, no-store, max-age=0'
+        }
+    });
 
   } catch (error) {
     console.error("Database Error:", error);

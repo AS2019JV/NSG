@@ -32,7 +32,6 @@ import DynamicIsland from "@/components/layout/DynamicIsland";
 import clsx from "clsx";
 import BrandAtom from "@/components/ui/BrandAtom";
 import NewsAnalysisResult from "./NewsAnalysisResult";
-import axios from "axios";
 import { AnimatePresence, motion } from "framer-motion";
 
 export interface ChatPayload {
@@ -93,11 +92,18 @@ const MessageItem = React.memo(
                             const answers = parsed.answer;
                             // Strict filtering: find content for the currently selected model
                             const modelKey = selectedModel.toLowerCase().replace(/\s+/g, '');
+                            
+                            // Pulse Mode Expects:
+                            // 1. Simple String: { "answer": "..." }
+                            // 2. Targeted Object: { "answer": { "openai": "..." } } (Polymorphic)
+                            // 3. Fallback Keys: { "response": "..." }
+                            
                             const keyMap: Record<string, string[]> = {
-                                "chatgpt": ["openai", "gpt", "chatgpt", "openAI_response"],
-                                "gemini": ["gemini", "gemini_pro", "gemini_response"],
-                                "claude": ["claude", "anthropic", "claude_response"],
-                                "nsgai": ["nsgai", "nsg", "internal", "nsg_ai"]
+                                "chatgpt": ["openai", "gpt", "chatgpt", "openAI_response", "gpt-4", "gpt-3.5"],
+                                "gemini": ["gemini", "gemini_pro", "gemini_response", "bard", "google"],
+                                "claude": ["claude", "anthropic", "claude_response", "claude-3", "claude-3.5"],
+                                "nsgai": ["nsgai", "nsg", "internal", "nsg_ai", "super_nsg", "fusion", "nsg_fusion"],
+                                "supernsg": ["nsgai", "nsg", "internal", "nsg_ai", "super_nsg", "fusion", "nsg_fusion"] // Handling "Super NSG" selection
                             };
                             
                             const targetKeys = keyMap[modelKey] || [modelKey];
@@ -131,22 +137,12 @@ const MessageItem = React.memo(
                 }
             }
 
-            // Cleanup emojis for a more professional look as requested
+            // Comprehensive Emoji Removal for Professional AI appearance
             if (displayContent) {
-                displayContent = displayContent.replace(/[\u{1F300}-\u{1F9FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
+                 // Remove standard emojis, symbols, and pictographs
+                 displayContent = displayContent.replace(/[\u{1F300}-\u{1F9FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1F900}-\u{1F9FF}\u{1F018}-\u{1F270}\u{238C}-\u{2454}\u{203C}\u{2049}\u{2122}\u{2139}\u{2194}-\u{2199}\u{21A9}-\u{21AA}\u{231A}-\u{231B}\u{2328}\u{23CF}\u{23E9}-\u{23F3}\u{23F8}-\u{23FA}\u{24C2}\u{25AA}-\u{25AB}\u{25B6}\u{25C0}\u{25FB}-\u{25FE}\u{2600}-\u{2604}\u{260E}\u{2611}\u{2614}-\u{2615}\u{2618}\u{261D}\u{2620}\u{2622}-\u{2623}\u{2626}\u{262A}\u{262E}-\u{262F}\u{2638}-\u{263A}]/gu, '');
             }
         }
-
-            // Clean-up: If "Fusion" selected but we rely on fallback, ensure we aren't showing JSON
-            if (displayContent && typeof displayContent === 'string' && displayContent.trim().startsWith('{')) {
-                try {
-                     const p = JSON.parse(displayContent);
-                     displayContent = p.response || p.output || p.text || displayContent;
-                } catch {}
-            }
-
-            // Emoji Removal Cleanup (Global)
-            // displayContent = displayContent.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F018}-\u{1F270}\u{238C}-\u{2454}]/gu, ''); 
             
             // Actually, user asked to remove emojis specifically for this chat or globally? 
             // "Remove emojis" was part of the request for this specific content. 
@@ -840,32 +836,35 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
     useEffect(() => {
         if (currentSessionId && chatSessions[currentSessionId]) {
             const session = chatSessions[currentSessionId];
+            
+            // Sync Model
             if (session.model && session.model !== selectedModel) {
                  setSelectedModel(session.model);
             }
-            // If the session has a specific mode, we could switch to it, 
-            // but usually mode (App Feature) drives the session, not vice versa?
-            // Let's safe-guard: if session has mode, use it.
-            if (session.mode && session.mode !== mode) {
-                 // If session mode is one of the intelligence modes, sync it
+            
+            // Sync Intelligence Mode/Module Mode
+            if (session.mode) {
                  if (['pulse', 'compare', 'fusion', 'deep'].includes(session.mode)) {
                       setIntelligenceMode(session.mode as any);
-                 } else {
+                 } else if (session.mode !== mode) {
                       setMode(session.mode);
                  }
             }
         }
-    }, [currentSessionId, intelligenceMode]);
+    }, [currentSessionId]);
 
     // Persist Model/Mode changes to current session
     useEffect(() => {
         if (currentSessionId) {
+            // If intelligence mode is active, it takes priority in the session state for historical filtering
+            const effectiveMode = intelligenceMode !== 'pulse' ? intelligenceMode : mode;
+            
             updateChatSession(currentSessionId, { 
                 model: selectedModel,
-                mode: mode 
+                mode: effectiveMode 
             });
         }
-    }, [selectedModel, mode, currentSessionId]);
+    }, [selectedModel, mode, intelligenceMode, currentSessionId]);
 
 
     // Attachment & Audio State
@@ -889,16 +888,25 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
     // For now, let's assume a "Session" is a continuous specific stream, but we keep the filtering to not break existing logic if needed.
     // However, typical Chat History (Gemini) shows the whole conversation.
     const messages = React.useMemo(() => {
-        // If the session has a specific mode locked, we might just return rawMessages.
-        // But for backward compatibility with the 'intelligenceMode' toggles:
-        if (intelligenceMode === "pulse") {
-             // If the message has NO targetModel (legacy) or matches selected
-             // return rawMessages.filter((m) => !m.targetModel || m.targetModel === selectedModel);
-             // Actually, simplest is just return all messages for 'Standard' chat feel:
-             return rawMessages; 
-        }
-        // For Compare/Fusion, we might want to filter, but let's try returning all to see the flow
-        return rawMessages;
+        if (!rawMessages) return [];
+        
+        // Define what the current "View Target" is based on the mode
+        const viewTarget = intelligenceMode === "pulse" ? selectedModel : intelligenceMode;
+        
+        // Filter messages to only show those belonging to the current target OR global/legacy ones
+        return rawMessages.filter((m) => {
+            // 1. Global/Legacy messages (no targetModel) are always shown
+            if (!m.targetModel) return true;
+            
+            // 2. Exact match for current target (e.g. "Chat GPT" in Pulse mode, or "fusion" in Fusion mode)
+            if (m.targetModel === viewTarget) return true;
+            
+            // 3. Fallback: if we are in Pulse mode but the message is "fusion", 
+            // maybe we want to show it? The user said "ONLY for that AI". 
+            // In Fusion mode, the message IS for that AI too. 
+            // However, to keep it strictly isolated as requested:
+            return false;
+        });
     }, [rawMessages, intelligenceMode, selectedModel]);
 
     const isLoading = loadingStates[loadingKey] || false;
@@ -1141,14 +1149,34 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                 headers["Authorization"] = `Bearer ${token}`;
             }
 
-            const response = await axios.post(webhookUrl, requestData, {
-                headers: attachment ? { 
-                    "Authorization": `Bearer ${token}` 
-                } : headers, 
-            });
+            let fetchOptions: RequestInit = {
+                method: 'POST',
+            };
 
-            // Process the response
-            const responseData = response.data;
+            if (attachment) {
+                // If attachment (FormData), browser sets Content-Type boundary automatically.
+                // We only explicitly set Auth if needed.
+                fetchOptions.body = requestData as FormData;
+                fetchOptions.headers = {
+                     "Authorization": `Bearer ${token}` 
+                };
+            } else {
+                // JSON
+                fetchOptions.body = JSON.stringify(requestData);
+                fetchOptions.headers = {
+                    "Content-Type": "application/json",
+                     "Authorization": `Bearer ${token}` 
+                };
+            }
+
+            const response = await fetch(webhookUrl, fetchOptions);
+
+            if (!response.ok) {
+                 const errorText = await response.text();
+                 throw new Error(`Request failed with status ${response.status}: ${errorText}`);
+            }
+
+            const responseData = await response.json();
 
             let assistantContent;
             let messageType: "text" | "analysis" = "text";
@@ -1169,7 +1197,7 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                 }
 
                 // IMPROVED LOGIC: Check for model-specific keys first to enable dynamic switching
-                if (
+                const hasModelKeys = 
                     responseData.claude_response ||
                     responseData.gemini_response ||
                     responseData.openAI_response ||
@@ -1177,10 +1205,11 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                     responseData.gemini ||
                     responseData.claude ||
                     responseData.nsgai || 
-                    responseData.answer
-                ) {
-                    // If we have specific model responses, save the whole object as string
-                    // so MessageItem can parse and select the right one based on selectedModel state
+                    responseData.answer; // Added answer to check
+                
+                if (hasModelKeys) {
+                    // If we have specific model responses (OR the robust 'answer' object), 
+                    // save the WHOLE object as string so MessageItem can parse and filter it.
                     assistantContent = JSON.stringify(responseData);
                 } else {
                     // General Fallback
@@ -1627,7 +1656,7 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                 </div>
 
                 {/* --- TOP GRADIENT FADE --- */}
-                <div className="absolute top-0 left-0 w-full h-32 md:h-48 bg-gradient-to-b from-[#F8FAFF] via-[#F8FAFF]/80 to-transparent z-30 pointer-events-none" />
+                <div className="absolute top-0 left-0 w-full h-32 md:h-48 bg-linear-to-b from-[#F8FAFF] via-[#F8FAFF]/80 to-transparent z-30 pointer-events-none" />
 
                 {/* spacer */}
                 <div className="w-full h-52 md:h-64 shrink-0" />
@@ -1667,7 +1696,7 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                 </div>
 
                 {/* --- LAYER 3: INPUT AREA --- */}
-                <div className="absolute bottom-0 left-0 w-full z-40 px-4 pb-6 md:pb-8 pt-12 bg-gradient-to-t from-[#F8FAFF] via-[#F8FAFF] via-60% to-transparent pointer-events-none">
+                <div className="absolute bottom-0 left-0 w-full z-40 px-4 pb-6 md:pb-8 pt-12 bg-linear-to-t from-[#F8FAFF] via-[#F8FAFF] via-60% to-transparent pointer-events-none">
                     <div className="max-w-3xl mx-auto pointer-events-auto">
                         {!isContextCached ? (
                             <div className="flex items-center justify-center gap-4 text-[15px] text-[#0b57d0] font-medium py-5 bg-white rounded-[24px] shadow-sm animate-pulse">

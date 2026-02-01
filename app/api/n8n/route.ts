@@ -3,11 +3,11 @@ import { NextResponse } from 'next/server';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const webhookUrl = "TU_N8N_WEBHOOK_URL";
-
-    if (!webhookUrl) {
+    const webhookUrl = (process.env.N8N_WEBHOOK || "").trim();
+    
+    if (!webhookUrl || webhookUrl === "") {
       return NextResponse.json(
-        { error: 'N8N_WEBHOOK environment variable is not defined' },
+        { error: 'N8N_WEBHOOK environment variable is not defined or empty' },
         { status: 500 }
       );
     }
@@ -21,19 +21,23 @@ export async function POST(req: Request) {
       body: JSON.stringify(body),
     });
 
-    // Check if N8N response is JSON
-    const contentType = response.headers.get('content-type');
+    // 5. Smart Parsing (Normalization)
     let data;
-    if (contentType && contentType.includes('application/json')) {
+    try {
       data = await response.json();
-    } else {
-      data = await response.text();
-      // Try to parse if it's a stringified JSON
-      try {
-        data = JSON.parse(data);
-      } catch {
-        // keep as text
+      
+      // Handle n8n array [ { ... } ]
+      if (Array.isArray(data) && data.length > 0) {
+        data = data[0];
       }
+      
+      // Handle n8n 'json' key nesting
+      if (data && typeof data === 'object' && data.json) {
+        data = data.json;
+      }
+    } catch {
+      data = await response.text();
+      try { data = JSON.parse(data as string); } catch { /* ignore */ }
     }
 
     if (!response.ok) {
