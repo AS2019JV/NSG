@@ -101,7 +101,7 @@ export default function DynamicIsland({
                 >
                     {intelligenceMode === "fusion"
                         ? "NSG AI"
-                        : "System NSG Intelligence"}
+                        : "System BS Intelligence"}
                 </span>
             </button>
 

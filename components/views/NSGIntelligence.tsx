@@ -25,15 +25,33 @@ export default function NSGIntelligence() {
     const comingSoonSections = ["clinical_radar", "patients", "library"];
 
     return (
-        <div className="flex-1 overflow-y-auto custom-scroll safe-bottom-scroll scroll-smooth w-full animate-fade-in-up flex flex-col items-center bg-white text-slate-900 selection:bg-blue-100">
-            {/* Project Slider - Full Width */}
-            <div className="w-full px-2 xs:px-4 lg:px-12 pt-6 pb-6 max-w-[1700px] relative z-20">
-                <ProjectSlider />
-            </div>
+        <div className="flex-1 overflow-y-auto custom-scroll safe-bottom-scroll scroll-smooth w-full animate-fade-in-up flex flex-col items-center bg-slate-50/50 text-slate-900 selection:bg-blue-100">
+            {/* Main Container */}
+            <div className="w-full max-w-[1700px] px-6 lg:px-12 py-8 flex flex-col gap-8">
+                
+                {/* 2. Hero Slider */}
+                <div className="w-full relative z-20 mt-6 lg:mt-8">
+                    <ProjectSlider />
+                </div>
 
-            <div className="w-full px-2 xs:px-4 lg:px-12 pb-24 max-w-[1700px] relative z-10">
-                {/* Enhanced Modules Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 xs:gap-6 w-full">
+                {/* 3. Section Title / Divider */}
+                <div className="w-full text-center py-8 md:py-12 space-y-4">
+                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50/80 border border-blue-100 text-blue-600 text-[9px] font-black uppercase tracking-widest backdrop-blur-sm">
+                        <BrandAtom className="w-3 h-3" variant="colored" />
+                        Neural Orchestrator Active
+                    </div>
+                    <div className="space-y-2">
+                        <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-navy-950">
+                            Sistemas de Inteligencia <span className="text-blue-600">BS</span>
+                        </h2>
+                        <p className="text-slate-500 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
+                            Accede a tu red personalizada de herramientas tácticas y análisis profundo diseñados para maximizar tu impacto operativo.
+                        </p>
+                    </div>
+                </div>
+
+                {/* 4. Modules Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full pb-24 relative z-10">
                     {modules.map((item, index) => {
                         // Admin puede acceder a todas las secciones
                         const isComingSoon =
@@ -54,9 +72,11 @@ export default function NSGIntelligence() {
                         );
                     })}
                 </div>
-
-                {/* Footer Info */}
-                <div className="mt-12 xs:mt-16 pt-8 border-t border-slate-200">
+            </div>
+            
+             {/* Footer Info - Moved inside container or kept at bottom? The original had it inside, but let's keep it here for flow */}
+             <div className="w-full max-w-[1700px] px-6 lg:px-12 pb-8">
+                <div className="pt-8 border-t border-slate-200">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
                         <div className="flex items-center gap-2 text-slate-500">
                             <BrandAtom className="w-4 h-4" variant="colored" />

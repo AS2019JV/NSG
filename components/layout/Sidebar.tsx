@@ -231,7 +231,7 @@ export default function Sidebar() {
 
                 {/* MENU NAVIGATION with Groups */}
                 <nav className="flex-1 px-4 space-y-4 overflow-y-auto sidebar-scroll pb-6">
-                    {/* NSG Intelligence - Special highlighting */}
+                    {/* BS Intelligence - Special highlighting */}
                     {groupedMenu.intelligence && (
                         <div className="pt-2">
                             <Link

@@ -864,7 +864,7 @@ Tu KB v5 dice: 'Riesgos: cargar solo, todo o nada'. Lo más inteligente que pued
 
 Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Ambos son síntomas de falta de límites.
 
-**Eliminación de la Fricción Cognitiva:** Cada vez que tu cerebro cambia de 'NSG Intelligence' a 'Problemas de Duke' o a 'Instagram', pierdes 20 minutos de enfoque cognitivo (residuo de atención). Lo más estratégico es agrupar todas las tareas de Duke en un solo bloque semanal (como propusiste) y prohibirte pensar en ello el resto de la semana.
+**Eliminación de la Fricción Cognitiva:** Cada vez que tu cerebro cambia de 'BS Intelligence' a 'Problemas de Duke' o a 'Instagram', pierdes 20 minutos de enfoque cognitivo (residuo de atención). Lo más estratégico es agrupar todas las tareas de Duke en un solo bloque semanal (como propusiste) y prohibirte pensar en ello el resto de la semana.
 
 **El Arte de la Renuncia:** Para ganar los $1.2M, debes renunciar a la necesidad de 'quedar bien' inmediatamente. Sé firme con los plazos.
 
@@ -1299,7 +1299,7 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                 message?: string;
             };
 
-            let errorMessage = "Error: Could not connect to NSG Intelligence.";
+            let errorMessage = "Error: Could not connect to BS Intelligence.";
 
             if (error.response && error.response.status === 404) {
                 errorMessage =
@@ -1802,7 +1802,7 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                                     ¿En qué puedo ayudarte hoy?
                                 </h3>
                                 <p className="text-sm text-slate-500 max-w-xs mt-2">
-                                    NSG Intelligence puede redactar textos,
+                                    BS Intelligence puede redactar textos,
                                     analizar documentos y generar ideas
                                     creativas.
                                 </p>
@@ -2098,7 +2098,7 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                                 </div>
                                 <div className="text-center mt-2">
                                     <p className="text-[11px] text-slate-400">
-                                        NSG Intelligence puede cometer errores.
+                                        BS Intelligence puede cometer errores.
                                         Considera verificar la información
                                         importante.
                                     </p>

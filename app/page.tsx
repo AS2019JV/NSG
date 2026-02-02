@@ -23,7 +23,7 @@ export default function LandingPage() {
                             onClick={() => router.push("/")}
                         >
                             <span className="text-base sm:text-lg font-bold text-navy-950 tracking-tight">
-                                NSG Intelligence
+                                BS Intelligence
                             </span>
                         </div>
 
@@ -242,7 +242,7 @@ export default function LandingPage() {
                             </div>
                         </div>
 
-                        {/* NSG Intelligence */}
+                        {/* BS Intelligence */}
                         <div className="group relative bg-white p-12 rounded-[2.5rem] border border-slate-100 shadow-[0_2px_20px_rgb(0,0,0,0.02)] hover:shadow-[0_20px_50px_rgb(0,0,0,0.06)] transition-all duration-700 hover:-translate-y-1 overflow-hidden flex flex-col justify-between h-full">
                             <div className="absolute inset-0 bg-linear-to-b from-slate-50/0 via-slate-50/0 to-slate-100/50 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
@@ -370,7 +370,7 @@ export default function LandingPage() {
                     </h2>
 
                     <p className="text-lg sm:text-xl text-slate-500 font-light leading-relaxed mb-16 max-w-2xl mx-auto">
-                        NSG Intelligence democratiza herramientas avanzadas de
+                        BS Intelligence democratiza herramientas avanzadas de
                         inteligencia estratégica. Todo profesional merece acceso
                         a capacidades de IA de grado empresarial.
                     </p>
@@ -450,7 +450,7 @@ export default function LandingPage() {
                         <div className="md:col-span-2">
                             <div className="flex items-center gap-2 mb-4">
                                 <span className="text-xl font-display font-medium text-white tracking-tight">
-                                    NSG Intelligence
+                                    BS Intelligence
                                 </span>
                             </div>
                             <p className="text-sm text-slate-400 font-light max-w-xs leading-relaxed">
@@ -508,7 +508,7 @@ export default function LandingPage() {
 
                     <div className="pt-8 border-t border-navy-900 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
                         <p className="text-xs text-slate-500 font-light">
-                            © 2024 NSG Intelligence. Todos los derechos
+                            © 2024 BS Intelligence. Todos los derechos
                             reservados.
                         </p>
                         <div className="flex gap-6">
