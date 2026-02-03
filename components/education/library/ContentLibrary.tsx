@@ -1,15 +1,16 @@
 "use client";
 
 import { useAppStore } from "@/store/useAppStore";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import IngestInput from "./IngestInput";
 import ContentGrid from "./ContentGrid";
-import { Search, Filter, LayoutGrid, List, Loader2 } from "lucide-react";
+import { Search, Filter, LayoutGrid, Loader2 } from "lucide-react";
 
 import { EducationContent } from "@/types/education";
-import ContentChat from "./ContentChat";
+import ContentDetail from "./ContentDetail";
 import { Banner } from "@/components/ui/Banner";
 import { useToast } from "@/components/ui/ToastProvider";
+import api from "@/lib/api";
 
 export default function ContentLibrary() {
     const { userId } = useAppStore();
@@ -18,8 +19,40 @@ export default function ContentLibrary() {
         null,
     );
     const [isProcessing, setIsProcessing] = useState(false);
-    const [extraItems, setExtraItems] = useState<EducationContent[]>([]);
+    const [libraryItems, setLibraryItems] = useState<EducationContent[]>([]);
+    const [isLoadingLibrary, setIsLoadingLibrary] = useState(true);
     const [showFilters, setShowFilters] = useState(false);
+
+    // Load library content from backend
+    const loadContent = async () => {
+        try {
+            setIsLoadingLibrary(true);
+            const response = await api.get("/education/content");
+            if (response.data.success) {
+                setLibraryItems(response.data.data);
+            }
+        } catch (error: unknown) {
+            console.error("Error loading library:", error);
+            // Fallback to mock data if backend is not available
+            if ((error as any).response?.status === 404) {
+                console.warn(
+                    "[Education] Backend endpoint not deployed yet, using mock data",
+                );
+                setLibraryItems([]);
+            } else {
+                // For any other error, don't show toast (to avoid annoying users)
+                console.warn("[Education] Using empty library");
+                setLibraryItems([]);
+            }
+        } finally {
+            setIsLoadingLibrary(false);
+        }
+    };
+
+    // Load content on mount
+    useEffect(() => {
+        loadContent();
+    }, []);
 
     const handleIngest = async (data: {
         url: string;
@@ -46,7 +79,6 @@ export default function ContentLibrary() {
                 method: "POST",
                 headers: {
                     ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                    // Note: Don't set Content-Type, fetch will set multipart/form-data with boundary
                 },
                 body: formData,
             });
@@ -63,6 +95,9 @@ export default function ContentLibrary() {
 
             // brief delay for premium feel
             await new Promise((resolve) => setTimeout(resolve, 1500));
+
+            // Reload library to show new content
+            await loadContent();
 
             // Check if it's our specific demo URL for the instant feedback
             if (
@@ -82,7 +117,6 @@ export default function ContentLibrary() {
                     summary:
                         "Psicología del éxito y desbloqueo del potencial humano.",
                 };
-                setExtraItems((prev) => [newItem, ...prev]);
                 setSelectedItem(newItem);
             }
         } catch (error: any) {
@@ -96,7 +130,7 @@ export default function ContentLibrary() {
     // If item selected, show Chat Interface for that content
     if (selectedItem) {
         return (
-            <ContentChat
+            <ContentDetail
                 item={selectedItem}
                 onBack={() => setSelectedItem(null)}
             />
@@ -146,7 +180,7 @@ export default function ContentLibrary() {
                 <div className="flex items-center justify-between pb-4 shrink-0">
                     <h3 className="text-sm font-bold text-navy-900 uppercase tracking-widest flex items-center gap-2">
                         <LayoutGrid className="w-4 h-4 text-slate-400" />
-                        Archivos Recientes
+                        Recursos
                     </h3>
                     <button
                         onClick={() => setShowFilters(!showFilters)}
@@ -190,10 +224,16 @@ export default function ContentLibrary() {
                 </div>
 
                 <div className="flex-1 min-h-0 pr-2 pb-2">
-                    <ContentGrid
-                        onSelect={setSelectedItem}
-                        extraItems={extraItems}
-                    />
+                    {isLoadingLibrary ? (
+                        <div className="flex items-center justify-center h-full">
+                            <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
+                        </div>
+                    ) : (
+                        <ContentGrid
+                            onSelect={setSelectedItem}
+                            extraItems={libraryItems}
+                        />
+                    )}
                 </div>
             </div>
         </div>
