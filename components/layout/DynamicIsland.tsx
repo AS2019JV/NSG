@@ -68,7 +68,7 @@ export default function DynamicIsland({
                 onClick={() =>
                     intelligenceMode === "fusion" &&
                     setSelectedModel &&
-                    setSelectedModel("Super NSG")
+                    setSelectedModel("BS Fusion")
                 }
                 className={clsx(
                     "flex items-center gap-1.5 xs:gap-2 px-2 xs:px-3 py-1 rounded-lg backdrop-blur-md shadow-sm animate-fade-in group transition-all duration-300",
@@ -76,7 +76,7 @@ export default function DynamicIsland({
                         ? "cursor-pointer hover:bg-white/80"
                         : "cursor-default bg-white/50 border border-white/60",
                     intelligenceMode === "fusion" &&
-                        selectedModel === "Super NSG"
+                        selectedModel === "BS Fusion"
                         ? "bg-blue-50 border border-blue-200 ring-1 ring-blue-100"
                         : "bg-white/50 border border-white/60",
                 )}
@@ -85,7 +85,7 @@ export default function DynamicIsland({
                     className={clsx(
                         "w-1.5 h-1.5 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]",
                         intelligenceMode === "fusion" &&
-                            selectedModel === "Super NSG"
+                            selectedModel === "BS Fusion"
                             ? "bg-blue-500 shadow-blue-500/50"
                             : "bg-emerald-500",
                     )}
@@ -94,13 +94,13 @@ export default function DynamicIsland({
                     className={clsx(
                         "text-[9px] xs:text-[10px] font-bold tracking-[0.15em] uppercase font-display transition-colors",
                         intelligenceMode === "fusion" &&
-                            selectedModel === "NSG AI"
+                            selectedModel === "BS AI"
                             ? "text-blue-700"
                             : "text-navy-900/70 group-hover:text-navy-900",
                     )}
                 >
                     {intelligenceMode === "fusion"
-                        ? "NSG AI"
+                        ? "BS AI"
                         : "System BS Intelligence"}
                 </span>
             </button>

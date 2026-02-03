@@ -66,13 +66,20 @@ export default function IEducationPage() {
     };
 
     return (
-        <div className="h-full flex flex-col p-4 md:p-6 gap-4 md:gap-6 relative">
+        <div className="h-full flex flex-col p-4 md:p-6 gap-4 md:gap-6 relative overflow-y-auto">
             {/* Top Navigation Bar */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between bg-white rounded-2xl p-2 px-4 shadow-sm border border-slate-100 shrink-0 gap-2 sm:gap-0">
+            <div
+                className={clsx(
+                    "flex flex-col sm:flex-row items-stretch sm:items-center justify-between bg-white rounded-2xl p-2 px-4 shadow-sm border border-slate-100 shrink-0 gap-2 sm:gap-0 transition-all duration-500",
+                    !isStrategyCompleted &&
+                        "opacity-50 pointer-events-none grayscale",
+                )}
+            >
                 <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-1 sm:pb-0 -mx-2 px-2 sm:mx-0 sm:px-0">
                     {NAV_ITEMS.map((item) => (
                         <button
                             key={item.id}
+                            disabled={!isStrategyCompleted}
                             onClick={() => setCurrentView(item.id)}
                             className={clsx(
                                 "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all",
@@ -107,18 +114,48 @@ export default function IEducationPage() {
             </div>
 
             {/* Main Content Area */}
-            <div className="flex-1 overflow-hidden transition-all duration-500">
+            <div
+                className={clsx(
+                    "flex-1 transition-all duration-700 relative",
+                    !isStrategyCompleted &&
+                        "blur-md pointer-events-none scale-[0.98] select-none opacity-40",
+                )}
+            >
                 {currentView === "library" && (
-                    <div className="h-full bg-slate-50/50 rounded-4xl border border-white/50 shadow-inner overflow-hidden">
+                    <div className="bg-slate-50/50 rounded-4xl border border-white/50 shadow-inner overflow-hidden">
                         <ContentLibrary />
                     </div>
                 )}
                 {/* Defaulting Plans as main view when user lands (home) */}
-                {currentView === "plans" && <ActionPlanView />}
+                {currentView === "plans" && (
+                    <div className="h-full">
+                        <ActionPlanView />
+                    </div>
+                )}
                 {currentView === "diagnostic" && (
-                    <div className="h-full bg-slate-50/50 rounded-4xl border border-white/50 shadow-inner p-8 overflow-y-auto">
+                    <div className="h-full bg-slate-50/50 rounded-4xl border border-white/50 shadow-inner p-8">
                         <div className="mb-4 flex gap-4">
                             <DiagnosticWrapper />
+                        </div>
+                    </div>
+                )}
+
+                {/* Overlay Message when locked */}
+                {!isStrategyCompleted && (
+                    <div className="absolute inset-x-0 top-1/4 z-10 flex items-center justify-center p-6 text-center">
+                        <div className="max-w-md bg-white/80 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-white/40">
+                            <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                                <GraduationCap className="w-8 h-8 text-amber-500" />
+                            </div>
+                            <h3 className="text-xl font-display font-bold text-navy-950 mb-3">
+                                Protocolo Requerido
+                            </h3>
+                            <p className="text-slate-600 text-sm leading-relaxed">
+                                Por favor complete su{" "}
+                                <strong>Protocolo Estratégico</strong> para
+                                desbloquear las herramientas cognitivas y planes
+                                de acción personalizados.
+                            </p>
                         </div>
                     </div>
                 )}

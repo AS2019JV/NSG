@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
+import { CONFIG } from '@/lib/config';
 
 /**
  * Unified N8N Proxy Configuration
  * Centralizes connection logic for both Chat and Document services.
  */
-const BASE_URL = (process.env.N8N_WEBHOOK || "https://personal-n8n.suwsiw.easypanel.host/webhook").trim();
+const BASE_URL = CONFIG.N8N_URL;
 
 export async function POST(req: Request) {
   try {

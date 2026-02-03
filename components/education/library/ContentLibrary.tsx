@@ -9,8 +9,11 @@ import { Search, Filter, LayoutGrid, List, Loader2 } from "lucide-react";
 import { EducationContent } from "@/types/education";
 import ContentChat from "./ContentChat";
 import { Banner } from "@/components/ui/Banner";
+import { useToast } from "@/components/ui/ToastProvider";
 
 export default function ContentLibrary() {
+    const { userId } = useAppStore();
+    const { showToast } = useToast();
     const [selectedItem, setSelectedItem] = useState<EducationContent | null>(
         null,
     );
@@ -18,11 +21,56 @@ export default function ContentLibrary() {
     const [extraItems, setExtraItems] = useState<EducationContent[]>([]);
     const [showFilters, setShowFilters] = useState(false);
 
-    const handleIngest = (url: string) => {
-        if (url.trim() === "https://www.youtube.com/watch?v=Fbt7qNMMdas") {
-            setIsProcessing(true);
-            setTimeout(() => {
-                setIsProcessing(false);
+    const handleIngest = async (data: {
+        url: string;
+        document: File | null;
+        audio: File | null;
+    }) => {
+        setIsProcessing(true);
+        try {
+            // Create FormData to handle both text and files
+            const formData = new FormData();
+            formData.append("userId", userId || "");
+
+            if (data.url) formData.append("url", data.url);
+            if (data.document) formData.append("document", data.document);
+            if (data.audio) formData.append("audio", data.audio);
+
+            // Get token from localStorage for the proxy
+            const token =
+                typeof window !== "undefined"
+                    ? localStorage.getItem("nsg-token")
+                    : null;
+
+            const response = await fetch("/api/nsg-education/content", {
+                method: "POST",
+                headers: {
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    // Note: Don't set Content-Type, fetch will set multipart/form-data with boundary
+                },
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || "Error en el servidor");
+            }
+
+            const result = await response.json();
+
+            // Success feedback
+            showToast("Recurso enviado exitosamente a la nube NSG", "success");
+
+            // brief delay for premium feel
+            await new Promise((resolve) => setTimeout(resolve, 1500));
+
+            // Check if it's our specific demo URL for the instant feedback
+            if (
+                data.url &&
+                data.url.trim() ===
+                    "https://www.youtube.com/watch?v=Fbt7qNMMdas"
+            ) {
+                // Success feedback with the mock item for visual demo
                 const newItem: EducationContent = {
                     id: "brian-tracy-fenix",
                     title: "Seminario Fénix (Brian Tracy)",
@@ -30,15 +78,18 @@ export default function ContentLibrary() {
                     status: "ready",
                     thumbnailUrl:
                         "https://i.ytimg.com/vi/Fbt7qNMMdas/mqdefault.jpg",
-                    createdAt: "Hace 1 min",
+                    createdAt: "Recién añadido",
                     summary:
                         "Psicología del éxito y desbloqueo del potencial humano.",
                 };
-
-                // Add to library AND open it
                 setExtraItems((prev) => [newItem, ...prev]);
                 setSelectedItem(newItem);
-            }, 3000);
+            }
+        } catch (error: any) {
+            console.error("❌ Error en la ingesta:", error);
+            showToast(error.message || "Error al procesar el recurso", "error");
+        } finally {
+            setIsProcessing(false);
         }
     };
 
@@ -83,6 +134,11 @@ export default function ContentLibrary() {
                 title="NSG Education"
                 description="Gestión de Archivos Clasificados y Recursos Estratégicos. Decodifica información compleja y conviértela en inteligencia accionable para tu perfil estratégico."
             />
+
+            {/* 2. INGEST AREA - The Entry Point for new content */}
+            <div className="max-w-4xl mx-auto w-full shrink-0">
+                <IngestInput onIngest={handleIngest} />
+            </div>
 
             {/* Filters & Grid */}
             <div className="flex-1 flex flex-col gap-0 overflow-hidden">
@@ -133,7 +189,7 @@ export default function ContentLibrary() {
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto min-h-0 pr-2 pb-2">
+                <div className="flex-1 min-h-0 pr-2 pb-2">
                     <ContentGrid
                         onSelect={setSelectedItem}
                         extraItems={extraItems}

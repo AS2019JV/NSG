@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { CONFIG } from '@/lib/config';
 
 export async function POST(req: Request) {
   try {
@@ -6,7 +7,7 @@ export async function POST(req: Request) {
     const { message, userId, step } = body;
 
     // Connect to n8n webhook
-    const BASE_URL = (process.env.N8N_WEBHOOK || "https://personal-n8n.suwsiw.easypanel.host/webhook").trim();
+    const BASE_URL = CONFIG.N8N_URL;
     const WEBHOOK_URL = `${BASE_URL}/nsg-strategy-onboarding`;
 
     const response = await fetch(WEBHOOK_URL, {

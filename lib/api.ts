@@ -4,16 +4,11 @@ import axios from "axios";
 // API Configuration
 // ============================================
 
-const isDevelopment = process.env.NEXT_PUBLIC_APP_ENV === "development" || process.env.NODE_ENV === "development";
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { CONFIG, isProduction } from "./config";
 
-if (!API_URL) {
-    if (isDevelopment) {
-        console.warn("[WARNING] NEXT_PUBLIC_API_URL is not set. API calls will fail.");
-    } else {
-        throw new Error("NEXT_PUBLIC_API_URL is required in production environments.");
-    }
-}
+const isDevelopment = !isProduction;
+const API_URL = CONFIG.API_URL;
+
 // Create axios instance
 const api = axios.create({
     baseURL: API_URL,

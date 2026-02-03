@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { CONFIG } from '@/lib/config';
 
 export async function POST(
   req: Request,
@@ -11,13 +12,10 @@ export async function POST(
     const { message, history, preferences } = body;
 
     // Direct connection to n8n Webhook
-    const BASE_URL = (process.env.N8N_WEBHOOK || "").trim();
-    const N8N_WEBHOOK_URL = (process.env.N8N_WEBHOOK_CHAT || 
-                            (BASE_URL ? `${BASE_URL}/nsg-education-chat` : null) || 
-                            "https://nsg-k8s.onrender.com/webhook/nsg-education-chat").trim();
+    const N8N_WEBHOOK_URL = `${CONFIG.N8N_URL}/nsg-education-chat`;
 
-    if (!N8N_WEBHOOK_URL) {
-        throw new Error("N8N_WEBHOOK_CHAT or N8N_WEBHOOK must be defined");
+    if (!CONFIG.N8N_URL) {
+        throw new Error("CONFIG.N8N_URL must be defined");
     }
 
     const n8nResponse = await fetch(N8N_WEBHOOK_URL, {

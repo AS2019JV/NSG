@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
+import { CONFIG } from '@/lib/config';
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const webhookUrl = (process.env.N8N_WEBHOOK || "").trim();
+    const webhookUrl = CONFIG.N8N_URL;
     
     if (!webhookUrl || webhookUrl === "") {
       return NextResponse.json(

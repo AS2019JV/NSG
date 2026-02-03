@@ -93,15 +93,39 @@ const MessageItem = React.memo(
             ) {
                 try {
                     const parsed = JSON.parse(msg.content);
-                    const modelKey = selectedModel.toLowerCase().replace(/\s+/g, '');
-                    
+                    const modelKey = selectedModel
+                        .toLowerCase()
+                        .replace(/\s+/g, "");
+
                     // Production Mapping for AI Models
                     const keyMap: Record<string, string[]> = {
-                        "chatgpt": ["chatgpt", "openai", "gpt", "openAI_response"],
-                        "gemini": ["gemini", "gemini_pro", "gemini_response"],
-                        "claude": ["claude", "anthropic", "claude_response"],
-                        "nsgai": ["nsgai", "nsg", "internal", "nsg_ai", "fusion", "bsai", "bs_fusion"],
-                        "supernsg": ["nsgai", "nsg", "internal", "nsg_ai", "fusion"]
+                        chatgpt: [
+                            "chatgpt",
+                            "openai",
+                            "gpt",
+                            "openAI_response",
+                        ],
+                        gemini: ["gemini", "gemini_pro", "gemini_response"],
+                        claude: ["claude", "anthropic", "claude_response"],
+                        bsai: [
+                            "bsai",
+                            "bs_ai",
+                            "nsgai",
+                            "nsg",
+                            "internal",
+                            "nsg_ai",
+                            "fusion",
+                            "bs_fusion",
+                        ],
+                        superbs: [
+                            "bs_fusion",
+                            "superbs",
+                            "nsgai",
+                            "nsg",
+                            "internal",
+                            "nsg_ai",
+                            "fusion",
+                        ],
                     };
 
                     const targetKeys = keyMap[modelKey] || [modelKey];
@@ -118,8 +142,16 @@ const MessageItem = React.memo(
                                 }
                             }
                             // Fallback if no model key found but answer is a string-like object
-                            if (!rawResult && (parsed.answer.text || parsed.answer.output || parsed.answer.response)) {
-                                rawResult = parsed.answer.text || parsed.answer.output || parsed.answer.response;
+                            if (
+                                !rawResult &&
+                                (parsed.answer.text ||
+                                    parsed.answer.output ||
+                                    parsed.answer.response)
+                            ) {
+                                rawResult =
+                                    parsed.answer.text ||
+                                    parsed.answer.output ||
+                                    parsed.answer.response;
                             }
                         } else {
                             // answer is a direct string
@@ -139,28 +171,45 @@ const MessageItem = React.memo(
 
                     // 3. FINAL FALLBACK: General standard keys
                     if (!rawResult) {
-                        rawResult = parsed.response || parsed.output || parsed.text || parsed.result;
+                        rawResult =
+                            parsed.response ||
+                            parsed.output ||
+                            parsed.text ||
+                            parsed.result;
                     }
 
                     // 4. CLEANUP & TYPE HANDLING
                     if (rawResult) {
                         // Handle potential double-stringified JSON (happens with some LLM outputs)
-                        if (typeof rawResult === "string" && rawResult.trim().startsWith("{")) {
+                        if (
+                            typeof rawResult === "string" &&
+                            rawResult.trim().startsWith("{")
+                        ) {
                             try {
                                 const inner = JSON.parse(rawResult);
-                                displayContent = inner.answer || inner.response || inner.output || inner.text || rawResult;
+                                displayContent =
+                                    inner.answer ||
+                                    inner.response ||
+                                    inner.output ||
+                                    inner.text ||
+                                    rawResult;
                             } catch {
                                 displayContent = rawResult;
                             }
                         } else if (typeof rawResult === "object") {
                             // If we still have an object, try one last time to extract a string field
-                            displayContent = rawResult.answer || rawResult.response || rawResult.text || JSON.stringify(rawResult);
+                            displayContent =
+                                rawResult.answer ||
+                                rawResult.response ||
+                                rawResult.text ||
+                                JSON.stringify(rawResult);
                         } else {
                             displayContent = String(rawResult);
                         }
                     } else {
                         // Only mark as "Coming Soon" if we specifically expect a model but got a structured response without it
-                        const isStructured = parsed.answer && typeof parsed.answer === "object";
+                        const isStructured =
+                            parsed.answer && typeof parsed.answer === "object";
                         if (isStructured) {
                             isComingSoon = true;
                             displayContent = "";
@@ -177,11 +226,14 @@ const MessageItem = React.memo(
 
             // Comprehensive Emoji Removal for Professional AI appearance
             if (displayContent) {
-                 // Remove standard emojis, symbols, and pictographs
-                 displayContent = displayContent.replace(/[\u{1F300}-\u{1F9FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1F900}-\u{1F9FF}\u{1F018}-\u{1F270}\u{238C}-\u{2454}\u{203C}\u{2049}\u{2122}\u{2139}\u{2194}-\u{2199}\u{21A9}-\u{21AA}\u{231A}-\u{231B}\u{2328}\u{23CF}\u{23E9}-\u{23F3}\u{23F8}-\u{23FA}\u{24C2}\u{25AA}-\u{25AB}\u{25B6}\u{25C0}\u{25FB}-\u{25FE}\u{2600}-\u{2604}\u{260E}\u{2611}\u{2614}-\u{2615}\u{2618}\u{261D}\u{2620}\u{2622}-\u{2623}\u{2626}\u{262A}\u{262E}-\u{262F}\u{2638}-\u{263A}]/gu, '');
+                // Remove standard emojis, symbols, and pictographs
+                displayContent = displayContent.replace(
+                    /[\u{1F300}-\u{1F9FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1F900}-\u{1F9FF}\u{1F018}-\u{1F270}\u{238C}-\u{2454}\u{203C}\u{2049}\u{2122}\u{2139}\u{2194}-\u{2199}\u{21A9}-\u{21AA}\u{231A}-\u{231B}\u{2328}\u{23CF}\u{23E9}-\u{23F3}\u{23F8}-\u{23FA}\u{24C2}\u{25AA}-\u{25AB}\u{25B6}\u{25C0}\u{25FB}-\u{25FE}\u{2600}-\u{2604}\u{260E}\u{2611}\u{2614}-\u{2615}\u{2618}\u{261D}\u{2620}\u{2622}-\u{2623}\u{2626}\u{262A}\u{262E}-\u{262F}\u{2638}-\u{263A}]/gu,
+                    "",
+                );
             }
         }
-            
+
         // If content is empty/null and NOT marked as coming soon, assume waiting
         if ((!displayContent || displayContent.length === 0) && !isComingSoon) {
             isWaiting = true;
@@ -876,18 +928,22 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
     useEffect(() => {
         if (currentSessionId && chatSessions[currentSessionId]) {
             const session = chatSessions[currentSessionId];
-            
+
             // Sync Model
             if (session.model && session.model !== selectedModel) {
                 setSelectedModel(session.model);
             }
             // Sync Intelligence Mode/Module Mode
             if (session.mode && session.mode !== mode) {
-                 if (['pulse', 'compare', 'fusion', 'deep'].includes(session.mode)) {
-                      setIntelligenceMode(session.mode as any);
-                 } else {
-                      setMode(session.mode);
-                 }
+                if (
+                    ["pulse", "compare", "fusion", "deep"].includes(
+                        session.mode,
+                    )
+                ) {
+                    setIntelligenceMode(session.mode as any);
+                } else {
+                    setMode(session.mode);
+                }
             }
         }
     }, [currentSessionId]);
@@ -896,11 +952,12 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
     useEffect(() => {
         if (currentSessionId) {
             // If intelligence mode is active, it takes priority in the session state for historical filtering
-            const effectiveMode = intelligenceMode !== 'pulse' ? intelligenceMode : mode;
-            
-            updateChatSession(currentSessionId, { 
+            const effectiveMode =
+                intelligenceMode !== "pulse" ? intelligenceMode : mode;
+
+            updateChatSession(currentSessionId, {
                 model: selectedModel,
-                mode: effectiveMode 
+                mode: effectiveMode,
             });
         }
     }, [selectedModel, mode, intelligenceMode, currentSessionId]);
@@ -929,18 +986,19 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
     // However, typical Chat History (Gemini) shows the whole conversation.
     const messages = React.useMemo(() => {
         if (!rawMessages) return [];
-        
+
         // Define what the current "View Target" is based on the mode
-        const viewTarget = intelligenceMode === "pulse" ? selectedModel : intelligenceMode;
-        
+        const viewTarget =
+            intelligenceMode === "pulse" ? selectedModel : intelligenceMode;
+
         // Filter messages to only show those belonging to the current target OR global/legacy ones
         return rawMessages.filter((m) => {
             // 1. Global/Legacy messages (no targetModel) are always shown
             if (!m.targetModel) return true;
-            
+
             // 2. Exact match for current target (e.g. "Chat GPT" in Pulse mode, or "fusion" in Fusion mode)
             if (m.targetModel === viewTarget) return true;
-            
+
             return false;
         });
     }, [rawMessages, intelligenceMode, selectedModel]);
@@ -1195,7 +1253,7 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
             }
 
             let fetchOptions: RequestInit = {
-                method: 'POST',
+                method: "POST",
             };
 
             if (attachment) {
@@ -1203,22 +1261,24 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                 // We only explicitly set Auth if needed.
                 fetchOptions.body = requestData as FormData;
                 fetchOptions.headers = {
-                     "Authorization": `Bearer ${token}` 
+                    Authorization: `Bearer ${token}`,
                 };
             } else {
                 // JSON
                 fetchOptions.body = JSON.stringify(requestData);
                 fetchOptions.headers = {
                     "Content-Type": "application/json",
-                     "Authorization": `Bearer ${token}` 
+                    Authorization: `Bearer ${token}`,
                 };
             }
 
             const response = await fetch(webhookUrl, fetchOptions);
 
             if (!response.ok) {
-                 const errorText = await response.text();
-                 throw new Error(`Request failed with status ${response.status}: ${errorText}`);
+                const errorText = await response.text();
+                throw new Error(
+                    `Request failed with status ${response.status}: ${errorText}`,
+                );
             }
 
             const responseData = await response.json();
@@ -1242,18 +1302,18 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                 }
 
                 // IMPROVED LOGIC: Check for model-specific keys first to enable dynamic switching
-                const hasModelKeys = 
+                const hasModelKeys =
                     responseData.claude_response ||
                     responseData.gemini_response ||
                     responseData.openAI_response ||
                     responseData.openai ||
                     responseData.gemini ||
                     responseData.claude ||
-                    responseData.nsgai || 
+                    responseData.nsgai ||
                     responseData.answer; // Added answer to check
-                
+
                 if (hasModelKeys) {
-                    // If we have specific model responses (OR the robust 'answer' object), 
+                    // If we have specific model responses (OR the robust 'answer' object),
                     // save the WHOLE object as string so MessageItem can parse and filter it.
                     assistantContent = JSON.stringify(responseData);
                 } else {
