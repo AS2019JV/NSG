@@ -1,25 +1,36 @@
 import { NextResponse } from 'next/server';
+import { CONFIG } from '@/lib/config';
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { message, userId, step } = body;
 
-    // TODO: Connect to n8n webhook
-    // const WEBHOOK_URL = process.env.N8N_WEBHOOK_ONBOARDING;
-    // const response = await fetch(WEBHOOK_URL, { ... });
+    // Connect to n8n webhook
+    const BASE_URL = CONFIG.N8N_URL;
+    const WEBHOOK_URL = `${BASE_URL}/nsg-strategy-onboarding`;
 
-    // Mock Response for "Apple Pro" Demo
+    const response = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message, userId, step })
+    });
+
+    if (!response.ok) {
+        throw new Error(`N8N responded with ${response.status}`);
+    }
+
+    let n8nData = await response.json();
+
+    // Normalization
+    if (Array.isArray(n8nData) && n8nData.length > 0) n8nData = n8nData[0];
+    if (n8nData && typeof n8nData === 'object' && n8nData.json) n8nData = n8nData.json;
+
     return NextResponse.json({
         success: true,
-        data: {
-            answer: "Entendido. Procesando tu respuesta...",
-            nextStep: step + 1,
-            contextUpdate: {
-                // Mock context update that n8n would return
-                detectedGoal: "Escalar Negocio",
-            }
-        }
+        data: n8nData
     });
 
   } catch (error) {

@@ -1,45 +1,141 @@
 "use client";
 
 import { useAppStore } from "@/store/useAppStore";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import IngestInput from "./IngestInput";
 import ContentGrid from "./ContentGrid";
-import { Search, Filter, LayoutGrid, List, Loader2 } from "lucide-react";
+import { Search, Filter, LayoutGrid, Loader2 } from "lucide-react";
 
 import { EducationContent } from "@/types/education";
-import ContentChat from "./ContentChat";
+import ContentDetail from "./ContentDetail";
+import { Banner } from "@/components/ui/Banner";
+import { useToast } from "@/components/ui/ToastProvider";
+import api from "@/lib/api";
 
 export default function ContentLibrary() {
-    const [selectedItem, setSelectedItem] = useState<EducationContent | null>(null);
+    const { userId } = useAppStore();
+    const { showToast } = useToast();
+    const [selectedItem, setSelectedItem] = useState<EducationContent | null>(
+        null,
+    );
     const [isProcessing, setIsProcessing] = useState(false);
-    const [extraItems, setExtraItems] = useState<EducationContent[]>([]);
+    const [libraryItems, setLibraryItems] = useState<EducationContent[]>([]);
+    const [isLoadingLibrary, setIsLoadingLibrary] = useState(true);
     const [showFilters, setShowFilters] = useState(false);
 
-    const handleIngest = (url: string) => {
-        if (url.trim() === 'https://www.youtube.com/watch?v=Fbt7qNMMdas') {
-            setIsProcessing(true);
-            setTimeout(() => {
-                setIsProcessing(false);
+    // Load library content from backend
+    const loadContent = async () => {
+        try {
+            setIsLoadingLibrary(true);
+            const response = await api.get("/education/content");
+            if (response.data.success) {
+                setLibraryItems(response.data.data);
+            }
+        } catch (error: unknown) {
+            console.error("Error loading library:", error);
+            // Fallback to mock data if backend is not available
+            if ((error as any).response?.status === 404) {
+                console.warn(
+                    "[Education] Backend endpoint not deployed yet, using mock data",
+                );
+                setLibraryItems([]);
+            } else {
+                // For any other error, don't show toast (to avoid annoying users)
+                console.warn("[Education] Using empty library");
+                setLibraryItems([]);
+            }
+        } finally {
+            setIsLoadingLibrary(false);
+        }
+    };
+
+    // Load content on mount
+    useEffect(() => {
+        loadContent();
+    }, []);
+
+    const handleIngest = async (data: {
+        url: string;
+        document: File | null;
+        audio: File | null;
+    }) => {
+        setIsProcessing(true);
+        try {
+            // Create FormData to handle both text and files
+            const formData = new FormData();
+            formData.append("userId", userId || "");
+
+            if (data.url) formData.append("url", data.url);
+            if (data.document) formData.append("document", data.document);
+            if (data.audio) formData.append("audio", data.audio);
+
+            // Get token from localStorage for the proxy
+            const token =
+                typeof window !== "undefined"
+                    ? localStorage.getItem("nsg-token")
+                    : null;
+
+            const response = await fetch("/api/nsg-education/content", {
+                method: "POST",
+                headers: {
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || "Error en el servidor");
+            }
+
+            const result = await response.json();
+
+            // Success feedback
+            showToast("Recurso enviado exitosamente a la nube NSG", "success");
+
+            // brief delay for premium feel
+            await new Promise((resolve) => setTimeout(resolve, 1500));
+
+            // Reload library to show new content
+            await loadContent();
+
+            // Check if it's our specific demo URL for the instant feedback
+            if (
+                data.url &&
+                data.url.trim() ===
+                "https://www.youtube.com/watch?v=Fbt7qNMMdas"
+            ) {
+                // Success feedback with the mock item for visual demo
                 const newItem: EducationContent = {
-                    id: 'brian-tracy-fenix',
-                    title: 'Seminario Fénix (Brian Tracy)',
-                    type: 'video',
-                    status: 'ready',
-                    thumbnailUrl: 'https://i.ytimg.com/vi/Fbt7qNMMdas/mqdefault.jpg',
-                    createdAt: 'Hace 1 min',
-                    summary: 'Psicología del éxito y desbloqueo del potencial humano.'
+                    id: "brian-tracy-fenix",
+                    title: "Seminario Fénix (Brian Tracy)",
+                    type: "video",
+                    status: "ready",
+                    thumbnailUrl:
+                        "https://i.ytimg.com/vi/Fbt7qNMMdas/mqdefault.jpg",
+                    createdAt: "Recién añadido",
+                    summary:
+                        "Psicología del éxito y desbloqueo del potencial humano.",
                 };
 
-                // Add to library AND open it
-                setExtraItems(prev => [newItem, ...prev]);
                 setSelectedItem(newItem);
-            }, 3000);
+            }
+        } catch (error: any) {
+            console.error("❌ Error en la ingesta:", error);
+            showToast(error.message || "Error al procesar el recurso", "error");
+        } finally {
+            setIsProcessing(false);
         }
     };
 
     // If item selected, show Chat Interface for that content
     if (selectedItem) {
-        return <ContentChat item={selectedItem} onBack={() => setSelectedItem(null)} />;
+        return (
+            <ContentDetail
+                item={selectedItem}
+                onBack={() => setSelectedItem(null)}
+            />
+        );
     }
 
     if (isProcessing) {
@@ -49,10 +145,17 @@ export default function ContentLibrary() {
                     <div className="absolute inset-0 bg-blue-500 blur-xl opacity-20 rounded-full animate-pulse"></div>
                     <Loader2 className="w-12 h-12 text-blue-600 animate-spin relative z-10" />
                 </div>
-                <h2 className="mt-8 text-xl font-display font-bold text-navy-900 tracking-tight">Generando Campo de Inteligencia...</h2>
-                <p className="mt-2 text-slate-500 font-medium">Decodificando Seminario Fénix y Cruzando con Perfil #1</p>
+                <h2 className="mt-8 text-xl font-display font-bold text-navy-900 tracking-tight">
+                    Generando Campo de Inteligencia...
+                </h2>
+                <p className="mt-2 text-slate-500 font-medium">
+                    Decodificando Seminario Fénix y Cruzando con Perfil #1
+                </p>
                 <div className="mt-6 w-64 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-600 rounded-full animate-[progress_3s_ease-in-out_forwards]" style={{ width: '0%' }}></div>
+                    <div
+                        className="h-full bg-blue-600 rounded-full animate-[progress_3s_ease-in-out_forwards]"
+                        style={{ width: "0%" }}
+                    ></div>
                 </div>
             </div>
         );
@@ -60,53 +163,52 @@ export default function ContentLibrary() {
 
     return (
         <div className="flex flex-col h-full gap-5 md:gap-8 p-6 md:p-8">
-            {/* Header Area */}
-            <div className="flex flex-col gap-5 border-b border-slate-200/50 pb-5">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-0">
-                    <div className="flex flex-col gap-1">
-                        <h1 className="text-2xl md:text-3xl font-display font-bold text-navy-900 tracking-tight">Base de Conocimiento</h1>
-                        <p className="text-slate-500 text-sm font-medium">Gestión de Archivos Clasificados y Recursos Estratégicos</p>
-                    </div>
-                    <button className="bg-navy-900 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-navy-800 transition-all shadow-lg shadow-navy-900/20 active:scale-95 cursor-pointer flex items-center gap-2">
-                        <span className="text-lg leading-none">+</span> Ingresar Inteligencia
-                    </button>
-                </div>
+            {/* 1. HERO BANNER - Dashboard Optimized Style */}
+            <Banner
+                badge="Base de Conocimiento"
+                title="NSG Education"
+                description="Gestión de Archivos Clasificados y Recursos Estratégicos. Decodifica información compleja y conviértela en inteligencia accionable para tu perfil estratégico."
+            />
 
-                {/* Hero Input */}
+            {/* 2. INGEST AREA - The Entry Point for new content */}
+            <div className="max-w-4xl mx-auto w-full shrink-0">
                 <IngestInput onIngest={handleIngest} />
             </div>
 
             {/* Filters & Grid */}
             <div className="flex-1 flex flex-col gap-0 overflow-hidden">
-
                 {/* Control Header */}
                 <div className="flex items-center justify-between pb-4 shrink-0">
                     <h3 className="text-sm font-bold text-navy-900 uppercase tracking-widest flex items-center gap-2">
                         <LayoutGrid className="w-4 h-4 text-slate-400" />
-                        Archivos Recientes
+                        Recursos
                     </h3>
                     <button
                         onClick={() => setShowFilters(!showFilters)}
-                        className={`p-2 rounded-lg transition-all duration-300 flex items-center gap-2 text-xs font-bold uppercase tracking-wider ${showFilters ? 'bg-slate-100 text-navy-900' : 'text-slate-400 hover:text-navy-900 hover:bg-slate-50'}`}
+                        className={`p-2 rounded-lg transition-all duration-300 flex items-center gap-2 text-xs font-bold uppercase tracking-wider ${showFilters ? "bg-slate-100 text-navy-900" : "text-slate-400 hover:text-navy-900 hover:bg-slate-50"}`}
                     >
                         <Filter className="w-3.5 h-3.5" />
-                        {showFilters ? 'Ocultar Filtros' : 'Filtrar'}
+                        {showFilters ? "Ocultar Filtros" : "Filtrar"}
                     </button>
                 </div>
 
                 {/* Collapsible Filters */}
-                <div className={`overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${showFilters ? 'max-h-24 opacity-100 mb-6' : 'max-h-0 opacity-0 mb-0'}`}>
+                <div
+                    className={`overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${showFilters ? "max-h-24 opacity-100 mb-6" : "max-h-0 opacity-0 mb-0"}`}
+                >
                     <div className="flex flex-col md:flex-row items-center justify-between gap-4 shrink-0 pb-2 border-b border-slate-100">
                         {/* iOS Segmented Control Style Tabs */}
                         <div className="flex p-1 bg-slate-100/80 backdrop-blur-sm rounded-xl">
-                            {['Todo', 'Videos', 'Documentos', 'Enlaces'].map((tab, i) => (
-                                <button
-                                    key={tab}
-                                    className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all duration-300 ${i === 0 ? 'bg-white text-navy-900 shadow-sm' : 'text-slate-500 hover:text-navy-900'}`}
-                                >
-                                    {tab}
-                                </button>
-                            ))}
+                            {["Todo", "Videos", "Documentos", "Enlaces"].map(
+                                (tab, i) => (
+                                    <button
+                                        key={tab}
+                                        className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all duration-300 ${i === 0 ? "bg-white text-navy-900 shadow-sm" : "text-slate-500 hover:text-navy-900"}`}
+                                    >
+                                        {tab}
+                                    </button>
+                                ),
+                            )}
                         </div>
 
                         <div className="flex items-center gap-3 w-full md:w-auto">
@@ -122,8 +224,17 @@ export default function ContentLibrary() {
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto min-h-0 pr-2 pb-2">
-                    <ContentGrid onSelect={setSelectedItem} extraItems={extraItems} />
+                <div className="flex-1 min-h-0 pr-2 pb-2">
+                    {isLoadingLibrary ? (
+                        <div className="flex items-center justify-center h-full">
+                            <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
+                        </div>
+                    ) : (
+                        <ContentGrid
+                            onSelect={setSelectedItem}
+                            extraItems={libraryItems}
+                        />
+                    )}
                 </div>
             </div>
         </div>

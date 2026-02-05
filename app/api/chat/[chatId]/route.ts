@@ -53,6 +53,10 @@ export async function GET(
     return NextResponse.json({
         chatId: chat.sessionId,
         messages: chat.history || chat.messages || [] 
+    }, {
+        headers: {
+            'Cache-Control': 'private, no-cache, no-store, max-age=0'
+        }
     });
 
   } catch (error) {

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { CONFIG } from '@/lib/config';
 
 export async function POST(
   req: Request,
@@ -11,8 +12,11 @@ export async function POST(
     const { message, history, preferences } = body;
 
     // Direct connection to n8n Webhook
-    // Replace with your actual N8N Webhook URL for Chat
-    const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_CHAT || "https://nsg-k8s.onrender.com/webhook/nsg-education-chat";
+    const N8N_WEBHOOK_URL = `${CONFIG.N8N_URL}/nsg-education-chat`;
+
+    if (!CONFIG.N8N_URL) {
+        throw new Error("CONFIG.N8N_URL must be defined");
+    }
 
     const n8nResponse = await fetch(N8N_WEBHOOK_URL, {
       method: "POST",
@@ -33,7 +37,11 @@ export async function POST(
         throw new Error(`n8n responded with ${n8nResponse.status}`);
     }
 
-    const data = await n8nResponse.json();
+    let data = await n8nResponse.json();
+
+    // Normalization: Handle n8n wrappers
+    if (Array.isArray(data) && data.length > 0) data = data[0];
+    if (data && typeof data === 'object' && data.json) data = data.json;
 
     // Expecting n8n to return { output: "AI response text" } or similar
     // We map it to our Message format

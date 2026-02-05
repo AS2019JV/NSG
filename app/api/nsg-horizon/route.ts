@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
+import { CONFIG } from '@/lib/config';
 
 
 /**
  * Proxy for NSG Horizon Webhook
  * Path: /api/nsg-horizon
  */
-const BASE_URL = process.env.NEXT_PUBLIC_N8N_WEBHOOK || "https://personal-n8n.suwsiw.easypanel.host/webhook";
+const BASE_URL = CONFIG.N8N_URL;
 
 export async function POST(req: Request) {
   try {
@@ -23,19 +24,27 @@ export async function POST(req: Request) {
 
     // Use BASE_URL directly
     const targetUrl = `${BASE_URL}/nsg-horizon`;
+    console.log(`[N8N Horizon] Forwarding to: ${targetUrl}`);
 
     const response = await fetch(targetUrl, fetchOptions);
 
     if (!response.ok) {
       const text = await response.text();
+      console.warn(`[N8N Horizon] received ${response.status} from ${targetUrl}:`, text.substring(0, 100));
       return NextResponse.json({
         error: "N8N Workflow Error",
         status: response.status,
-        details: text
-      }, { status: 502 });
+        details: text,
+        targetUrl: targetUrl
+      }, { status: response.status });
     }
 
-    const data = await response.json();
+    let data = await response.json();
+    
+    // Normalization: Handle n8n containers
+    if (Array.isArray(data) && data.length > 0) data = data[0];
+    if (data && typeof data === 'object' && data.json) data = data.json;
+
     return NextResponse.json(data);
 
   } catch (error) {
