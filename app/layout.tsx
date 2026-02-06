@@ -24,9 +24,7 @@ export const metadata: Metadata = {
 
 import ThemeProvider from "@/components/providers/ThemeProvider";
 import TokenVerifier from "@/components/auth/TokenVerifier";
-
-
-// ... existing imports
+import { Suspense } from "react";
 
 export default function RootLayout({
   children,
@@ -37,9 +35,11 @@ export default function RootLayout({
     <html lang="es" className={`${inter.variable} ${mono.variable} antialiased h-full`} suppressHydrationWarning>
       <body className="h-full overflow-auto font-sans selection:bg-blue-100 selection:text-blue-900" suppressHydrationWarning>
         <ThemeProvider>
-          <TokenVerifier>
-            <ToastProvider>{children}</ToastProvider>
-          </TokenVerifier>
+          <Suspense fallback={<div className="h-screen w-screen bg-slate-50 animate-pulse" />}>
+            <TokenVerifier>
+              <ToastProvider>{children}</ToastProvider>
+            </TokenVerifier>
+          </Suspense>
         </ThemeProvider>
       </body>
     </html>
