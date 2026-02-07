@@ -27,13 +27,14 @@ export interface OnboardingSession {
 }
 
 export type ContentStatus = 'pending' | 'processing' | 'ready' | 'error';
-export type ContentType = 'video' | 'article' | 'pdf' | 'image';
+export type ContentType = 'video' | 'article' | 'pdf' | 'image' | 'text' | 'document';
 
 export interface EducationContent {
   id: string;
   title: string;
   originalUrl?: string;
   type: ContentType;
+  source_type?: 'text' | 'document' | 'image' | 'video';
   status: ContentStatus;
   thumbnailUrl?: string;
   summary?: string;

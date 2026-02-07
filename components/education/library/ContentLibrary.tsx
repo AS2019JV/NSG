@@ -130,6 +130,32 @@ export default function ContentLibrary() {
         }
     };
 
+    const handleDelete = async (contentId: string) => {
+        if (
+            !window.confirm(
+                "¿Estás seguro de que deseas eliminar este recurso?",
+            )
+        ) {
+            return;
+        }
+
+        try {
+            const response = await api.delete(
+                `/education/content/${contentId}`,
+            );
+            if (response.data.success) {
+                showToast("Recurso eliminado exitosamente", "success");
+                // Actualizar la lista localmente
+                setLibraryItems((prev) =>
+                    prev.filter((item) => item.id !== contentId),
+                );
+            }
+        } catch (error) {
+            console.error("❌ Error al eliminar:", error);
+            showToast("Error al eliminar el recurso", "error");
+        }
+    };
+
     // If item selected, show Chat Interface for that content
     if (selectedItem) {
         return (
@@ -234,6 +260,7 @@ export default function ContentLibrary() {
                     ) : (
                         <ContentGrid
                             onSelect={setSelectedItem}
+                            onDelete={handleDelete}
                             extraItems={libraryItems}
                         />
                     )}
