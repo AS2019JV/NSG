@@ -5,14 +5,14 @@ export async function POST(req: Request) {
   try {
     const contentType = req.headers.get('content-type') || '';
     const authHeader = req.headers.get('authorization');
-    
+
     const fetchOptions: RequestInit = {
-        method: 'POST',
-        headers: {} as Record<string, string>
+      method: 'POST',
+      headers: {} as Record<string, string>
     };
 
     if (authHeader) {
-        (fetchOptions.headers as Record<string, string>)['Authorization'] = authHeader;
+      (fetchOptions.headers as Record<string, string>)['Authorization'] = authHeader;
     }
 
     if (contentType.includes('multipart/form-data')) {
@@ -53,12 +53,12 @@ export async function POST(req: Request) {
 }
 
 export async function GET() {
-    // Mock getting library items (Eventually from n8n or database)
-    return NextResponse.json({
-        success: true,
-        data: [
-            { id: '1', title: 'Cómo escalar tu agencia en 2024', type: 'video', status: 'ready', createdAt: '2024-01-20T10:00:00Z' },
-            { id: '2', title: 'Protocolo de Sueño Huberman', type: 'pdf', status: 'processing', createdAt: '2024-01-21T12:00:00Z' }
-        ]
-    })
+  // Mock getting library items (Eventually from n8n or database)
+  return NextResponse.json({
+    success: true,
+    data: [
+      { id: '1', title: 'Cómo escalar tu agencia en 2024', type: 'video', status: 'ready', createdAt: '2024-01-20T10:00:00Z' },
+      { id: '2', title: 'Protocolo de Sueño Huberman', type: 'pdf', status: 'processing', createdAt: '2024-01-21T12:00:00Z' }
+    ]
+  });
 }

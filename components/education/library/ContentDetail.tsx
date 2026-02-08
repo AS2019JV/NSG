@@ -52,6 +52,18 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
         suggested_questions = [],
     } = analysis;
 
+    const [isDataLoaded, setIsDataLoaded] = useState(false);
+    const [isFading, setIsFading] = useState(false);
+
+    // Effect to handle transition when data is loaded
+    useEffect(() => {
+        if (isDataLoaded) {
+            setIsFading(true);
+            const timer = setTimeout(() => setIsFading(false), 500);
+            return () => clearTimeout(timer);
+        }
+    }, [isDataLoaded]);
+
     const scrollToBottom = () => {
         if (scrollContainerRef.current) {
             scrollContainerRef.current.scrollTo({
@@ -119,6 +131,12 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                 type: "text",
             };
             setMessages((prev) => [...prev, aiMsg]);
+
+            // Temporary Logic: If certain keywords or just for testing, trigger content load
+            // The user mentioned an AI agent will send a signal.
+            if (aiMsg.content.includes("CARGAR_DATOS") || aiMsg.content.includes("ANÁLISIS_LISTO")) {
+                setIsDataLoaded(true);
+            }
         } catch (error: any) {
             console.error("Chat Error:", error);
             setIsTyping(false);
@@ -135,191 +153,36 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
 
     return (
         <div className="flex flex-col lg:flex-row h-full gap-6">
-            {/* Left Panel: AI Analysis - Minimalist & Clean */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-white rounded-2xl shadow-sm">
-                {/* Header - Simplified */}
-                <div className="flex items-center gap-3 pb-5 border-b border-slate-100">
-                    <button
-                        onClick={onBack}
-                        className="p-2 rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-50 transition-all"
-                    >
-                        <ArrowLeft className="w-5 h-5" />
-                    </button>
-                    <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                            <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                                <Sparkles className="w-3.5 h-3.5 text-white" />
-                            </div>
-                            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                                Análisis Estratégico AI
-                            </p>
-                        </div>
-                        <h1 className="text-xl font-bold text-slate-900 leading-tight">
-                            {title}
-                        </h1>
-                    </div>
-                </div>
-
-                {/* Executive Summary - Clean Card */}
-                <section className="bg-gradient-to-br from-slate-900 to-slate-800 p-8 rounded-2xl shadow-md">
-                    <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">
-                        Reporte Ejecutivo
-                    </h3>
-                    <p className="text-white/90 leading-relaxed text-[15px]">
-                        {summary}
-                    </p>
-                </section>
-
-                {/* Strategic Analysis */}
-                {strategic_analysis.alignment && (
-                    <section>
-                        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-6 flex items-center gap-3">
-                            <div className="w-8 h-[2px] bg-blue-500"></div>
-                            Alineación Estratégica
-                        </h3>
-                        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6">
-                            <div>
-                                <h4 className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">
-                                    Por qué es vital para ti
-                                </h4>
-                                <p className="text-slate-700 leading-relaxed">
-                                    {strategic_analysis.alignment}
-                                </p>
-                            </div>
-                            {strategic_analysis.friction_bypass && (
-                                <div>
-                                    <h4 className="text-xs font-bold text-orange-600 uppercase tracking-widest mb-2">
-                                        Superando tu fricción
-                                    </h4>
-                                    <p className="text-slate-700 leading-relaxed">
-                                        {strategic_analysis.friction_bypass}
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                    </section>
-                )}
-
-                {/* Key Insights */}
-                {key_insights.length > 0 && (
-                    <section>
-                        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-6 flex items-center gap-3">
-                            <div className="w-8 h-[2px] bg-purple-500"></div>
-                            Insights Clave
-                        </h3>
-                        <div className="grid gap-4">
-                            {key_insights.map((insight: any, i: number) => {
-                                const IconComponent =
-                                    iconMap[insight.icon] || Sparkles;
-                                return (
-                                    <div
-                                        key={i}
-                                        className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all flex items-start gap-4"
-                                    >
-                                        <div className="p-3 bg-purple-50 text-purple-600 rounded-xl shrink-0">
-                                            <IconComponent className="w-5 h-5" />
-                                        </div>
-                                        <p className="text-slate-700 leading-relaxed font-medium flex-1">
-                                            {insight.text}
-                                        </p>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </section>
-                )}
-
-                {/* Action Plan */}
-                {action_plan.length > 0 && (
-                    <section>
-                        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-8 flex items-center gap-3">
-                            <div className="w-8 h-[2px] bg-emerald-500"></div>
-                            Plan de Acción
-                        </h3>
-                        <div className="grid gap-6">
-                            {action_plan.map((step: any, i: number) => {
-                                const impactColors = {
-                                    High: "emerald",
-                                    Medium: "blue",
-                                    Low: "slate",
-                                };
-                                const color =
-                                    impactColors[
-                                        step.impact as keyof typeof impactColors
-                                    ] || "slate";
-
-                                return (
-                                    <div key={i} className="relative group">
-                                        {i !== action_plan.length - 1 && (
-                                            <div className="hidden md:block absolute left-9 top-16 bottom-[-24px] w-0.5 bg-slate-100"></div>
-                                        )}
-                                        <div className="flex gap-6 items-start">
-                                            <div className="hidden md:flex flex-col items-center gap-2 shrink-0 w-20 pt-2">
-                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                                    Paso
-                                                </div>
-                                                <div
-                                                    className={`text-3xl font-display font-bold text-${color}-500`}
-                                                >
-                                                    0{i + 1}
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
-                                                <div className="flex items-center justify-between mb-3">
-                                                    <div className="md:hidden text-xs font-bold text-emerald-500 uppercase tracking-widest">
-                                                        Paso 0{i + 1}
-                                                    </div>
-                                                    <div className="flex items-center gap-3">
-                                                        <span
-                                                            className={`px-3 py-1 bg-${color}-50 text-${color}-700 text-xs font-bold rounded-full`}
-                                                        >
-                                                            {step.impact} Impact
-                                                        </span>
-                                                        <span className="text-xs text-slate-500 font-medium">
-                                                            ⏱ {step.time}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <p className="text-lg font-medium text-slate-800 leading-relaxed">
-                                                    {step.task}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </section>
-                )}
-            </div>
-
-            {/* Right Panel: Chat - Sticky & Minimalist */}
-            <div className="w-full lg:w-[440px] lg:sticky lg:top-8 lg:self-start flex flex-col bg-white rounded-3xl border border-slate-200/60 shadow-lg overflow-hidden lg:max-h-[calc(99vh-4rem)]">
-                {/* Chat Header - Simplified */}
-                <div className="px-6 py-5 border-b border-slate-100">
+            {/* LEFT Panel: Chat (Main focus first) */}
+            <div className="w-full lg:w-[480px] flex flex-col bg-white rounded-3xl border border-slate-200/60 shadow-lg overflow-hidden lg:h-[calc(100vh-12rem)]">
+                {/* Chat Header */}
+                <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/50">
                     <div className="flex items-center gap-3">
+                        <button
+                            onClick={onBack}
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-900 hover:bg-white transition-all mr-1 shadow-sm border border-slate-100"
+                        >
+                            <ArrowLeft className="w-4 h-4" />
+                        </button>
                         <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                             <Sparkles className="w-4 h-4 text-white" />
                         </div>
                         <div>
                             <h3 className="text-sm font-bold text-slate-900">
-                                Asistente de Profundización
+                                Asistente Estratégico
                             </h3>
-                            <p className="text-xs text-slate-500">
-                                Pregunta lo que necesites
+                            <p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">
+                                Agente de Calibración
                             </p>
                         </div>
                     </div>
                 </div>
 
-                {/* Messages - Clean & Readable */}
+                {/* Messages */}
                 <div
                     ref={scrollContainerRef}
-                    className="flex-1 overflow-y-auto p-5 space-y-4 bg-slate-50/30"
-                    style={{
-                        scrollbarWidth: "thin",
-                        scrollbarColor: "#cbd5e1 transparent",
-                    }}
+                    className="flex-1 overflow-y-auto p-5 space-y-4 bg-white"
+                    style={{ scrollbarWidth: "thin" }}
                 >
                     {messages.map((msg) => (
                         <div
@@ -332,16 +195,16 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                             )}
                         >
                             {msg.role === "system" && (
-                                <div className="w-7 h-7 mt-0.5 shrink-0 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 p-1.5 flex items-center justify-center">
+                                <div className="w-7 h-7 mt-0.5 shrink-0 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 p-1.5 flex items-center justify-center shadow-lg shadow-blue-500/20">
                                     <BrandAtom className="w-full h-full text-white" />
                                 </div>
                             )}
                             <div
                                 className={clsx(
-                                    "max-w-[85%] px-4 py-3 rounded-2xl text-[15px] leading-relaxed",
+                                    "max-w-[85%] px-4 py-3 rounded-2xl text-[14px] leading-relaxed shadow-sm",
                                     msg.role === "user"
-                                        ? "bg-slate-900 text-white rounded-br-sm shadow-sm"
-                                        : "bg-white text-slate-700 rounded-bl-sm border border-slate-100 shadow-sm",
+                                        ? "bg-slate-900 text-white rounded-br-sm"
+                                        : "bg-slate-50 text-slate-700 rounded-bl-sm border border-slate-100",
                                 )}
                             >
                                 {msg.content}
@@ -349,7 +212,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                         </div>
                     ))}
 
-                    {/* Suggested Questions - Minimal Pills */}
+                    {/* Suggested Questions */}
                     {messages.length === 1 &&
                         suggested_questions.length > 0 && (
                             <div className="flex flex-wrap gap-2 justify-start pl-10 pt-2">
@@ -358,7 +221,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                                         <button
                                             key={i}
                                             onClick={() => handleSend(q)}
-                                            className="px-3 py-1.5 bg-white border border-slate-200 hover:border-blue-400 hover:bg-blue-50 text-slate-700 hover:text-blue-700 text-xs font-medium rounded-lg transition-all"
+                                            className="px-3 py-1.5 bg-white border border-slate-200 hover:border-blue-400 hover:bg-blue-50 text-slate-700 hover:text-blue-700 text-xs font-bold rounded-lg transition-all shadow-sm"
                                         >
                                             {q}
                                         </button>
@@ -367,17 +230,16 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                             </div>
                         )}
 
-                    {/* Typing Indicator - Subtle */}
                     {isTyping && (
                         <div className="flex justify-start w-full gap-3 pl-10">
-                            <div className="bg-white border border-slate-100 px-4 py-2.5 rounded-2xl rounded-bl-sm flex items-center gap-1">
-                                <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></div>
+                            <div className="bg-slate-50 border border-slate-100 px-4 py-2.5 rounded-2xl rounded-bl-sm flex items-center gap-1">
+                                <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"></div>
                                 <div
-                                    className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"
+                                    className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"
                                     style={{ animationDelay: "0.15s" }}
                                 ></div>
                                 <div
-                                    className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"
+                                    className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"
                                     style={{ animationDelay: "0.3s" }}
                                 ></div>
                             </div>
@@ -385,7 +247,22 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                     )}
                 </div>
 
-                {/* Input - Clean & Focused */}
+                {/* Loading Action (Simulation) */}
+                {!isDataLoaded && (
+                    <div className="px-5 py-3 bg-blue-50/50 border-t border-blue-100 flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">
+                            Estado: Calibrando Inteligencia
+                        </span>
+                        <button
+                            onClick={() => setIsDataLoaded(true)}
+                            className="text-[10px] font-bold text-white bg-blue-600 px-2 py-1 rounded-md hover:bg-blue-700 transition-colors"
+                        >
+                            Simular Carga
+                        </button>
+                    </div>
+                )}
+
+                {/* Input */}
                 <div className="p-4 bg-white border-t border-slate-100">
                     <div className="relative flex items-center gap-2">
                         <input
@@ -403,12 +280,177 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                         <button
                             onClick={() => handleSend(input)}
                             disabled={!input.trim()}
-                            className="p-3 bg-slate-900 text-white rounded-xl hover:bg-black transition-all hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+                            className="p-3 bg-slate-900 text-white rounded-xl hover:bg-black transition-all hover:scale-105 active:scale-95 disabled:opacity-40"
                         >
                             <Send className="w-4 h-4" />
                         </button>
                     </div>
                 </div>
+            </div>
+
+            {/* RIGHT Panel: Content (Starts as skeleton) */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-8 bg-white rounded-3xl border border-slate-100 shadow-sm relative lg:h-[calc(100vh-12rem)]">
+                {!isDataLoaded ? (
+                    <div className="animate-pulse space-y-8">
+                        {/* Header Skeleton */}
+                        <div className="flex items-center gap-3 pb-5 border-b border-slate-100">
+                            <div className="w-10 h-10 bg-slate-100 rounded-xl"></div>
+                            <div className="space-y-2 flex-1">
+                                <div className="h-3 w-24 bg-slate-100 rounded"></div>
+                                <div className="h-6 w-3/4 bg-slate-200 rounded"></div>
+                            </div>
+                        </div>
+                        {/* Summary Skeleton */}
+                        <div className="h-32 bg-slate-900/5 rounded-2xl"></div>
+                        {/* Detailed Analysis Skeleton */}
+                        <div className="space-y-4">
+                            <div className="h-4 w-40 bg-slate-100 rounded"></div>
+                            <div className="h-48 bg-slate-50 rounded-3xl"></div>
+                        </div>
+                        {/* Insights Skeleton */}
+                        <div className="space-y-4">
+                            <div className="h-4 w-32 bg-slate-100 rounded"></div>
+                            <div className="grid gap-4">
+                                <div className="h-20 bg-slate-50 rounded-2xl"></div>
+                                <div className="h-20 bg-slate-50 rounded-2xl"></div>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className={clsx("space-y-8", isFading ? "opacity-0" : "opacity-100 transition-opacity duration-500")}>
+                        {/* Header */}
+                        <div className="flex items-center gap-3 pb-5 border-b border-slate-100">
+                            <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                    <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                                        <Sparkles className="w-3.5 h-3.5 text-white" />
+                                    </div>
+                                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                                        Inteligencia Decodificada
+                                    </p>
+                                </div>
+                                <h1 className="text-2xl font-bold text-slate-900 leading-tight tracking-tight">
+                                    {title}
+                                </h1>
+                            </div>
+                        </div>
+
+                        {/* Executive Summary */}
+                        <section className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-8 rounded-3xl shadow-xl shadow-slate-900/10 border border-slate-800">
+                            <div className="flex items-center gap-2 mb-4">
+                                <BrandAtom className="w-5 h-5 text-blue-400" />
+                                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">
+                                    Reporte Ejecutivo
+                                </h3>
+                            </div>
+                            <p className="text-white/90 leading-relaxed text-lg font-medium italic">
+                                "{summary}"
+                            </p>
+                        </section>
+
+                        {/* Strategic Analysis */}
+                        {strategic_analysis.alignment && (
+                            <section className="space-y-6">
+                                <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.3em] flex items-center gap-4">
+                                    Alineación Estratégica
+                                    <div className="flex-1 h-[1px] bg-slate-100"></div>
+                                </h3>
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <div className="bg-blue-50/30 p-6 rounded-3xl border border-blue-100/50">
+                                        <h4 className="text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-3">
+                                            Valor Estratégico
+                                        </h4>
+                                        <p className="text-slate-700 leading-relaxed text-sm">
+                                            {strategic_analysis.alignment}
+                                        </p>
+                                    </div>
+                                    {strategic_analysis.friction_bypass && (
+                                        <div className="bg-amber-50/30 p-6 rounded-3xl border border-amber-100/50">
+                                            <h4 className="text-[10px] font-bold text-amber-600 uppercase tracking-widest mb-3">
+                                                Superando Fricción
+                                            </h4>
+                                            <p className="text-slate-700 leading-relaxed text-sm">
+                                                {strategic_analysis.friction_bypass}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* Key Insights */}
+                        {key_insights.length > 0 && (
+                            <section className="space-y-6">
+                                <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.3em] flex items-center gap-4">
+                                    Insights de Valor
+                                    <div className="flex-1 h-[1px] bg-slate-100"></div>
+                                </h3>
+                                <div className="grid gap-4">
+                                    {key_insights.map((insight: any, i: number) => {
+                                        const IconComponent =
+                                            iconMap[insight.icon] || Sparkles;
+                                        return (
+                                            <div
+                                                key={i}
+                                                className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:border-blue-200 transition-all flex items-start gap-4 group"
+                                            >
+                                                <div className="p-3 bg-slate-50 text-slate-900 rounded-xl shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                                    <IconComponent className="w-5 h-5" />
+                                                </div>
+                                                <p className="text-slate-700 leading-relaxed font-semibold flex-1 pt-0.5">
+                                                    {insight.text}
+                                                </p>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </section>
+                        )}
+
+                        {/* Action Plan */}
+                        {action_plan.length > 0 && (
+                            <section className="space-y-8">
+                                <h3 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.3em] flex items-center gap-4">
+                                    Plan de Ejecución
+                                    <div className="flex-1 h-[1px] bg-slate-100"></div>
+                                </h3>
+                                <div className="space-y-4">
+                                    {action_plan.map((step: any, i: number) => {
+                                        const impactColors: Record<string, string> = {
+                                            High: "emerald",
+                                            Medium: "blue",
+                                            Low: "slate",
+                                        };
+                                        const color = impactColors[step.impact] || "slate";
+
+                                        return (
+                                            <div key={i} className="flex gap-6 items-start group">
+                                                <div className="pt-2">
+                                                    <div className={`w-8 h-8 rounded-full border-2 border-${color}-500 flex items-center justify-center text-[10px] font-black text-${color}-600`}>
+                                                        0{i + 1}
+                                                    </div>
+                                                </div>
+                                                <div className="flex-1 bg-slate-50/50 p-6 rounded-2xl border border-slate-100 group-hover:bg-white group-hover:shadow-md transition-all">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <span className={`text-[9px] font-black uppercase tracking-widest text-${color}-600 py-1 px-2 bg-${color}-50 rounded-md`}>
+                                                            {step.impact} Impact
+                                                        </span>
+                                                        <span className="text-[10px] font-bold text-slate-400">
+                                                            EST. {step.time}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-slate-900 font-bold leading-relaxed">
+                                                        {step.task}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </section>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     );

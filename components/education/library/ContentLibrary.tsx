@@ -4,7 +4,7 @@ import { useAppStore } from "@/store/useAppStore";
 import { useState, useEffect } from "react";
 import IngestInput from "./IngestInput";
 import ContentGrid from "./ContentGrid";
-import { Search, Filter, LayoutGrid, Loader2 } from "lucide-react";
+import { Search, Filter, LayoutGrid, Loader2, CheckCircle, ArrowRight } from "lucide-react";
 
 import { EducationContent } from "@/types/education";
 import ContentDetail from "./ContentDetail";
@@ -22,6 +22,8 @@ export default function ContentLibrary() {
     const [libraryItems, setLibraryItems] = useState<EducationContent[]>([]);
     const [isLoadingLibrary, setIsLoadingLibrary] = useState(true);
     const [showFilters, setShowFilters] = useState(false);
+    const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+    const [justIngestedItem, setJustIngestedItem] = useState<EducationContent | null>(null);
 
     // Load library content from backend
     const loadContent = async () => {
@@ -29,13 +31,16 @@ export default function ContentLibrary() {
             setIsLoadingLibrary(true);
             const response = await api.get("/education/content");
             if (response.data.success) {
-                setLibraryItems(response.data.data);
+                const items = response.data.data;
+                setLibraryItems(items);
+                return items;
             }
+            return [];
         } catch (error: unknown) {
             console.error("Error loading library:", error);
             // Fallback to mock data if backend is not available
             if (
-                (error as { response?: { status?: number } }).response
+                (error as { response?: { status?: number; }; }).response
                     ?.status === 404
             ) {
                 console.warn(
@@ -47,6 +52,7 @@ export default function ContentLibrary() {
                 console.warn("[Education] Using empty library");
                 setLibraryItems([]);
             }
+            return [];
         } finally {
             setIsLoadingLibrary(false);
         }
@@ -54,7 +60,31 @@ export default function ContentLibrary() {
 
     // Load content on mount
     useEffect(() => {
-        loadContent();
+        const init = async () => {
+            const items = await loadContent();
+            // If the latest item is very recent (e.g. last 5 minutes), open it automatically
+            // This handles cases where content was just ingested via external webhook
+            if (items && items.length > 0) {
+                const latest = items[0];
+                try {
+                    const createdDate = new Date(latest.createdAt);
+                    const now = new Date();
+                    const diffMs = now.getTime() - createdDate.getTime();
+                    const diffMins = diffMs / (1000 * 60);
+
+                    if (diffMins < 5) {
+                        console.log(
+                            "[Education] New content detected, auto-selecting:",
+                            latest.title,
+                        );
+                        setSelectedItem(latest);
+                    }
+                } catch (e) {
+                    console.error("Error parsing date for auto-select:", e);
+                }
+            }
+        };
+        init();
     }, []);
 
     const handleIngest = async (data: {
@@ -99,24 +129,33 @@ export default function ContentLibrary() {
                 const errorData = await response.json().catch(() => ({}));
                 const err = new Error(
                     errorData.error ||
-                        `N8N respondió con error ${response.status}`,
-                ) as Error & { details?: unknown };
+                    `N8N respondió con error ${response.status}`,
+                ) as Error & { details?: unknown; };
                 err.details = errorData.details;
                 throw err;
             }
 
-            await response.json();
+            const result = await response.json();
+
+            // Validate n8n response body as per user screenshot
+            if (result.status !== "success" && result.status !== "ok") {
+                console.warn("[Education] n8n returned non-success body:", result);
+            }
 
             // Success feedback
-            showToast("Recurso enviado exitosamente a la nube NSG", "success");
+            showToast("Recurso recibido por la IA Estratégica", "success");
 
             // brief delay for premium feel
-            await new Promise((resolve) => setTimeout(resolve, 1500));
+            await new Promise((resolve) => setTimeout(resolve, 1000));
 
-            // Reload library to show new content
-            await loadContent();
+            // Reload library and prepare for manual entry
+            const items = await loadContent();
+            if (items && items.length > 0) {
+                setJustIngestedItem(items[0]);
+                setShowSuccessAlert(true);
+            }
         } catch (error: unknown) {
-            const err = error as Error & { details?: unknown };
+            const err = error as Error & { details?: unknown; };
             console.error("❌ Error en la ingesta:", err);
 
             // Log technical details if available (from route.ts / n8n)
@@ -266,6 +305,45 @@ export default function ContentLibrary() {
                     )}
                 </div>
             </div>
+
+            {/* SUCCESS ALERT MODAL */}
+            {showSuccessAlert && justIngestedItem && (
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-navy-950/40 backdrop-blur-md animate-fade-in">
+                    <div className="bg-white rounded-[32px] p-8 max-w-sm w-full shadow-2xl border border-white/20 animate-scale-in">
+                        <div className="flex flex-col items-center text-center">
+                            <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-6">
+                                <CheckCircle className="w-10 h-10 text-emerald-500" />
+                            </div>
+
+                            <h2 className="text-2xl font-display font-bold text-navy-900 mb-2">
+                                Recurso Procesado
+                            </h2>
+                            <p className="text-slate-500 mb-8 text-sm leading-relaxed">
+                                El recurso se ha integrado correctamente a tu base de conocimiento estratégica. ¿Deseas analizarlo ahora?
+                            </p>
+
+                            <div className="flex w-full gap-3">
+                                <button
+                                    onClick={() => setShowSuccessAlert(false)}
+                                    className="flex-1 px-6 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-2xl transition-all"
+                                >
+                                    Cerrar
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setSelectedItem(justIngestedItem);
+                                        setShowSuccessAlert(false);
+                                    }}
+                                    className="flex-[1.5] px-6 py-3.5 bg-navy-900 hover:bg-black text-white font-bold rounded-2xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-navy-900/20"
+                                >
+                                    Ir
+                                    <ArrowRight className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
