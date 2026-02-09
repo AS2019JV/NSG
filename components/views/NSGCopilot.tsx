@@ -792,15 +792,11 @@ export default function ICopilot() {
             return;
         }
         if (isConnected) {
-            try {
-                const res = await api.delete("/google/calendar");
-                if (res.status === 200) {
-                    setIsConnected(false);
-                    showToast("Google Calendar desconectado", "info");
-                }
-            } catch {
-                showToast("Error", "error");
-            }
+            showToast(
+                "La desvinculación se realiza desde Configuración",
+                "info",
+            );
+            return;
         } else {
             try {
                 const res = await api.get("/google/auth");

@@ -110,7 +110,8 @@ api.interceptors.response.use(
             }
         } else if (error.request) {
             // Request made but no response received
-            if (process.env.NODE_ENV === 'development') {
+            const isVerifyToken = error.config?.url?.includes('/auth/verify-token');
+            if (process.env.NODE_ENV === 'development' && !isVerifyToken) {
                 console.error("[ERROR] Network Error: No response from server", {
                     url: error.config?.url,
                 });

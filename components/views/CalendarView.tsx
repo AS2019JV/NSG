@@ -88,18 +88,7 @@ export default function CalendarView() {
 
     const handleConnect = async () => {
         if (isConnected) {
-            // Desconectar
-            try {
-                const res = await api.delete("/google/calendar");
-                if (res.status === 200) {
-                    setIsConnected(false);
-                    setEvents([]);
-                    showToast("Google Calendar desconectado", "info");
-                }
-            } catch (error) {
-                console.error("Error disconnecting:", error);
-                showToast("Error al desconectar", "error");
-            }
+            showToast("Gestiona tu conexión desde Configuración", "info");
             return;
         }
 

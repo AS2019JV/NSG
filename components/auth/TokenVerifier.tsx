@@ -65,11 +65,16 @@ export default function TokenVerifier({
                             setUserLocation(response.user.location);
                         }
                     }
-                } catch (error) {
-                    console.error(
-                        "[TokenVerifier] Error verifying session:",
-                        error,
-                    );
+                } catch (error: any) {
+                    // Silenciar logs si es un timeout/error de red (ya lo maneja el interceptor de api.ts si no es verify-token)
+                    // Solo loguear si es un error real de respuesta (401, 500, etc)
+                    if (error.response) {
+                        console.error(
+                            "[TokenVerifier] Error verifying session:",
+                            error.response.status,
+                            error.response.data?.message,
+                        );
+                    }
                     if (
                         typeof window !== "undefined" &&
                         !localStorage.getItem("nsg-token")
