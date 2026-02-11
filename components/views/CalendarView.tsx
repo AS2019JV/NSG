@@ -94,7 +94,8 @@ export default function CalendarView() {
 
         // Conectar
         try {
-            const res = await api.get("/google/auth");
+            const origin = window.location.origin;
+            const res = await api.get(`/google/auth?origin=${encodeURIComponent(origin)}`);
             if (res.data?.url) {
                 window.open(res.data.url, "_blank");
             }
@@ -257,14 +258,14 @@ export default function CalendarView() {
                                             <span className="text-[10px] font-bold text-blue-300 uppercase tracking-widest">
                                                 {event.start.dateTime
                                                     ? new Date(
-                                                          event.start.dateTime,
-                                                      ).toLocaleTimeString(
-                                                          "es-ES",
-                                                          {
-                                                              hour: "2-digit",
-                                                              minute: "2-digit",
-                                                          },
-                                                      )
+                                                        event.start.dateTime,
+                                                    ).toLocaleTimeString(
+                                                        "es-ES",
+                                                        {
+                                                            hour: "2-digit",
+                                                            minute: "2-digit",
+                                                        },
+                                                    )
                                                     : "Todo el día"}
                                             </span>
                                         </div>
@@ -312,7 +313,7 @@ export default function CalendarView() {
                                     "relative group cursor-pointer rounded-2xl sm:rounded-3xl p-1.5 xs:p-2.5 sm:p-5 min-h-[70px] xs:min-h-[90px] sm:min-h-[160px] flex flex-col gap-1.5 xs:gap-3 transition-all duration-300",
                                     "border border-slate-100 bg-white/50 hover:bg-white hover:shadow-xl hover:shadow-blue-500/10 hover:border-blue-100",
                                     isToday &&
-                                        "bg-blue-600/5 border-blue-200/50 ring-2 ring-blue-500/10",
+                                    "bg-blue-600/5 border-blue-200/50 ring-2 ring-blue-500/10",
                                 )}
                             >
                                 <div className="flex justify-between items-start">
