@@ -55,7 +55,7 @@ export default function ContentChat({ item, onInteract, onUpdate }: ContentChatP
                         `[ContentChat] Disparando webhook de preguntas para: ${item.id}`,
                     );
                     const response = await fetch(
-                        "https://personal-n8n.suwsiw.easypanel.host/webhook/questions",
+                        `/api/nsg-education/content/${item.id}/questions`,
                         {
                             method: "POST",
                             headers: {
@@ -63,7 +63,6 @@ export default function ContentChat({ item, onInteract, onUpdate }: ContentChatP
                             },
                             body: JSON.stringify({
                                 action: "start_questions",
-                                contentId: item.id,
                                 telegramId: fullData?.telegram_id,
                             }),
                         },

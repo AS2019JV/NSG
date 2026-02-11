@@ -42,12 +42,12 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
     const blocks = qProcess?.question_blocks || [];
     const allQuestions = Array.isArray(blocks)
         ? blocks.flatMap((b: any) =>
-              (b.questions || []).map((q: any) => ({
-                  ...q,
-                  blockTitle: b.block,
-                  blockIntent: b.intent,
-              })),
-          )
+            (b.questions || []).map((q: any) => ({
+                ...q,
+                blockTitle: b.block,
+                blockIntent: b.intent,
+            })),
+        )
         : [];
 
     const refreshContent = useCallback(async () => {
@@ -110,13 +110,12 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                     const fullData = currentItem.fullData as any;
 
                     await fetch(
-                        "https://personal-n8n.suwsiw.easypanel.host/webhook/questions",
+                        `/api/nsg-education/content/${currentItem.id}/questions`,
                         {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
                                 action: "start_questions",
-                                contentId: currentItem.id,
                                 telegramId: fullData?.telegram_id,
                             }),
                         },
@@ -454,7 +453,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                                                                     [allQuestions[
                                                                         currentStep
                                                                     ].id ||
-                                                                    `q-${currentStep}`]:
+                                                                        `q-${currentStep}`]:
                                                                         opt,
                                                                 })
                                                             }
@@ -464,7 +463,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                                                                     allQuestions[
                                                                         currentStep
                                                                     ].id ||
-                                                                        `q-${currentStep}`
+                                                                    `q-${currentStep}`
                                                                 ] === opt
                                                                     ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-200"
                                                                     : "bg-slate-50 border-slate-200 text-navy-900 hover:border-blue-300",
@@ -475,7 +474,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                                                     ))}
                                                 </div>
                                             ) : allQuestions[currentStep]
-                                                  .type === "boolean" ? (
+                                                .type === "boolean" ? (
                                                 <div className="grid grid-cols-2 gap-4">
                                                     {["Sí", "No"].map((opt) => (
                                                         <button
@@ -486,7 +485,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                                                                     [allQuestions[
                                                                         currentStep
                                                                     ].id ||
-                                                                    `q-${currentStep}`]:
+                                                                        `q-${currentStep}`]:
                                                                         opt,
                                                                 })
                                                             }
@@ -496,7 +495,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                                                                     allQuestions[
                                                                         currentStep
                                                                     ].id ||
-                                                                        `q-${currentStep}`
+                                                                    `q-${currentStep}`
                                                                 ] === opt
                                                                     ? "bg-blue-600 text-white border-blue-600 shadow-xl shadow-blue-200"
                                                                     : "bg-slate-50 border-slate-200 text-navy-900 hover:border-blue-300",
@@ -512,10 +511,10 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                                                     className="w-full flex-1 p-6 bg-white border-2 border-slate-300 rounded-4xl text-navy-900 text-base font-medium focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none transition-all resize-none shadow-sm min-h-[160px]"
                                                     value={
                                                         answers[
-                                                            allQuestions[
-                                                                currentStep
-                                                            ].id ||
-                                                                `q-${currentStep}`
+                                                        allQuestions[
+                                                            currentStep
+                                                        ].id ||
+                                                        `q-${currentStep}`
                                                         ] || ""
                                                     }
                                                     onChange={(e) =>
@@ -524,7 +523,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                                                             [allQuestions[
                                                                 currentStep
                                                             ].id ||
-                                                            `q-${currentStep}`]:
+                                                                `q-${currentStep}`]:
                                                                 e.target.value,
                                                         })
                                                     }
@@ -559,7 +558,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                                                 ) : (
                                                     <>
                                                         {currentStep ===
-                                                        allQuestions.length - 1
+                                                            allQuestions.length - 1
                                                             ? "Finalizar"
                                                             : "Siguiente"}
                                                         <ChevronRight className="w-4 h-4" />
