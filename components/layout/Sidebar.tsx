@@ -12,6 +12,7 @@ import {
     Settings,
     ChevronDown,
     Lock,
+    Crown,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -224,6 +225,14 @@ export default function Sidebar() {
                             >
                                 <Settings className="w-4 h-4" />
                                 Configuración
+                            </Link>
+                            <Link
+                                href="/billing"
+                                className="flex items-center gap-3 px-4 py-3 text-sm text-slate-300 hover:bg-white/5 hover:text-white transition cursor-pointer border-t border-navy-800"
+                                onClick={() => setShowUserMenu(false)}
+                            >
+                                <Crown className="w-4 h-4 text-blue-400" />
+                                Facturación
                             </Link>
                         </div>
                     )}
