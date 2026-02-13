@@ -580,9 +580,7 @@ export default function ICopilot() {
         try {
             // Fetch streaks
             try {
-                const streaksResponse = await api.get(
-                    `/copilot/streaks/${userId}`,
-                );
+                const streaksResponse = await api.get(`/copilot/streaks`);
                 if (streaksResponse.status === 200) {
                     setStreakData(streaksResponse.data.streaks);
                 }
@@ -599,7 +597,7 @@ export default function ICopilot() {
             // Fetch metrics (monthly)
             try {
                 const metricsResponse = await api.get(
-                    `/copilot/metrics/${userId}?period=month`,
+                    `/copilot/metrics?period=month`,
                 );
                 if (metricsResponse.status === 200) {
                     setMetricsData(metricsResponse.data.metrics);
@@ -617,7 +615,7 @@ export default function ICopilot() {
             // Fetch heatmap data
             try {
                 const heatmapResponse = await api.get(
-                    `/copilot/heatmap/${userId}?months=1`,
+                    `/copilot/heatmap?months=1`,
                 );
                 if (heatmapResponse.status === 200) {
                     setHeatmapData(heatmapResponse.data.heatmap);
@@ -642,7 +640,7 @@ export default function ICopilot() {
                 const endDate = today.toISOString().split("T")[0];
 
                 const historyResponse = await api.get(
-                    `/copilot/history/${userId}?startDate=${startDate}&endDate=${endDate}`,
+                    `/copilot/history?startDate=${startDate}&endDate=${endDate}`,
                 );
                 if (historyResponse.status === 200) {
                     // Transform data for chart
@@ -706,7 +704,7 @@ export default function ICopilot() {
         if (!userId) return;
 
         try {
-            const response = await api.get(`/copilot/today/${userId}`);
+            const response = await api.get(`/copilot/today`);
             if (response.status === 200) {
                 const completed = response.data.completed;
 
@@ -858,7 +856,6 @@ export default function ICopilot() {
         try {
             // Call backend to toggle completion
             const response = await api.post("/copilot/toggle", {
-                userId,
                 protocol,
                 metadata: {
                     deviceType: /Mobile/.test(navigator.userAgent)
