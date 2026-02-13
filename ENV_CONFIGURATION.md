@@ -1,83 +1,50 @@
-# Environment Variables Configuration
+# Configuración de Variables de Entorno - NSG Frontend
 
-## 📝 Setup Instructions
+## 📝 Instrucciones de Configuración
 
-### 1. Create `.env` file
+Para que el frontend funcione correctamente con el backend y los servicios externos, sigue estos pasos:
 
-Create a file named `.env` in the root of the `NSG-Frontend` directory with the following content:
+### 1. Crear archivo `.env.local`
+
+Crea un archivo llamado `.env.local` en la raíz del directorio `NSG-Frontend`. **Nota**: No uses `.env.production` o `.env.development` a menos que sea estrictamente necesario; `.env.local` es el estándar para el desarrollo local y el proxy se encarga del resto.
 
 ```env
 # ============================================
-# ENVIRONMENT
+# API BACKEND (Proxy)
 # ============================================
-APP_ENV=production
+# El frontend usa un proxy interno para omitir problemas de CORS y ocultar la URL real
+# Local
+NEXT_PUBLIC_API_URL=http://localhost:4000
+
+# Producción (Ejemplo)
+# NEXT_PUBLIC_API_URL=https://api.nsgintelligence.com
 
 # ============================================
-# BACKEND API
+# IA & SERVICIOS (Server-side)
 # ============================================
-# Production (VPS)
-API_URL=https://api.nsgintelligence.com
-
-# Frontend URL
-APP_URL=https://nsgintelligence.com
-
-# ============================================
-# DATABASE (Server-side only)
-# ============================================
-MONGODB_URI=your_mongodb_atlas_uri
-
-# ============================================
-# N8N WEBHOOKS
-# ============================================
-N8N_WEBHOOK=https://personal-n8n.suwsiw.easypanel.host/webhook
-
-# ============================================
-# GOOGLE AI API
-# ============================================
-# Get your API key from: https://aistudio.google.com/app/apikey
-# GOOGLE_GENERATIVE_AI_API_KEY=your_key
+# Estas variables solo son accesibles desde el servidor de Next.js
+GOOGLE_GENERATIVE_AI_API_KEY=tu_key_de_gemini
+MONGODB_URI=tu_uri_de_mongodb_atlas
 ```
 
----
+## 🔑 Variables Requeridas
 
-## 🔑 Required Variables
+### 1. **NEXT_PUBLIC_API_URL**
 
-### 1. **API_URL**
+- **Requerido**: Sí
+- **Propósito**: Indica al frontend dónde está el backend.
+- **Nota**: Se utiliza el prefijo `NEXT_PUBLIC_` porque es necesario para la configuración inicial de Axios en el cliente, pero las peticiones sensibles pasan por el proxy de Next.js.
 
-- **Required**: Yes
-- **Purpose**: Backend API base URL
-- **Value**: `https://api.nsgintelligence.com`
-- **Note**: This is used server-side only to avoid leaking secrets.
+### 2. **GOOGLE_GENERATIVE_AI_API_KEY**
 
-### 2. **APP_ENV**
+- **Requerido**: Sí (para funcionalidades de IA directas)
+- **Propósito**: Acceso a los modelos de Gemini 1.5.
 
-- **Required**: Yes (defaults to production in this setup)
-- **Purpose**: Specify the environment
-- **Value**: `production`
+## ⚠️ Notas de Seguridad
 
-### 3. **MONGODB_URI**
-
-- **Required**: Yes (for storage/onboarding features)
-- **Purpose**: Connection string for MongoDB Atlas
+1. JAMÁS subas el archivo `.env.local` al repositorio.
+2. **Proxy de Seguridad**: La arquitectura utiliza una ruta API (`app/api/backend`) para centralizar las peticiones al backend, permitiendo añadir logs y validaciones extra sin exponer la IP del backend al navegador.
 
 ---
 
-## ⚠️ Security Notes
-
-1. **Never commit `.env`** - It is included in `.gitignore`.
-2. **Never expose secret keys** in browser-accessible variables.
-3. **Use server-side environment variables** only (no `NEXT_PUBLIC_` prefix for sensitive data).
-
----
-
-## ✅ Verification
-
-After creating `.env`, verify it's working:
-
-1. Restart the dev server: `npm run dev`
-2. Check the server logs for any connectivity errors.
-3. Verify that requests to the backend are using `https://api.nsgintelligence.com`.
-
----
-
-**Last Updated**: 2026-02-06
+**Última actualización**: 2026-02-12 | Billing & Docker Integration Update

@@ -1,180 +1,88 @@
-# BS Intelligence - Next.js Migration
+# NSG Intelligence - Next.js Premium Interface
 
-Modern, production-ready Next.js application migrated from the legacy NSG.html prototype.
+![Next.js 15](https://img.shields.io/badge/Next.js_15-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS_4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![Stripe](https://img.shields.io/badge/Stripe-626CD9?style=for-the-badge&logo=stripe&logoColor=white)
+![Zustand](https://img.shields.io/badge/Zustand-443322?style=for-the-badge&logo=react&logoColor=white)
 
-## 🚀 Features
+Una plataforma de inteligencia profesional de última generación. Diseñada para transformar datos estratégicos en decisiones accionables mediante una interfaz de usuario inmersiva y de alto rendimiento.
 
--   **Gemini-Native AI**: Powered by Google Gemini 1.5 Flash via Vercel AI SDK
--   **Context Caching**: Intelligent caching for system instructions to reduce latency
--   **Multi-Role Support**: Consultant, Psychologist, Patient, Manager personas
--   **Real-time Streaming**: Edge runtime chat with streaming responses
--   **Glassmorphism UI**: Premium design with backdrop-blur and neon effects
--   **State Persistence**: Zustand with localStorage for seamless role switching
+## ✨ Pilares de la Experiencia
 
-## 📋 Prerequisites
+### 💎 Diseño Premium (Glassmorphism & Neon)
 
--   Node.js 18+
--   npm or yarn
--   Google AI API Key ([Get one here](https://aistudio.google.com/app/apikey))
+- **UI de Grado Empresarial**: Construida con Tailwind CSS 4, utilizando efectos de `backdrop-blur`, gradientes dinámicos y tipografía de precisión.
+- **Interacciones Vivas**: Micro-animaciones con `framer-motion` y efectos de partículas (BrandAtom).
+- **Responsive**: Adaptabilidad total de tablet a escritorio profesional.
 
-## 🛠️ Setup
+### 🧠 Módulos de Inteligencia
 
-1. **Install Dependencies**
+- **NSG Copilot Pro**: Protocolos de ejecución diaria alineados con la estrategia del usuario.
+- **Horizon**: Planificación a largo plazo y proyección de objetivos.
+- **Education (Bóveda)**: Gestión de conocimiento donde la IA analiza documentos PDF y extrae estrategias personalizadas.
+- **Onboarding Estratégico**: Un flujo interactivo que "calibra" la IA para que piense como el usuario.
 
-    ```bash
-    npm install
-    ```
+### 💳 Gestión de Facturación (Billing)
 
-2. **Configure Environment Variables**
+- **Portal de Precios**: Interfaz limpia para la selección de planes (Explorer, Estratega, Enterprise).
+- **Stripe Checkout**: Integración nativa para pagos seguros y suscripciones recurrentes.
+- **Dashboard de Plan**: Visualización clara del estado de la suscripción y límites del plan.
 
-    Create a `.env` file in the root directory:
+## 🛠️ Stack Tecnológico
 
-    ```bash
-    GOOGLE_GENERATIVE_AI_API_KEY=your_api_key_here
-    APP_ENV=production
-    ```
+- **Frontend**: Next.js 15 (App Router / Turbopack)
+- **IA**: Google Gemini 1.5 Pro/Flash + OpenAI Whisper
+- **Estado**: Zustand (Persistence & Store Sharding)
+- **Estilos**: Tailwind CSS 4 + Lucide React (Iconografía)
+- **Analytics**: Fathom Integration
+- **Despliegue**: Docker Standalone Build (Ready for VPS)
 
-3. **Run Development Server**
+## 📁 Estructura del Proyecto
 
-    ```bash
-    npm run dev
-    ```
-
-    Open [http://localhost:3000](http://localhost:3000)
-
-4. **Build for Production**
-    ```bash
-    npm run build
-    npm start
-    ```
-
-## 📁 Project Structure
-
-```
-NSG/
+```text
+NSG-Frontend/
 ├── app/
-│   ├── api/
-│   │   ├── chat/          # Edge runtime chat endpoint
-│   │   ├── context/       # Context cache initialization
-│   │   └── files/upload/  # File upload for RAG
-│   ├── chat/              # Chat page
-│   ├── layout.tsx         # Root layout with Sidebar
-│   └── page.tsx           # Dashboard
+│   ├── (auth)/        # Flujos de Login y Registro
+│   ├── billing/       # Sección de Pagos y Planes
+│   ├── dashboard/     # Núcleo de la aplicación (Copilot, Education, etc.)
+│   └── layout.tsx     # Contenedor con Sidebar y TopNav
 ├── components/
-│   ├── chat/
-│   │   └── ChatInterface.tsx
-│   ├── dashboard/
-│   └── layout/
-│       ├── Sidebar.tsx
-│       └── DynamicIsland.tsx
-├── lib/
-│   └── gemini/
-│       ├── cacheManager.ts       # Context caching logic
-│       └── systemInstructions.ts # Role-specific prompts
-├── store/
-│   └── useAppStore.ts     # Zustand global state
-└── data/
-    └── context.ts         # Role configurations
+│   ├── ui/            # Componentes atómicos (Botones, Inputs, BrandAtom)
+│   ├── features/      # Lógica compleja de cada módulo
+│   └── layout/        # Estructura visual persistente
+├── lib/               # Servicios (API, Auth, Billing, Gemini)
+└── store/             # Gestión de estado global con Zustand
 ```
 
-## 🎨 Design System
+## 🚀 Instalación y Desarrollo
 
-The application uses a custom Tailwind configuration with:
+1. **Instalar dependencias**
 
--   **Colors**: Navy, Slate, Deep (ultra-dark for Dynamic Island)
--   **Shadows**: Glass, Sovereign, Precision, Glow, Island
--   **Animations**: Fade-in-up, Slide, Breathing, Spin-process, Text-glow
--   **Fonts**: Inter (sans), Plus Jakarta Sans (display), JetBrains Mono (mono)
+   ```bash
+   npm install
+   ```
 
-## 🧠 AI Integration
+2. **Configurar el entorno**
 
-### Context Caching
+   Crea un archivo `.env.local`:
 
-The app uses Google AI's Context Caching to store role-specific system instructions:
+   ```env
+   NEXT_PUBLIC_API_URL=http://localhost:4000
+   ```
 
--   **TTL**: 1 hour
--   **Model**: gemini-1.5-flash-001
--   **Benefit**: Reduced latency and token costs
+3. **Iniciar servidor de desarrollo**
 
-### Chat Flow
+   ```bash
+   npm run dev
+   ```
 
-1. User selects a role (Consultant, Psychologist, etc.)
-2. App calls `/api/context` to initialize cache (Node.js runtime)
-3. Cache name is stored in Zustand
-4. Chat messages sent to `/api/chat` (Edge runtime) with streaming
-5. Responses stream back in real-time
+## 🐳 Producción con Docker
 
-## 🔧 Key Technologies
-
--   **Framework**: Next.js 16 (App Router)
--   **AI**: Vercel AI SDK + @ai-sdk/google
--   **State**: Zustand with persistence
--   **Styling**: Tailwind CSS 4
--   **Icons**: Lucide React
--   **Charts**: React Chart.js 2
-
-## 📊 Performance
-
--   **Edge Runtime**: Chat API runs on edge for <100ms latency
--   **Context Caching**: System instructions cached to skip token processing
--   **Optimistic UI**: Instant feedback, no waiting for AI "thinking"
--   **60fps Animations**: GPU-accelerated with `will-change-transform`
-
-## 🚀 Production Deployment
-
-### Environment Variables
-
-Create `.env` file (see [ENV_CONFIGURATION.md](./ENV_CONFIGURATION.md) for details):
-
-```env
-GOOGLE_GENERATIVE_AI_API_KEY=your_api_key
-API_URL=https://api.nsgintelligence.com
-APP_ENV=production
-```
-
-### Build & Deploy
+El frontend está optimizado para ejecutarse en contenedores ligeros mediante el Dockerfile standalone:
 
 ```bash
-# Build for production
-npm run build
-
-# Start production server
-npm start
-
-# Or deploy to Vercel (recommended)
-# Just connect your GitHub repo
+docker build -t nsg-frontend .
 ```
 
-### Production Features
-
--   ✅ **Standalone builds** - Docker-ready output
--   ✅ **Image optimization** - Auto AVIF/WebP conversion
--   ✅ **Code splitting** - Optimized bundle sizes
--   ✅ **Security headers** - XSS, CSRF protection
--   ✅ **Error boundaries** - Graceful error handling
--   ✅ **CDN-ready** - Static asset caching configured
-
-📚 **Full deployment guide**: [PRODUCTION_DEPLOYMENT.md](./PRODUCTION_DEPLOYMENT.md)
-
-## 🚧 Roadmap
-
--   [ ] Implement file upload with RAG (File Search)
--   [ ] Add chart components with Generative UI
--   [ ] Implement Settings page
--   [ ] Add Files/Knowledge Base page
--   [ ] Performance monitoring (Lighthouse, Core Web Vitals)
--   [ ] Mobile optimization (sidebar drawer, touch gestures)
-
-## 📝 Notes
-
--   The legacy `NSG.html` has been renamed to `NSG_legacy.html` for reference
--   Context caching requires the Google Generative AI SDK (server-side only)
--   Edge runtime chat uses @ai-sdk/google for streaming
-
-## 🤝 Contributing
-
-This is a migration project. For questions or issues, please refer to the implementation plan.
-
 ---
-
-**BS Intelligence** | Deep Processing v14.6 | Powered by Google Gemini
+**NSG Intelligence** | Premium Experience v3.2 | Strategic Interface
