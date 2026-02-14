@@ -7,23 +7,24 @@
 // - Server Actions
 // DO NOT import in client components
 
-const APP_ENV = process.env.APP_ENV || 'development';
+const APP_ENV = process.env.APP_ENV || process.env.NODE_ENV || 'development';
 const isProduction = APP_ENV === 'production';
 
 export const CONFIG = {
     // Backend API URL - ONLY available on server
-    API_URL: (process.env.API_URL || (isProduction 
-        ? 'https://api.nsgintelligence.com' 
+    API_URL: (process.env.API_URL || (isProduction
+        ? 'https://api.nsgintelligence.com'
         : 'http://localhost:4000')).replace(/\/$/, ''),
-    
+
     // Frontend App URL - ONLY available on server
-    APP_URL: (process.env.APP_URL || (isProduction
+    // We try to use APP_URL, then VERCEL_URL (if on Vercel), then production/dev defaults
+    APP_URL: (process.env.APP_URL || process.env.NEXT_PUBLIC_VERCEL_URL || (isProduction
         ? 'https://nsgintelligence.com'
-        : 'http://localhost:3000')).replace(/\/$/, ''),
-    
+        : 'http://localhost:3200')).replace(/\/$/, ''),
+
     // N8N Webhooks Base URL - ONLY available on server
     N8N_URL: (process.env.N8N_WEBHOOK || 'https://personal-n8n.suwsiw.easypanel.host/webhook').trim().replace(/\/$/, ''),
-    
+
     // Environment
     APP_ENV,
     isProduction,

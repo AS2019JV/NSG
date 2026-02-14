@@ -42,6 +42,12 @@ export default function LandingPage() {
                                 Nosotros
                             </a>
                             <Link
+                                href="/billing"
+                                className="text-sm font-medium text-slate-600 hover:text-navy-950 transition-colors"
+                            >
+                                Precios
+                            </Link>
+                            <Link
                                 href="/privacy"
                                 className="text-sm font-medium text-slate-600 hover:text-navy-950 transition-colors"
                             >
@@ -91,6 +97,12 @@ export default function LandingPage() {
                             >
                                 Nosotros
                             </a>
+                            <Link
+                                href="/billing"
+                                className="text-base font-medium text-slate-600 hover:text-navy-950 py-1"
+                            >
+                                Precios
+                            </Link>
                             <Link
                                 href="/privacy"
                                 className="text-base font-medium text-slate-600 hover:text-navy-950 py-1"
@@ -475,6 +487,12 @@ export default function LandingPage() {
                                     className="text-sm text-slate-400 hover:text-white transition-colors duration-300"
                                 >
                                     Iniciar Sesión
+                                </Link>
+                                <Link
+                                    href="/billing"
+                                    className="text-sm text-slate-400 hover:text-white transition-colors duration-300"
+                                >
+                                    Planes y Precios
                                 </Link>
                                 <Link
                                     href="/auth/register"

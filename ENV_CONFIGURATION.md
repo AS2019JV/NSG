@@ -1,149 +1,50 @@
-# Environment Variables Configuration
+# Configuración de Variables de Entorno - NSG Frontend
 
-## 📝 Setup Instructions
+## 📝 Instrucciones de Configuración
 
-### 1. Create `.env.local` file
+Para que el frontend funcione correctamente con el backend y los servicios externos, sigue estos pasos:
 
-Create a file named `.env.local` in the root of the `NSG-Frontend` directory with the following content:
+### 1. Crear archivo `.env.local`
 
-```env
-# ============================================
-# GOOGLE AI API
-# ============================================
-# Get your API key from: https://aistudio.google.com/app/apikey
-GOOGLE_GENERATIVE_AI_API_KEY=your_google_ai_api_key_here
-
-# ============================================
-# BACKEND API
-# ============================================
-# NEXT_PUBLIC_API_URL=http://localhost:4000
-
-# Production (VPS)
-NEXT_PUBLIC_API_URL=https://api.nsgintelligence.com
-
-# ============================================
-# ENVIRONMENT
-# ============================================
-NEXT_PUBLIC_APP_ENV=production
-
-# ============================================
-# OPTIONAL: Analytics & Monitoring
-# ============================================
-# NEXT_PUBLIC_SENTRY_DSN=your_sentry_dsn_here
-# NEXT_PUBLIC_GA_MEASUREMENT_ID=your_ga_id_here
-```
-
----
-
-## 🔑 Required Variables
-
-### 1. **GOOGLE_GENERATIVE_AI_API_KEY**
-
-- **Required**: Yes
-- **Purpose**: API key for Google Gemini AI
-- **How to get**:
-    1. Visit https://aistudio.google.com/app/apikey
-    2. Create a new API key
-    3. Copy and paste it in `.env.local`
-
-### 2. **NEXT_PUBLIC_API_URL**
-
-- **Required**: Yes
-- **Purpose**: Backend API base URL
-- **Values**:
-    - **Development**: `http://localhost:4000` (when running backend locally)
-    - **Production**: `https://api.nsgintelligence.com`
-- **Note**: Must start with `NEXT_PUBLIC_` to be accessible in the browser
-
-### 3. **NEXT_PUBLIC_APP_ENV**
-
-- **Required**: No (defaults to development)
-- **Purpose**: Specify the environment
-- **Values**: `development` | `production` | `staging`
-
----
-
-## 🌍 Environment-Specific Configuration
-
-### Development
+Crea un archivo llamado `.env.local` en la raíz del directorio `NSG-Frontend`. **Nota**: No uses `.env.production` o `.env.development` a menos que sea estrictamente necesario; `.env.local` es el estándar para el desarrollo local y el proxy se encarga del resto.
 
 ```env
-GOOGLE_GENERATIVE_AI_API_KEY=your_api_key
+# ============================================
+# API BACKEND (Proxy)
+# ============================================
+# El frontend usa un proxy interno para omitir problemas de CORS y ocultar la URL real
+# Local
 NEXT_PUBLIC_API_URL=http://localhost:4000
-NEXT_PUBLIC_APP_ENV=development
+
+# Producción (Ejemplo)
+# NEXT_PUBLIC_API_URL=https://api.nsgintelligence.com
+
+# ============================================
+# IA & SERVICIOS (Server-side)
+# ============================================
+# Estas variables solo son accesibles desde el servidor de Next.js
+GOOGLE_GENERATIVE_AI_API_KEY=tu_key_de_gemini
+MONGODB_URI=tu_uri_de_mongodb_atlas
 ```
 
-### Production (Vercel/Local Build)
+## 🔑 Variables Requeridas
 
-```env
-GOOGLE_GENERATIVE_AI_API_KEY=your_api_key
-NEXT_PUBLIC_API_URL=https://api.nsgintelligence.com
-NEXT_PUBLIC_APP_ENV=production
-```
+### 1. **NEXT_PUBLIC_API_URL**
 
----
+- **Requerido**: Sí
+- **Propósito**: Indica al frontend dónde está el backend.
+- **Nota**: Se utiliza el prefijo `NEXT_PUBLIC_` porque es necesario para la configuración inicial de Axios en el cliente, pero las peticiones sensibles pasan por el proxy de Next.js.
 
-## 🚀 Deployment Configuration
+### 2. **GOOGLE_GENERATIVE_AI_API_KEY**
 
-### Vercel
+- **Requerido**: Sí (para funcionalidades de IA directas)
+- **Propósito**: Acceso a los modelos de Gemini 1.5.
 
-1. Go to your project settings in Vercel
-2. Navigate to **Environment Variables**
-3. Add the following variables:
+## ⚠️ Notas de Seguridad
 
-| Variable Name                  | Value                             | Environment                      |
-| ------------------------------ | --------------------------------- | -------------------------------- |
-| `GOOGLE_GENERATIVE_AI_API_KEY` | Your API key                      | Production, Preview, Development |
-| `NEXT_PUBLIC_API_URL`          | `https://api.nsgintelligence.com` | Production, Preview              |
-| `NEXT_PUBLIC_API_URL`          | `http://localhost:4000`           | Development                      |
-| `NEXT_PUBLIC_APP_ENV`          | `production`                      | Production                       |
-
-### Netlify
-
-Add the same variables in **Site Settings → Environment Variables**
-
-### Docker
-
-Create a `.env.production` file (gitignored) and mount it when running the container.
+1. JAMÁS subas el archivo `.env.local` al repositorio.
+2. **Proxy de Seguridad**: La arquitectura utiliza una ruta API (`app/api/backend`) para centralizar las peticiones al backend, permitiendo añadir logs y validaciones extra sin exponer la IP del backend al navegador.
 
 ---
 
-## ⚠️ Security Notes
-
-1. **Never commit `.env.local`** - It's already in `.gitignore`
-2. **Never expose secret keys** in `NEXT_PUBLIC_*` variables (they're visible in browser)
-3. **Use server-side environment variables** for sensitive data (without `NEXT_PUBLIC_` prefix)
-4. **Rotate API keys regularly** especially if they're accidentally exposed
-
----
-
-## ✅ Verification
-
-After creating `.env.local`, verify it's working:
-
-```bash
-# Start the development server
-npm run dev
-
-# Check the console for the API URL being used
-# It should show your configured NEXT_PUBLIC_API_URL
-```
-
-In the browser console, you can verify:
-
-```javascript
-// This should show your backend URL
-console.log(process.env.NEXT_PUBLIC_API_URL);
-```
-
----
-
-## 📚 Additional Resources
-
-- [Next.js Environment Variables Documentation](https://nextjs.org/docs/basic-features/environment-variables)
-- [Google AI API Keys](https://aistudio.google.com/app/apikey)
-- [Vercel Environment Variables](https://vercel.com/docs/concepts/projects/environment-variables)
-
----
-
-**Last Updated**: 2026-01-11
+**Última actualización**: 2026-02-12 | Billing & Docker Integration Update

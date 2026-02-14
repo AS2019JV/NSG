@@ -11,9 +11,6 @@ export default function GlobalError({
 }) {
   return (
     <html lang="es">
-      <head>
-        <title>Error Crítico | BS Intelligence</title>
-      </head>
       <body className="bg-slate-50 min-h-screen flex items-center justify-center p-4 font-sans selection:bg-blue-100 selection:text-blue-900">
         <div className="max-w-md w-full bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-100 overflow-hidden">
           <div className="p-8 md:p-10 text-center">

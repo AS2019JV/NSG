@@ -1,415 +1,599 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { EducationContent } from "@/types/education";
 import {
     ArrowLeft,
-    Send,
     Sparkles,
-    Lightbulb,
+    Brain,
+    Loader2,
     Target,
     Zap,
-    TrendingUp,
+    ListChecks,
+    ChevronRight,
+    Trophy,
+    Lightbulb,
 } from "lucide-react";
+import { useToast } from "@/components/ui/ToastProvider";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { educationService } from "@/lib/education";
 import clsx from "clsx";
-import BrandAtom from "@/components/ui/BrandAtom";
-import { EducationContent, Message } from "@/types/education";
-import { useAppStore } from "@/store/useAppStore";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ContentDetailProps {
     item: EducationContent;
     onBack: () => void;
 }
 
-const iconMap: Record<string, any> = {
-    "💡": Lightbulb,
-    "🎯": Target,
-    "⚡": Zap,
-    "🚀": TrendingUp,
-};
-
 export default function ContentDetail({ item, onBack }: ContentDetailProps) {
-    const { userId } = useAppStore();
-    const [messages, setMessages] = useState<Message[]>([
-        {
-            id: "1",
-            role: "system",
-            content: `Hola! He analizado "${item.title}" específicamente para tu perfil estratégico. ¿En qué puedo ayudarte a profundizar?`,
-            type: "text",
-        },
-    ]);
-    const [input, setInput] = useState("");
-    const [isTyping, setIsTyping] = useState(false);
-    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const { showToast } = useToast();
+    const [currentItem, setCurrentItem] = useState<EducationContent>(item);
+    const [currentStep, setCurrentStep] = useState(0);
+    const [answers, setAnswers] = useState<Record<string, string>>({});
+    const [direction, setDirection] = useState(0);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [generatedData, setGeneratedData] = useState<any>(null);
+    const hasTriggeredRef = useRef<boolean>(false);
 
-    // Extract AI analysis data from item
-    const analysis = (item as any).fullData || {};
-    const {
-        title = item.title,
-        summary = item.summary,
-        strategic_analysis = {},
-        key_insights = [],
-        action_plan = [],
-        suggested_questions = [],
-    } = analysis;
+    const qProcess =
+        (currentItem as any)?.question_process ||
+        (currentItem.fullData as any)?.question_process;
+    const isCompleted = qProcess?.completed === true || !!generatedData;
+    const blocks = qProcess?.question_blocks || [];
+    const allQuestions = Array.isArray(blocks)
+        ? blocks.flatMap((b: any) =>
+              (b.questions || []).map((q: any) => ({
+                  ...q,
+                  blockTitle: b.block,
+                  blockIntent: b.intent,
+              })),
+          )
+        : [];
 
-    const scrollToBottom = () => {
-        if (scrollContainerRef.current) {
-            scrollContainerRef.current.scrollTo({
-                top: scrollContainerRef.current.scrollHeight,
-                behavior: "smooth",
-            });
-        }
-    };
-
-    useEffect(() => {
-        scrollToBottom();
-    }, [messages, isTyping]);
-
-    const handleSend = async (text: string) => {
-        if (!text.trim()) return;
-
-        const newMsg: Message = {
-            id: Date.now().toString(),
-            role: "user",
-            content: text,
-        };
-        setMessages((prev) => [...prev, newMsg]);
-        setInput("");
-        setIsTyping(true);
-
+    const refreshContent = useCallback(async () => {
         try {
-            const token =
-                typeof window !== "undefined"
-                    ? localStorage.getItem("nsg-token")
-                    : null;
+            setIsRefreshing(true);
+            const updated = await educationService.getContent(currentItem.id);
+            if (updated) {
+                setCurrentItem(updated);
+            }
+        } catch (error) {
+            console.error("Error refreshing content:", error);
+        } finally {
+            setIsRefreshing(false);
+        }
+    }, [currentItem.id]);
 
-            const response = await fetch(
-                `/api/nsg-education/content/${item.id}/chat`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                    },
-                    body: JSON.stringify({
-                        message: text,
-                        history: messages.map((m) => ({
-                            role: m.role,
-                            content: m.content,
-                        })),
-                        userId,
-                    }),
-                },
+    const handleFinishAnswers = async () => {
+        try {
+            setIsSubmitting(true);
+            await educationService.saveAnswers(currentItem.id, answers);
+            showToast(
+                "Respuestas enviadas. Generando análisis final...",
+                "success",
             );
 
-            if (!response.ok) {
-                throw new Error("Error en la respuesta");
-            }
-
-            const data = await response.json();
-
-            setIsTyping(false);
-            const aiMsg: Message = {
-                id: (Date.now() + 1).toString(),
-                role: "system",
-                content:
-                    data.message?.content ||
-                    data.output ||
-                    "Respuesta procesada.",
-                type: "text",
-            };
-            setMessages((prev) => [...prev, aiMsg]);
-        } catch (error: any) {
-            console.error("Chat Error:", error);
-            setIsTyping(false);
-            const errorMsg: Message = {
-                id: (Date.now() + 1).toString(),
-                role: "system",
-                content:
-                    "Error al procesar tu pregunta. Por favor, intenta de nuevo.",
-                type: "text",
-            };
-            setMessages((prev) => [...prev, errorMsg]);
+            // La petición await educationService.saveAnswers ahora espera el success de n8n
+            // Ahora traemos el recurso de la tabla education_content_generated
+            const finalData = await educationService.getGeneratedContent(
+                currentItem.id,
+            );
+            setGeneratedData(finalData);
+            showToast("Análisis completado exitosamente", "success");
+            await refreshContent();
+        } catch (error) {
+            console.error("Error saving answers:", error);
+            showToast(
+                "No se pudo generar el análisis. Intenta de nuevo.",
+                "error",
+            );
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
-    return (
-        <div className="flex flex-col lg:flex-row h-full gap-6">
-            {/* Left Panel: AI Analysis - Minimalist & Clean */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-white rounded-2xl shadow-sm">
-                {/* Header - Simplified */}
-                <div className="flex items-center gap-3 pb-5 border-b border-slate-100">
-                    <button
-                        onClick={onBack}
-                        className="p-2 rounded-lg text-slate-400 hover:text-slate-900 hover:bg-slate-50 transition-all"
-                    >
-                        <ArrowLeft className="w-5 h-5" />
-                    </button>
-                    <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                            <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                                <Sparkles className="w-3.5 h-3.5 text-white" />
-                            </div>
-                            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                                Análisis Estratégico AI
-                            </p>
-                        </div>
-                        <h1 className="text-xl font-bold text-slate-900 leading-tight">
-                            {title}
-                        </h1>
+    // Webhook Trigger Logic
+    useEffect(() => {
+        const triggerWebhook = async () => {
+            // Only trigger if no questions AND not completed AND not already triggered in this session
+            if (
+                !isCompleted &&
+                allQuestions.length === 0 &&
+                !hasTriggeredRef.current
+            ) {
+                hasTriggeredRef.current = true;
+
+                try {
+                    console.log(
+                        `[ContentDetail] Triggering webhook for item: ${currentItem.id}`,
+                    );
+                    const fullData = currentItem.fullData as any;
+
+                    await fetch(
+                        `/api/nsg-education/content/${currentItem.id}/questions`,
+                        {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                action: "start_questions",
+                                telegramId: fullData?.telegram_id,
+                            }),
+                        },
+                    );
+
+                    // Start polling after a short delay
+                    setTimeout(refreshContent, 3000);
+                } catch (error) {
+                    console.error("Error triggering webhook:", error);
+                }
+            }
+        };
+
+        triggerWebhook();
+    }, [
+        isCompleted,
+        allQuestions.length,
+        currentItem.id,
+        currentItem.fullData,
+        refreshContent,
+    ]);
+
+    // Fetch generated content if already completed
+    useEffect(() => {
+        if (qProcess?.completed === true && !generatedData && !isRefreshing) {
+            const fetchGenerated = async () => {
+                try {
+                    console.log(
+                        `[ContentDetail] Fetching existing generated content for: ${currentItem.id}`,
+                    );
+                    const data = await educationService.getGeneratedContent(
+                        currentItem.id,
+                    );
+                    setGeneratedData(data);
+                } catch (error) {
+                    console.error("Error fetching generated content:", error);
+                    // No mostramos toast de error aquí para no molestar si el registro aún no existe
+                    // pero el flag está en true (posible desincronización base de datos)
+                }
+            };
+            fetchGenerated();
+        }
+    }, [qProcess?.completed, currentItem.id, generatedData, isRefreshing]);
+
+    // Long polling if still processing
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (!isCompleted && allQuestions.length === 0) {
+            interval = setInterval(refreshContent, 5000);
+        }
+        return () => clearInterval(interval);
+    }, [isCompleted, allQuestions.length, refreshContent]);
+
+    const handleNext = (total: number) => {
+        if (currentStep < total - 1) {
+            setDirection(1);
+            setCurrentStep((prev) => prev + 1);
+        } else {
+            handleFinishAnswers();
+        }
+    };
+
+    const handleBack = () => {
+        if (currentStep > 0) {
+            setDirection(-1);
+            setCurrentStep((prev) => prev - 1);
+        }
+    };
+
+    // Render Analysis Cards
+    const renderAnalysis = () => {
+        const data = (generatedData?.question_process_generated ||
+            currentItem.fullData) as any;
+        if (!data) return null;
+
+        return (
+            <div className="max-w-4xl mx-auto space-y-8 pb-12">
+                {/* Header Card */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white rounded-[2.5rem] p-8 md:p-12 border border-slate-100 shadow-2xl shadow-blue-500/5 relative overflow-hidden"
+                >
+                    <div className="absolute top-0 right-0 p-8 opacity-5">
+                        <Trophy className="w-32 h-32 text-navy-900" />
                     </div>
-                </div>
-
-                {/* Executive Summary - Clean Card */}
-                <section className="bg-gradient-to-br from-slate-900 to-slate-800 p-8 rounded-2xl shadow-md">
-                    <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">
-                        Reporte Ejecutivo
-                    </h3>
-                    <p className="text-white/90 leading-relaxed text-[15px]">
-                        {summary}
-                    </p>
-                </section>
-
-                {/* Strategic Analysis */}
-                {strategic_analysis.alignment && (
-                    <section>
-                        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-6 flex items-center gap-3">
-                            <div className="w-8 h-[2px] bg-blue-500"></div>
-                            Alineación Estratégica
-                        </h3>
-                        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6">
-                            <div>
-                                <h4 className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">
-                                    Por qué es vital para ti
-                                </h4>
-                                <p className="text-slate-700 leading-relaxed">
-                                    {strategic_analysis.alignment}
-                                </p>
+                    <div className="relative z-10 space-y-4">
+                        <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200">
+                                <Sparkles className="w-6 h-6 text-white" />
                             </div>
-                            {strategic_analysis.friction_bypass && (
-                                <div>
-                                    <h4 className="text-xs font-bold text-orange-600 uppercase tracking-widest mb-2">
-                                        Superando tu fricción
-                                    </h4>
-                                    <p className="text-slate-700 leading-relaxed">
-                                        {strategic_analysis.friction_bypass}
-                                    </p>
-                                </div>
-                            )}
+                            <h3 className="text-2xl md:text-3xl font-black text-navy-900 tracking-tight">
+                                Análisis Estratégico
+                            </h3>
                         </div>
-                    </section>
-                )}
+                        <p className="text-slate-500 text-lg font-medium leading-relaxed max-w-2xl">
+                            {data.summary ||
+                                "He procesado este recurso bajo tu arquitectura de pensamiento. Aquí tienes el horizonte de ejecución."}
+                        </p>
+                    </div>
+                </motion.div>
 
-                {/* Key Insights */}
-                {key_insights.length > 0 && (
-                    <section>
-                        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-6 flex items-center gap-3">
-                            <div className="w-8 h-[2px] bg-purple-500"></div>
-                            Insights Clave
-                        </h3>
-                        <div className="grid gap-4">
-                            {key_insights.map((insight: any, i: number) => {
-                                const IconComponent =
-                                    iconMap[insight.icon] || Sparkles;
-                                return (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Key insights */}
+                    <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="bg-white rounded-4xl p-8 border border-slate-100 shadow-xl shadow-blue-500/5 space-y-6"
+                    >
+                        <div className="flex items-center gap-3 text-blue-600">
+                            <Lightbulb className="w-6 h-6" />
+                            <h4 className="font-bold text-lg uppercase tracking-wider">
+                                Key Insights
+                            </h4>
+                        </div>
+                        <div className="space-y-4">
+                            {(data.key_insights || []).map(
+                                (insight: any, i: number) => (
                                     <div
                                         key={i}
-                                        className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all flex items-start gap-4"
+                                        className="flex gap-4 p-4 bg-slate-50/50 rounded-2xl border border-slate-100/50 group hover:bg-white hover:shadow-md transition-all"
                                     >
-                                        <div className="p-3 bg-purple-50 text-purple-600 rounded-xl shrink-0">
-                                            <IconComponent className="w-5 h-5" />
-                                        </div>
-                                        <p className="text-slate-700 leading-relaxed font-medium flex-1">
+                                        <span className="text-xl shrink-0">
+                                            {insight.icon || "💡"}
+                                        </span>
+                                        <p className="text-sm font-medium text-slate-700 leading-relaxed">
                                             {insight.text}
                                         </p>
                                     </div>
-                                );
-                            })}
+                                ),
+                            )}
                         </div>
-                    </section>
-                )}
+                    </motion.div>
+
+                    {/* Strategic Alignment */}
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="bg-navy-900 rounded-4xl p-8 text-white shadow-xl shadow-navy-900/10 space-y-6 relative overflow-hidden"
+                    >
+                        <div className="absolute -bottom-8 -right-8 opacity-10">
+                            <Brain className="w-40 h-40 text-white" />
+                        </div>
+                        <div className="flex items-center gap-3 text-blue-400 relative z-10">
+                            <Target className="w-6 h-6" />
+                            <h4 className="font-bold text-lg uppercase tracking-wider">
+                                Alineación
+                            </h4>
+                        </div>
+                        <div className="space-y-6 relative z-10">
+                            <div className="space-y-2">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-blue-400">
+                                    Objetivo
+                                </span>
+                                <p className="text-sm leading-relaxed text-slate-200">
+                                    {data.strategic_analysis?.alignment}
+                                </p>
+                            </div>
+                            <div className="space-y-2">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-blue-400">
+                                    Bypass de Fricción
+                                </span>
+                                <p className="text-sm leading-relaxed text-slate-200">
+                                    {data.strategic_analysis?.friction_bypass}
+                                </p>
+                            </div>
+                        </div>
+                    </motion.div>
+                </div>
 
                 {/* Action Plan */}
-                {action_plan.length > 0 && (
-                    <section>
-                        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest mb-8 flex items-center gap-3">
-                            <div className="w-8 h-[2px] bg-emerald-500"></div>
-                            Plan de Acción
-                        </h3>
-                        <div className="grid gap-6">
-                            {action_plan.map((step: any, i: number) => {
-                                const impactColors = {
-                                    High: "emerald",
-                                    Medium: "blue",
-                                    Low: "slate",
-                                };
-                                const color =
-                                    impactColors[
-                                        step.impact as keyof typeof impactColors
-                                    ] || "slate";
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="bg-white rounded-4xl p-8 md:p-10 border border-slate-100 shadow-xl shadow-blue-500/5 space-y-8"
+                >
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3 text-emerald-600">
+                            <ListChecks className="w-6 h-6" />
+                            <h4 className="font-bold text-lg uppercase tracking-wider">
+                                Plan de Acción
+                            </h4>
+                        </div>
+                        <span className="text-[10px] font-black bg-emerald-50 text-emerald-600 px-4 py-1.5 rounded-full uppercase">
+                            Próximos Pasos
+                        </span>
+                    </div>
 
-                                return (
-                                    <div key={i} className="relative group">
-                                        {i !== action_plan.length - 1 && (
-                                            <div className="hidden md:block absolute left-9 top-16 bottom-[-24px] w-0.5 bg-slate-100"></div>
-                                        )}
-                                        <div className="flex gap-6 items-start">
-                                            <div className="hidden md:flex flex-col items-center gap-2 shrink-0 w-20 pt-2">
-                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                                    Paso
-                                                </div>
-                                                <div
-                                                    className={`text-3xl font-display font-bold text-${color}-500`}
-                                                >
-                                                    0{i + 1}
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 bg-white p-8 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
-                                                <div className="flex items-center justify-between mb-3">
-                                                    <div className="md:hidden text-xs font-bold text-emerald-500 uppercase tracking-widest">
-                                                        Paso 0{i + 1}
-                                                    </div>
-                                                    <div className="flex items-center gap-3">
-                                                        <span
-                                                            className={`px-3 py-1 bg-${color}-50 text-${color}-700 text-xs font-bold rounded-full`}
-                                                        >
-                                                            {step.impact} Impact
-                                                        </span>
-                                                        <span className="text-xs text-slate-500 font-medium">
-                                                            ⏱ {step.time}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <p className="text-lg font-medium text-slate-800 leading-relaxed">
-                                                    {step.task}
-                                                </p>
-                                            </div>
+                    <div className="grid grid-cols-1 gap-4">
+                        {(data.action_plan || []).map(
+                            (step: any, i: number) => (
+                                <div
+                                    key={i}
+                                    className="flex items-center gap-6 p-6 bg-slate-50/50 rounded-2xl group hover:bg-emerald-50/30 transition-all border border-transparent hover:border-emerald-100"
+                                >
+                                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center font-bold text-navy-900 shadow-sm group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                                        {i + 1}
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="font-bold text-navy-900">
+                                            {step.task}
+                                        </p>
+                                        <div className="flex items-center gap-4 mt-1">
+                                            <span
+                                                className={clsx(
+                                                    "text-[9px] font-black uppercase tracking-widest",
+                                                    step.impact === "High"
+                                                        ? "text-red-500"
+                                                        : "text-amber-500",
+                                                )}
+                                            >
+                                                Impacto {step.impact}
+                                            </span>
+                                            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                                                {step.time}
+                                            </span>
                                         </div>
                                     </div>
-                                );
-                            })}
-                        </div>
-                    </section>
-                )}
+                                    <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-emerald-500 transition-colors" />
+                                </div>
+                            ),
+                        )}
+                    </div>
+                </motion.div>
             </div>
+        );
+    };
 
-            {/* Right Panel: Chat - Sticky & Minimalist */}
-            <div className="w-full lg:w-[440px] lg:sticky lg:top-8 lg:self-start flex flex-col bg-white rounded-3xl border border-slate-200/60 shadow-lg overflow-hidden lg:max-h-[calc(99vh-4rem)]">
-                {/* Chat Header - Simplified */}
-                <div className="px-6 py-5 border-b border-slate-100">
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                            <Sparkles className="w-4 h-4 text-white" />
-                        </div>
+    return (
+        <div className="flex flex-col min-h-full bg-slate-50/50">
+            {/* Header */}
+            <header className="bg-white/80 backdrop-blur-md border-b border-slate-100 p-4 sticky top-0 z-50">
+                <div className="max-w-full mx-auto flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={onBack}
+                            className="p-2 hover:bg-slate-100 rounded-xl transition-all text-slate-500 hover:text-navy-900"
+                        >
+                            <ArrowLeft className="w-5 h-5" />
+                        </button>
                         <div>
-                            <h3 className="text-sm font-bold text-slate-900">
-                                Asistente de Profundización
-                            </h3>
-                            <p className="text-xs text-slate-500">
-                                Pregunta lo que necesites
+                            <h2 className="font-bold text-navy-900 leading-none">
+                                {generatedData?.question_process_generated
+                                    ?.title ||
+                                    currentItem.title ||
+                                    (currentItem.fullData as any)?.title ||
+                                    "Recurso de Inteligencia"}
+                            </h2>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 flex items-center gap-1.5">
+                                <Sparkles className="w-3 h-3 text-blue-500" />
+                                {isCompleted
+                                    ? "Análisis Estratégico Finalizado"
+                                    : "Agente de Inteligencia Estratégica"}
                             </p>
                         </div>
                     </div>
-                </div>
-
-                {/* Messages - Clean & Readable */}
-                <div
-                    ref={scrollContainerRef}
-                    className="flex-1 overflow-y-auto p-5 space-y-4 bg-slate-50/30"
-                    style={{
-                        scrollbarWidth: "thin",
-                        scrollbarColor: "#cbd5e1 transparent",
-                    }}
-                >
-                    {messages.map((msg) => (
-                        <div
-                            key={msg.id}
-                            className={clsx(
-                                "flex w-full gap-3 animate-fade-in",
-                                msg.role === "user"
-                                    ? "justify-end"
-                                    : "justify-start",
-                            )}
-                        >
-                            {msg.role === "system" && (
-                                <div className="w-7 h-7 mt-0.5 shrink-0 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 p-1.5 flex items-center justify-center">
-                                    <BrandAtom className="w-full h-full text-white" />
-                                </div>
-                            )}
-                            <div
-                                className={clsx(
-                                    "max-w-[85%] px-4 py-3 rounded-2xl text-[15px] leading-relaxed",
-                                    msg.role === "user"
-                                        ? "bg-slate-900 text-white rounded-br-sm shadow-sm"
-                                        : "bg-white text-slate-700 rounded-bl-sm border border-slate-100 shadow-sm",
-                                )}
-                            >
-                                {msg.content}
-                            </div>
-                        </div>
-                    ))}
-
-                    {/* Suggested Questions - Minimal Pills */}
-                    {messages.length === 1 &&
-                        suggested_questions.length > 0 && (
-                            <div className="flex flex-wrap gap-2 justify-start pl-10 pt-2">
-                                {suggested_questions.map(
-                                    (q: string, i: number) => (
-                                        <button
-                                            key={i}
-                                            onClick={() => handleSend(q)}
-                                            className="px-3 py-1.5 bg-white border border-slate-200 hover:border-blue-400 hover:bg-blue-50 text-slate-700 hover:text-blue-700 text-xs font-medium rounded-lg transition-all"
-                                        >
-                                            {q}
-                                        </button>
-                                    ),
-                                )}
-                            </div>
-                        )}
-
-                    {/* Typing Indicator - Subtle */}
-                    {isTyping && (
-                        <div className="flex justify-start w-full gap-3 pl-10">
-                            <div className="bg-white border border-slate-100 px-4 py-2.5 rounded-2xl rounded-bl-sm flex items-center gap-1">
-                                <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></div>
-                                <div
-                                    className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"
-                                    style={{ animationDelay: "0.15s" }}
-                                ></div>
-                                <div
-                                    className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"
-                                    style={{ animationDelay: "0.3s" }}
-                                ></div>
-                            </div>
+                    {isRefreshing && (
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-[10px] font-bold animate-pulse">
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                            Sincronizando...
                         </div>
                     )}
                 </div>
+            </header>
 
-                {/* Input - Clean & Focused */}
-                <div className="p-4 bg-white border-t border-slate-100">
-                    <div className="relative flex items-center gap-2">
-                        <input
-                            type="text"
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            onKeyDown={(e) =>
-                                e.key === "Enter" &&
-                                !e.shiftKey &&
-                                handleSend(input)
-                            }
-                            placeholder="Escribe tu pregunta..."
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all text-sm"
-                        />
-                        <button
-                            onClick={() => handleSend(input)}
-                            disabled={!input.trim()}
-                            className="p-3 bg-slate-900 text-white rounded-xl hover:bg-black transition-all hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
-                        >
-                            <Send className="w-4 h-4" />
-                        </button>
+            <main className="flex-1 p-4 md:p-8">
+                {isCompleted ? (
+                    renderAnalysis()
+                ) : allQuestions.length > 0 ? (
+                    <div className="max-w-xl mx-auto space-y-6">
+                        <div className="space-y-3">
+                            <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
+                                <span>Progreso</span>
+                                <span className="text-blue-600">
+                                    {currentStep + 1} / {allQuestions.length}
+                                </span>
+                            </div>
+                            <div className="h-1 w-full bg-white rounded-full overflow-hidden border border-slate-100/50">
+                                <motion.div
+                                    className="h-full bg-blue-600 transition-all"
+                                    initial={{ width: 0 }}
+                                    animate={{
+                                        width: `${((currentStep + 1) / allQuestions.length) * 100}%`,
+                                    }}
+                                    transition={{ duration: 0.5 }}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="relative pt-4 min-h-[400px]">
+                            <AnimatePresence mode="wait" custom={direction}>
+                                <motion.div
+                                    key={currentStep}
+                                    className="w-full"
+                                    layout
+                                >
+                                    <div className="bg-white rounded-4xl p-8 md:p-12 border border-slate-100 shadow-xl shadow-blue-500/5 space-y-8">
+                                        <div className="space-y-2">
+                                            <span className="text-[9px] font-black text-blue-600 uppercase tracking-[0.2em]">
+                                                {
+                                                    allQuestions[currentStep]
+                                                        .blockTitle
+                                                }
+                                            </span>
+                                            <h4 className="text-2xl font-bold text-navy-900 leading-tight">
+                                                {
+                                                    allQuestions[currentStep]
+                                                        .question
+                                                }
+                                            </h4>
+                                        </div>
+
+                                        {/* Input Section - Robust rendering */}
+                                        <div className="flex-1 min-h-[220px] py-4 flex flex-col">
+                                            {/* Debug Label */}
+                                            <div className="mb-2 text-[10px] text-blue-500/40 font-black uppercase tracking-widest">
+                                                Modo:{" "}
+                                                {allQuestions[currentStep]
+                                                    .type || "desconocido"}
+                                            </div>
+
+                                            {allQuestions[currentStep].options
+                                                ?.length > 0 ? (
+                                                <div className="grid grid-cols-1 gap-3">
+                                                    {(
+                                                        allQuestions[
+                                                            currentStep
+                                                        ].options || []
+                                                    ).map((opt: string) => (
+                                                        <button
+                                                            key={opt}
+                                                            onClick={() =>
+                                                                setAnswers({
+                                                                    ...answers,
+                                                                    [allQuestions[
+                                                                        currentStep
+                                                                    ].id ||
+                                                                    `q-${currentStep}`]:
+                                                                        opt,
+                                                                })
+                                                            }
+                                                            className={clsx(
+                                                                "w-full p-4 border-2 rounded-2xl text-left font-bold text-sm transition-all",
+                                                                answers[
+                                                                    allQuestions[
+                                                                        currentStep
+                                                                    ].id ||
+                                                                        `q-${currentStep}`
+                                                                ] === opt
+                                                                    ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-200"
+                                                                    : "bg-slate-50 border-slate-200 text-navy-900 hover:border-blue-300",
+                                                            )}
+                                                        >
+                                                            {opt}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            ) : allQuestions[currentStep]
+                                                  .type === "boolean" ? (
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    {["Sí", "No"].map((opt) => (
+                                                        <button
+                                                            key={opt}
+                                                            onClick={() =>
+                                                                setAnswers({
+                                                                    ...answers,
+                                                                    [allQuestions[
+                                                                        currentStep
+                                                                    ].id ||
+                                                                    `q-${currentStep}`]:
+                                                                        opt,
+                                                                })
+                                                            }
+                                                            className={clsx(
+                                                                "p-8 border-2 rounded-3xl font-black text-xl transition-all",
+                                                                answers[
+                                                                    allQuestions[
+                                                                        currentStep
+                                                                    ].id ||
+                                                                        `q-${currentStep}`
+                                                                ] === opt
+                                                                    ? "bg-blue-600 text-white border-blue-600 shadow-xl shadow-blue-200"
+                                                                    : "bg-slate-50 border-slate-200 text-navy-900 hover:border-blue-300",
+                                                            )}
+                                                        >
+                                                            {opt}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <textarea
+                                                    placeholder="Escribe tu respuesta aquí..."
+                                                    className="w-full flex-1 p-6 bg-white border-2 border-slate-300 rounded-4xl text-navy-900 text-base font-medium focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none transition-all resize-none shadow-sm min-h-[160px]"
+                                                    value={
+                                                        answers[
+                                                            allQuestions[
+                                                                currentStep
+                                                            ].id ||
+                                                                `q-${currentStep}`
+                                                        ] || ""
+                                                    }
+                                                    onChange={(e) =>
+                                                        setAnswers({
+                                                            ...answers,
+                                                            [allQuestions[
+                                                                currentStep
+                                                            ].id ||
+                                                            `q-${currentStep}`]:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                />
+                                            )}
+                                        </div>
+
+                                        <div className="flex items-center justify-between pt-4">
+                                            <button
+                                                onClick={handleBack}
+                                                disabled={currentStep === 0}
+                                                className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-navy-900 disabled:opacity-0"
+                                            >
+                                                <ArrowLeft className="w-4 h-4" />
+                                                Atrás
+                                            </button>
+
+                                            <button
+                                                onClick={() =>
+                                                    handleNext(
+                                                        allQuestions.length,
+                                                    )
+                                                }
+                                                disabled={isSubmitting}
+                                                className="px-8 py-4 bg-navy-900 text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest shadow-xl shadow-navy-900/10 hover:bg-blue-600 hover:-translate-y-1 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                {isSubmitting ? (
+                                                    <>
+                                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                                        Guardando...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        {currentStep ===
+                                                        allQuestions.length - 1
+                                                            ? "Finalizar"
+                                                            : "Siguiente"}
+                                                        <ChevronRight className="w-4 h-4" />
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
                     </div>
-                </div>
-            </div>
+                ) : (
+                    <div className="flex flex-col items-center justify-center py-32 space-y-8">
+                        <div className="relative">
+                            <div className="w-20 h-20 bg-blue-50 rounded-[2rem] flex items-center justify-center border border-blue-100">
+                                <Zap className="w-10 h-10 text-blue-600 animate-pulse" />
+                            </div>
+                            <div className="absolute -inset-4 bg-blue-500/10 blur-2xl rounded-full -z-10 animate-pulse"></div>
+                        </div>
+                        <div className="text-center space-y-3">
+                            <h3 className="text-2xl font-black text-navy-900 font-display">
+                                Sincronizando Inteligencia...
+                            </h3>
+                            <p className="text-slate-400 text-sm font-medium max-w-xs mx-auto">
+                                Estamos extrayendo los horizontes estratégicos
+                                de este recurso para tu arquitectura.
+                            </p>
+                        </div>
+                    </div>
+                )}
+            </main>
         </div>
     );
 }

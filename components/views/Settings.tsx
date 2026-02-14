@@ -245,7 +245,8 @@ export default function Settings() {
             }
         } else {
             try {
-                const res = await api.get("/google/auth");
+                const origin = window.location.origin;
+                const res = await api.get(`/google/auth?origin=${encodeURIComponent(origin)}`);
                 if (res.data?.url) window.open(res.data.url, "_blank");
             } catch (error) {
                 console.error(error);
@@ -478,7 +479,7 @@ function ToggleItem({
     soon,
     onClick,
 }: ToggleItemProps) {
-    const styles: Record<string, { container: string; iconBox: string }> = {
+    const styles: Record<string, { container: string; iconBox: string; }> = {
         blue: {
             container: "hover:border-blue-300",
             iconBox:
@@ -661,10 +662,10 @@ function IntegrationCard({
                 {loading
                     ? "..."
                     : soon
-                      ? "Próximamente"
-                      : connected
-                        ? "Desconectar"
-                        : "Conectar"}
+                        ? "Próximamente"
+                        : connected
+                            ? "Desconectar"
+                            : "Conectar"}
             </button>
         </div>
     );
