@@ -6,38 +6,55 @@ export async function POST(req: Request) {
     const contentType = req.headers.get('content-type') || '';
     const authHeader = req.headers.get('authorization');
 
-    const fetchOptions: RequestInit = {
-      method: 'POST',
-      headers: {} as Record<string, string>
-    };
+    // Determine if this is a PDF upload by inspecting the FormData
+    let targetUrl = `${CONFIG.N8N_URL}/education`;
+    let fetchBody: BodyInit;
+    const fetchHeaders: Record<string, string> = {};
 
     if (authHeader) {
-      (fetchOptions.headers as Record<string, string>)['Authorization'] = authHeader;
+      fetchHeaders['Authorization'] = authHeader;
     }
 
     if (contentType.includes('multipart/form-data')) {
       const formData = await req.formData();
-      // Forward as FormData
-      fetchOptions.body = formData;
+      const document = formData.get("document") as File | null;
+      const isPdf = document?.name?.toLowerCase().endsWith(".pdf");
+
+      if (isPdf) {
+        // Route PDFs to the backend for server-side text extraction
+        targetUrl = `${CONFIG.API_URL}/education/ingest-pdf`;
+        console.log(`[Education Ingest] PDF detected ("${document?.name}"), routing to backend: ${targetUrl}`);
+      } else {
+        console.log(`[Education Ingest] Non-PDF content, forwarding to n8n: ${targetUrl}`);
+      }
+
+      fetchBody = formData;
       // Note: Fetch naturally sets the correct boundary when body is FormData
     } else {
       const body = await req.json();
-      fetchOptions.body = JSON.stringify(body);
-      (fetchOptions.headers as Record<string, string>)['Content-Type'] = 'application/json';
+      fetchBody = JSON.stringify(body);
+      fetchHeaders['Content-Type'] = 'application/json';
     }
 
-    const WEBHOOK_URL = `${CONFIG.N8N_URL}/education`;
-    console.log(`[Education Ingest] Forwarding to: ${WEBHOOK_URL}`);
-
-    const response = await fetch(WEBHOOK_URL, fetchOptions);
+    const response = await fetch(targetUrl, {
+      method: 'POST',
+      headers: fetchHeaders,
+      body: fetchBody,
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`[Education API] N8N Error (${response.status}):`, errorText);
-      return NextResponse.json(
-        { error: `N8N responded with ${response.status}`, details: errorText },
-        { status: response.status }
-      );
+      console.error(`[Education API] Error (${response.status}):`, errorText);
+
+      // Try to parse as JSON for structured error messages
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch {
+        errorData = { error: `Server responded with ${response.status}`, details: errorText };
+      }
+
+      return NextResponse.json(errorData, { status: response.status });
     }
 
     const data = await response.json();
@@ -51,4 +68,3 @@ export async function POST(req: Request) {
     );
   }
 }
-
