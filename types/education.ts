@@ -12,7 +12,7 @@ export interface Message {
 export type ContentStatus = "pending" | "processing" | "ready" | "error";
 export type ContentType =
     | "video"
-    | "article"
+    | "audio"
     | "pdf"
     | "image"
     | "text"
@@ -23,7 +23,7 @@ export interface EducationContent {
     title: string;
     originalUrl?: string;
     type: ContentType;
-    source_type?: "text" | "document" | "image" | "video";
+    source_type?: ContentType;
     status: ContentStatus;
     thumbnailUrl?: string;
     summary?: string;
