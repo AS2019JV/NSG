@@ -12,6 +12,7 @@ import {
     Trophy,
     Lightbulb,
     CheckCircle2,
+    Atom,
 } from "lucide-react";
 import { useToast } from "@/components/ui/ToastProvider";
 import { useState, useEffect, useCallback, useRef } from "react";
@@ -53,6 +54,12 @@ interface GeneratedContent {
     };
 }
 
+const LOADING_PHRASES = [
+    "Decodificando arquitectura de datos estratégica...",
+    "Procesando análisis de alta precisión...",
+    "Finalizando. Tu protocolo estará listo en breve.",
+];
+
 export default function ContentDetail({ item, onBack }: ContentDetailProps) {
     const { showToast } = useToast();
     const [currentItem, setCurrentItem] = useState<EducationContent>(item);
@@ -65,6 +72,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
         null,
     );
     const hasTriggeredRef = useRef<boolean>(false);
+    const [phraseIndex, setPhraseIndex] = useState(0);
 
     const qProcess =
         currentItem.question_process || currentItem.fullData?.question_process;
@@ -82,6 +90,16 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
               })),
           )
         : [];
+
+    // Phrase rotation effect
+    useEffect(() => {
+        if (!isCompleted && allQuestions.length === 0) {
+            const interval = setInterval(() => {
+                setPhraseIndex((prev) => (prev + 1) % LOADING_PHRASES.length);
+            }, 3000);
+            return () => clearInterval(interval);
+        }
+    }, [isCompleted, allQuestions.length]);
 
     const refreshContent = useCallback(async () => {
         try {
@@ -272,7 +290,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                             <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200">
                                 <Brain className="w-6 h-6 text-white" />
                             </div>
-                            <div className="text-2xl md:text-3xl font-black text-navy-900 tracking-tight prose prose-p:my-0 prose-strong:text-navy-900">
+                            <div className="text-2xl md:text-3xl font-display font-semibold text-navy-900 tracking-tight prose prose-p:my-0 prose-strong:text-navy-900">
                                 <ReactMarkdown>
                                     Análisis Estratégico
                                 </ReactMarkdown>
@@ -442,8 +460,8 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                         >
                             <ArrowLeft className="w-5 h-5" />
                         </button>
-                        <div>
-                            <div className="font-bold text-navy-900 leading-none prose prose-p:my-0 prose-strong:text-navy-900">
+                        <div className="flex flex-col justify-center">
+                            <div className="font-display font-semibold text-lg text-navy-950 tracking-tight leading-snug prose prose-p:my-0 prose-strong:text-navy-900">
                                 <ReactMarkdown>
                                     {generatedData?.question_process_generated
                                         ?.title ||
@@ -709,31 +727,50 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                         </AnimatePresence>
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center justify-center py-20 space-y-6">
-                        <div className="relative">
-                            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center border border-slate-100 shadow-sm">
-                                <Zap className="w-7 h-7 text-blue-600 animate-pulse" />
+                    <div className="flex flex-col items-center justify-center py-24 space-y-8 animate-fade-in relative z-10">
+                        {/* Orange Atom Icon Box */}
+                        <div className="relative group">
+                            <div className="absolute inset-0 bg-blue-500 blur-2xl opacity-20 rounded-full animate-pulse"></div>
+                            <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center border border-blue-100 shadow-xl shadow-blue-500/10 relative z-10 ring-4 ring-blue-50/50">
+                                <Atom className="w-10 h-10 text-blue-600 animate-[spin_5s_linear_infinite]" />
                             </div>
                         </div>
-                        <div className="text-center space-y-2">
-                            <h3 className="text-lg font-bold text-navy-950 tracking-tight">
-                                Sincronizando Inteligencia...
+
+                        <div className="text-center space-y-3 max-w-md mx-auto relative h-24">
+                             <h3 className="text-xl font-display font-semibold text-navy-950 tracking-tight">
+                                Generando Protocolo...
                             </h3>
-                            <p className="text-slate-400 text-sm font-medium max-w-xs mx-auto leading-relaxed">
-                                Extrayendo los horizontes estratégicos de este
-                                recurso.
-                            </p>
-                            <div className="flex justify-center gap-1 pt-2">
+                            
+                            <div className="relative h-12 flex items-center justify-center">
+                                <AnimatePresence mode="wait">
+                                    <motion.p
+                                        key={phraseIndex}
+                                        initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+                                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                                        exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
+                                        transition={{ duration: 0.5, ease: "easeOut" }}
+                                        className="text-slate-500 text-sm font-medium leading-relaxed absolute w-full text-center"
+                                    >
+                                        {LOADING_PHRASES[phraseIndex]}
+                                    </motion.p>
+                                </AnimatePresence>
+                            </div>
+
+                            <div className="flex justify-center gap-1.5 pt-4">
                                 {[0, 1, 2].map((i) => (
                                     <motion.div
                                         key={i}
-                                        animate={{ opacity: [0.2, 1, 0.2] }}
+                                        animate={{ 
+                                            opacity: [0.3, 1, 0.3],
+                                            scale: [1, 1.2, 1],
+                                            backgroundColor: ["#cbd5e1", "#2563eb", "#cbd5e1"]
+                                        }}
                                         transition={{
                                             duration: 1.5,
                                             repeat: Infinity,
                                             delay: i * 0.2,
                                         }}
-                                        className="w-1.5 h-1.5 rounded-full bg-blue-600"
+                                        className="w-1.5 h-1.5 rounded-full"
                                     />
                                 ))}
                             </div>
