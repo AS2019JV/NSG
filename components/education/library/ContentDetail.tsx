@@ -71,6 +71,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
     const [generatedData, setGeneratedData] = useState<GeneratedContent | null>(
         null,
     );
+    const [initialCheckDone, setInitialCheckDone] = useState(false);
     const hasTriggeredRef = useRef<boolean>(false);
     const [phraseIndex, setPhraseIndex] = useState(0);
 
@@ -115,6 +116,12 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
         }
     }, [currentItem.id]);
 
+    // Initial Sync on mount
+    useEffect(() => {
+        setInitialCheckDone(false);
+        refreshContent().finally(() => setInitialCheckDone(true));
+    }, [refreshContent]);
+
     const handleFinishAnswers = async () => {
         try {
             setIsSubmitting(true);
@@ -144,6 +151,8 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
     // Webhook Trigger Logic
     useEffect(() => {
         const triggerWebhook = async () => {
+            if (!initialCheckDone) return; // CRITICAL: Wait for data sync before triggering generation
+
             if (
                 !isCompleted &&
                 allQuestions.length === 0 &&
@@ -205,6 +214,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
         currentItem.fullData,
         refreshContent,
         showToast,
+        initialCheckDone,
     ]);
 
     // Fetch generated content if already completed
@@ -295,6 +305,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                                     Análisis Estratégico
                                 </ReactMarkdown>
                             </div>
+
                         </div>
                         <div className="text-slate-500 text-lg font-medium leading-relaxed max-w-2xl prose prose-p:my-0 prose-strong:text-slate-700">
                             <ReactMarkdown>
@@ -331,9 +342,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                                             {insight.icon || "💡"}
                                         </span>
                                         <div className="text-sm font-medium text-slate-700 leading-relaxed prose prose-p:my-0 prose-strong:text-slate-900">
-                                            <ReactMarkdown>
-                                                {insight.text}
-                                            </ReactMarkdown>
+                                            <ReactMarkdown>{insight.text}</ReactMarkdown>
                                         </div>
                                     </div>
                                 ),
@@ -362,8 +371,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                                 </span>
                                 <div className="text-sm leading-relaxed text-slate-200 prose prose-p:my-0 prose-strong:text-white prose-invert">
                                     <ReactMarkdown>
-                                        {data.strategic_analysis?.alignment ||
-                                            ""}
+                                        {data.strategic_analysis?.alignment || ''}
                                     </ReactMarkdown>
                                 </div>
                             </div>
@@ -373,8 +381,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                                 </span>
                                 <div className="text-sm leading-relaxed text-slate-200 prose prose-p:my-0 prose-strong:text-white prose-invert">
                                     <ReactMarkdown>
-                                        {data.strategic_analysis
-                                            ?.friction_bypass || ""}
+                                        {data.strategic_analysis?.friction_bypass || ''}
                                     </ReactMarkdown>
                                 </div>
                             </div>
@@ -418,9 +425,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                                     </div>
                                     <div className="flex-1">
                                         <div className="font-bold text-navy-900 prose prose-p:my-0 prose-strong:text-navy-900">
-                                            <ReactMarkdown>
-                                                {step.task}
-                                            </ReactMarkdown>
+                                            <ReactMarkdown>{step.task}</ReactMarkdown>
                                         </div>
                                         <div className="flex items-center gap-4 mt-1">
                                             <span
@@ -449,9 +454,9 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
     };
 
     return (
-        <div className="flex flex-col min-h-full bg-slate-50/50">
+        <div className="flex flex-col h-full bg-slate-50/50 overflow-hidden">
             {/* Header */}
-            <header className="bg-white/80 backdrop-blur-md border-b border-slate-100 p-4 sticky top-0 z-50">
+            <header className="bg-white/80 backdrop-blur-md border-b border-slate-100 p-3 sm:p-4 z-50 shrink-0">
                 <div className="max-w-full mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <button
@@ -486,245 +491,355 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                 </div>
             </header>
 
-            <main className="flex-1 p-4 md:p-8">
+            <main className="flex-1 flex flex-col p-3 sm:p-4 md:p-6 overflow-hidden">
                 {isCompleted ? (
                     renderAnalysis()
                 ) : allQuestions.length > 0 ? (
-                    <div className="max-w-3xl mx-auto space-y-4">
-                        {/* Minimal Progress Bar */}
-                        <div className="flex items-center gap-4">
-                            <div className="flex-1 h-1 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="w-full max-w-3xl mx-auto flex flex-col flex-1 overflow-hidden" style={{ gap: 'clamp(0.5rem, 1.2dvh, 0.75rem)' }}>
+                        {/* Progress Header — Dark Glass */}
+                        <div 
+                            className="rounded-2xl shrink-0 border border-white/10 backdrop-blur-xl"
+                            style={{ 
+                                padding: 'clamp(0.6rem, 1.5dvh, 1.25rem) clamp(0.75rem, 2dvw, 1.5rem)',
+                                background: 'linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,41,59,0.9))',
+                            }}
+                        >
+                            <div className="flex items-center justify-between" style={{ marginBottom: 'clamp(0.375rem, 1dvh, 0.75rem)' }}>
+                                <div>
+                                    <span className="font-semibold uppercase tracking-[0.15em] text-cyan-400/80" style={{ fontSize: 'clamp(0.5rem, 1.1dvh, 0.625rem)' }}>
+                                        Protocolo de Análisis
+                                    </span>
+                                    <h4 className="font-display font-bold text-white/90" style={{ fontSize: 'clamp(0.75rem, 1.8dvh, 1rem)' }}>
+                                        Etapa {currentStep + 1} de{" "}
+                                        {allQuestions.length}
+                                    </h4>
+                                </div>
+                                <div className="text-right">
+                                    <span className="font-display font-bold text-white" style={{ fontSize: 'clamp(1rem, 2.8dvh, 1.5rem)' }}>
+                                        {Math.round(
+                                            ((currentStep + 1) /
+                                                allQuestions.length) *
+                                                100,
+                                        )}
+                                        %
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="w-full rounded-full overflow-hidden" style={{ height: 'clamp(3px, 0.6dvh, 6px)', background: 'rgba(255,255,255,0.08)' }}>
                                 <motion.div
-                                    className="h-full bg-blue-600 rounded-full"
+                                    className="h-full rounded-full"
+                                    style={{ background: 'linear-gradient(90deg, #06b6d4, #3b82f6, #8b5cf6)', boxShadow: '0 0 20px rgba(6,182,212,0.4)' }}
                                     initial={{ width: 0 }}
                                     animate={{
                                         width: `${((currentStep + 1) / allQuestions.length) * 100}%`,
                                     }}
                                     transition={{
-                                        duration: 0.6,
-                                        ease: "easeOut",
+                                        duration: 0.8,
+                                        ease: "circOut",
                                     }}
                                 />
                             </div>
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest shrink-0">
-                                {currentStep + 1}/{allQuestions.length}
-                            </span>
                         </div>
 
                         {/* Question Card */}
-                        <AnimatePresence mode="wait" custom={direction}>
-                            <motion.div
-                                key={currentStep}
-                                initial={{
-                                    x: direction > 0 ? 16 : -16,
-                                    opacity: 0,
-                                }}
-                                animate={{ x: 0, opacity: 1 }}
-                                exit={{
-                                    x: direction > 0 ? -16 : 16,
-                                    opacity: 0,
-                                }}
-                                transition={{
-                                    type: "spring",
-                                    damping: 30,
-                                    stiffness: 300,
-                                }}
-                                className="w-full"
-                            >
-                                <div className="bg-white rounded-2xl p-5 md:p-6 border border-slate-100 shadow-sm space-y-5">
-                                    {/* Block Label + Question */}
-                                    <div className="space-y-3">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-blue-600" />
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                        <div className="relative flex-1 flex flex-col overflow-hidden" style={{ paddingTop: 'clamp(0.125rem, 0.3dvh, 0.25rem)' }}>
+                            <AnimatePresence mode="wait" custom={direction}>
+                                <motion.div
+                                    key={currentStep}
+                                    initial={{
+                                        x: direction > 0 ? 30 : -30,
+                                        opacity: 0,
+                                        scale: 0.98,
+                                    }}
+                                    animate={{ x: 0, opacity: 1, scale: 1 }}
+                                    exit={{
+                                        x: direction > 0 ? -30 : 30,
+                                        opacity: 0,
+                                        scale: 0.98,
+                                    }}
+                                    transition={{
+                                        type: "spring",
+                                        damping: 28,
+                                        stiffness: 220,
+                                    }}
+                                    className="w-full flex-1 flex flex-col"
+                                >
+                                    <div
+                                        className="rounded-2xl border border-white/[0.08] backdrop-blur-xl flex flex-col relative overflow-hidden flex-1"
+                                        style={{ 
+                                            padding: 'clamp(0.75rem, 2dvh, 1.5rem) clamp(0.875rem, 2.5dvw, 1.75rem)', 
+                                            gap: 'clamp(0.5rem, 1.5dvh, 1.25rem)',
+                                            background: 'linear-gradient(160deg, rgba(15,23,42,0.97), rgba(20,30,48,0.95), rgba(15,23,42,0.97))',
+                                            boxShadow: '0 0 0 1px rgba(6,182,212,0.06), 0 25px 50px -12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)',
+                                        }}
+                                    >
+                                        {/* Top accent line */}
+                                        <div className="absolute top-0 left-0 w-full" style={{ height: '2px', background: 'linear-gradient(90deg, transparent, rgba(6,182,212,0.5), rgba(59,130,246,0.5), transparent)' }} />
+                                        
+                                        {/* Question header */}
+                                        <div className="shrink-0" style={{ display: 'flex', flexDirection: 'column', gap: 'clamp(0.25rem, 0.7dvh, 0.5rem)' }}>
+                                            <div className="flex items-center" style={{ gap: 'clamp(0.375rem, 0.8dvh, 0.5rem)' }}>
+                                                <div className="rounded-full" style={{ width: 'clamp(5px, 0.8dvh, 7px)', height: 'clamp(5px, 0.8dvh, 7px)', background: '#06b6d4', boxShadow: '0 0 12px rgba(6,182,212,0.6)' }} />
+                                                <span className="font-semibold text-cyan-400/70 uppercase tracking-[0.15em]" style={{ fontSize: 'clamp(0.5rem, 1.1dvh, 0.625rem)' }}>
+                                                    {
+                                                        allQuestions[
+                                                            currentStep
+                                                        ].blockTitle
+                                                    }
+                                                </span>
+                                            </div>
+                                            <h4 className="font-display font-bold text-white/95 leading-snug" style={{ fontSize: 'clamp(0.875rem, 2.2dvh, 1.25rem)' }}>
                                                 {
                                                     allQuestions[currentStep]
-                                                        .blockTitle
+                                                        .question
                                                 }
-                                            </span>
+                                            </h4>
                                         </div>
-                                        <h4 className="text-base md:text-lg font-bold text-navy-900 leading-snug">
-                                            {allQuestions[currentStep].question}
-                                        </h4>
-                                    </div>
 
-                                    {/* Input Section */}
-                                    <div className="space-y-2">
-                                        {allQuestions[currentStep].options &&
-                                        allQuestions[currentStep].options!
-                                            .length > 0 ? (
-                                            <div className="space-y-2">
-                                                {(
-                                                    allQuestions[currentStep]
-                                                        .options || []
-                                                ).map((opt: string) => (
-                                                    <motion.button
-                                                        key={opt}
-                                                        whileHover={{
-                                                            x: 4,
-                                                        }}
-                                                        whileTap={{
-                                                            scale: 0.99,
-                                                        }}
-                                                        onClick={() =>
-                                                            setAnswers({
-                                                                ...answers,
-                                                                [allQuestions[
-                                                                    currentStep
-                                                                ].id ||
-                                                                `q-${currentStep}`]:
-                                                                    opt,
-                                                            })
-                                                        }
-                                                        className={clsx(
-                                                            "w-full p-4 rounded-xl text-left font-medium transition-all flex items-center justify-between group border",
-                                                            answers[
-                                                                allQuestions[
-                                                                    currentStep
-                                                                ].id ||
-                                                                    `q-${currentStep}`
-                                                            ] === opt
-                                                                ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/15"
-                                                                : "bg-slate-50/50 border-slate-100 text-navy-900 hover:border-blue-200 hover:bg-white hover:shadow-sm",
-                                                        )}
-                                                    >
-                                                        <span className="text-sm">
-                                                            {opt}
-                                                        </span>
-                                                        <CheckCircle2
+                                        {/* Input Section */}
+                                        <div className="flex-1 flex flex-col justify-center overflow-y-auto">
+                                            {allQuestions[currentStep]
+                                                .options &&
+                                            allQuestions[currentStep].options!
+                                                .length > 0 ? (
+                                                <div className="grid grid-cols-1" style={{ gap: 'clamp(0.375rem, 0.9dvh, 0.75rem)' }}>
+                                                    {(
+                                                        allQuestions[
+                                                            currentStep
+                                                        ].options || []
+                                                    ).map((opt: string, idx: number) => (
+                                                        <motion.button
+                                                            key={opt}
+                                                            whileHover={{
+                                                                x: 4,
+                                                                transition: { duration: 0.2 },
+                                                            }}
+                                                            whileTap={{
+                                                                scale: 0.98,
+                                                            }}
+                                                            onClick={() =>
+                                                                setAnswers({
+                                                                    ...answers,
+                                                                    [allQuestions[
+                                                                        currentStep
+                                                                    ].id ||
+                                                                    `q-${currentStep}`]:
+                                                                        opt,
+                                                                })
+                                                            }
                                                             className={clsx(
-                                                                "w-4 h-4 transition-all shrink-0",
+                                                                "w-full rounded-xl text-left font-medium transition-all flex items-center justify-between group border",
                                                                 answers[
                                                                     allQuestions[
                                                                         currentStep
                                                                     ].id ||
                                                                         `q-${currentStep}`
                                                                 ] === opt
-                                                                    ? "opacity-100"
-                                                                    : "opacity-0 group-hover:opacity-20",
+                                                                    ? "border-cyan-500/50 text-white"
+                                                                    : "border-white/[0.06] text-white/70 hover:text-white hover:border-white/15",
                                                             )}
-                                                        />
-                                                    </motion.button>
-                                                ))}
-                                            </div>
-                                        ) : allQuestions[currentStep].type ===
-                                          "boolean" ? (
-                                            <div className="grid grid-cols-2 gap-3">
-                                                {["Sí", "No"].map((opt) => (
-                                                    <motion.button
-                                                        key={opt}
-                                                        whileHover={{
-                                                            y: -2,
-                                                        }}
-                                                        whileTap={{
-                                                            scale: 0.97,
-                                                        }}
-                                                        onClick={() =>
-                                                            setAnswers({
-                                                                ...answers,
-                                                                [allQuestions[
-                                                                    currentStep
-                                                                ].id ||
-                                                                `q-${currentStep}`]:
-                                                                    opt,
-                                                            })
-                                                        }
-                                                        className={clsx(
-                                                            "p-5 border rounded-2xl font-bold text-lg transition-all",
-                                                            answers[
-                                                                allQuestions[
-                                                                    currentStep
-                                                                ].id ||
-                                                                    `q-${currentStep}`
-                                                            ] === opt
-                                                                ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/15"
-                                                                : "bg-slate-50/50 border-slate-100 text-navy-900 hover:border-blue-200 hover:bg-white",
-                                                        )}
-                                                    >
-                                                        {opt}
-                                                    </motion.button>
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            <textarea
-                                                placeholder="Describe tu respuesta aquí..."
-                                                className="w-full p-4 bg-slate-50/50 border border-slate-100 rounded-xl text-navy-900 text-sm font-medium focus:border-blue-400 focus:bg-white outline-none transition-all resize-none min-h-[100px] md:min-h-[120px] placeholder:text-slate-400"
-                                                value={
-                                                    answers[
-                                                        allQuestions[
-                                                            currentStep
-                                                        ].id ||
-                                                            `q-${currentStep}`
-                                                    ] || ""
-                                                }
-                                                onChange={(e) =>
-                                                    setAnswers({
-                                                        ...answers,
-                                                        [allQuestions[
-                                                            currentStep
-                                                        ].id ||
-                                                        `q-${currentStep}`]:
-                                                            e.target.value,
-                                                    })
-                                                }
-                                            />
-                                        )}
-                                    </div>
-
-                                    {/* Navigation */}
-                                    <div className="flex items-center justify-between pt-4 border-t border-slate-50">
-                                        <button
-                                            onClick={handleBackBtn}
-                                            disabled={currentStep === 0}
-                                            className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-navy-900 disabled:opacity-0 transition-colors"
-                                        >
-                                            <ArrowLeft className="w-4 h-4" />
-                                            Atrás
-                                        </button>
-
-                                        <motion.button
-                                            whileHover={{ scale: 1.02 }}
-                                            whileTap={{ scale: 0.98 }}
-                                            onClick={() =>
-                                                handleNext(allQuestions.length)
-                                            }
-                                            disabled={
-                                                isSubmitting ||
-                                                (allQuestions[currentStep]
-                                                    .type !== "text" &&
-                                                    !answers[
-                                                        allQuestions[
-                                                            currentStep
-                                                        ].id ||
-                                                            `q-${currentStep}`
-                                                    ])
-                                            }
-                                            className={clsx(
-                                                "px-5 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed",
-                                                isSubmitting
-                                                    ? "bg-slate-100 text-slate-400"
-                                                    : "bg-blue-600 text-white hover:bg-blue-700 shadow-sm shadow-blue-600/20",
-                                            )}
-                                        >
-                                            {isSubmitting ? (
-                                                <>
-                                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                                    Procesando...
-                                                </>
+                                                            style={{ 
+                                                                padding: 'clamp(0.5rem, 1.4dvh, 1rem) clamp(0.75rem, 1.5dvw, 1.25rem)',
+                                                                background: answers[
+                                                                    allQuestions[currentStep].id || `q-${currentStep}`
+                                                                ] === opt 
+                                                                    ? 'linear-gradient(135deg, rgba(6,182,212,0.15), rgba(59,130,246,0.12))'
+                                                                    : 'rgba(255,255,255,0.03)',
+                                                                boxShadow: answers[
+                                                                    allQuestions[currentStep].id || `q-${currentStep}`
+                                                                ] === opt 
+                                                                    ? '0 0 20px rgba(6,182,212,0.15), inset 0 1px 0 rgba(255,255,255,0.08)'
+                                                                    : 'inset 0 1px 0 rgba(255,255,255,0.03)',
+                                                            }}
+                                                        >
+                                                            <div className="flex items-center" style={{ gap: 'clamp(0.5rem, 1dvh, 0.75rem)' }}>
+                                                                <span 
+                                                                    className={clsx(
+                                                                        "font-mono font-bold shrink-0 flex items-center justify-center rounded-lg",
+                                                                        answers[allQuestions[currentStep].id || `q-${currentStep}`] === opt
+                                                                            ? "text-cyan-300"
+                                                                            : "text-white/30"
+                                                                    )}
+                                                                    style={{ 
+                                                                        fontSize: 'clamp(0.563rem, 1.2dvh, 0.75rem)',
+                                                                        width: 'clamp(1.25rem, 3dvh, 1.75rem)', 
+                                                                        height: 'clamp(1.25rem, 3dvh, 1.75rem)',
+                                                                        background: answers[allQuestions[currentStep].id || `q-${currentStep}`] === opt
+                                                                            ? 'rgba(6,182,212,0.15)'
+                                                                            : 'rgba(255,255,255,0.05)',
+                                                                        border: `1px solid ${answers[allQuestions[currentStep].id || `q-${currentStep}`] === opt ? 'rgba(6,182,212,0.3)' : 'rgba(255,255,255,0.08)'}`,
+                                                                    }}
+                                                                >
+                                                                    {String.fromCharCode(65 + idx)}
+                                                                </span>
+                                                                <span style={{ fontSize: 'clamp(0.75rem, 1.7dvh, 0.938rem)' }}>
+                                                                    {opt}
+                                                                </span>
+                                                            </div>
+                                                            <CheckCircle2
+                                                                className={clsx(
+                                                                    "shrink-0 ml-2 transition-all",
+                                                                    answers[
+                                                                        allQuestions[
+                                                                            currentStep
+                                                                        ].id ||
+                                                                            `q-${currentStep}`
+                                                                    ] === opt
+                                                                        ? "opacity-100 text-cyan-400"
+                                                                        : "opacity-0 group-hover:opacity-20 text-white/40",
+                                                                )}
+                                                                style={{ width: 'clamp(0.875rem, 2dvh, 1.25rem)', height: 'clamp(0.875rem, 2dvh, 1.25rem)' }}
+                                                            />
+                                                        </motion.button>
+                                                    ))}
+                                                </div>
+                                            ) : allQuestions[currentStep]
+                                                  .type === "boolean" ? (
+                                                <div className="grid grid-cols-2" style={{ gap: 'clamp(0.5rem, 1.2dvh, 1rem)' }}>
+                                                    {["Sí", "No"].map((opt) => (
+                                                        <motion.button
+                                                            key={opt}
+                                                            whileHover={{
+                                                                y: -3,
+                                                                transition: { duration: 0.2 },
+                                                            }}
+                                                            whileTap={{
+                                                                scale: 0.96,
+                                                            }}
+                                                            onClick={() =>
+                                                                setAnswers({
+                                                                    ...answers,
+                                                                    [allQuestions[
+                                                                        currentStep
+                                                                    ].id ||
+                                                                    `q-${currentStep}`]:
+                                                                        opt,
+                                                                })
+                                                            }
+                                                            className={clsx(
+                                                                "border rounded-xl font-bold transition-all text-center",
+                                                                answers[
+                                                                    allQuestions[
+                                                                        currentStep
+                                                                    ].id ||
+                                                                        `q-${currentStep}`
+                                                                ] === opt
+                                                                    ? "border-cyan-500/50 text-white"
+                                                                    : "border-white/[0.06] text-white/60 hover:text-white hover:border-white/15",
+                                                            )}
+                                                            style={{ 
+                                                                padding: 'clamp(0.75rem, 2.5dvh, 1.5rem)', 
+                                                                fontSize: 'clamp(0.938rem, 2.2dvh, 1.125rem)',
+                                                                background: answers[
+                                                                    allQuestions[currentStep].id || `q-${currentStep}`
+                                                                ] === opt 
+                                                                    ? 'linear-gradient(135deg, rgba(6,182,212,0.15), rgba(59,130,246,0.12))'
+                                                                    : 'rgba(255,255,255,0.03)',
+                                                                boxShadow: answers[
+                                                                    allQuestions[currentStep].id || `q-${currentStep}`
+                                                                ] === opt 
+                                                                    ? '0 0 20px rgba(6,182,212,0.15), inset 0 1px 0 rgba(255,255,255,0.08)'
+                                                                    : 'inset 0 1px 0 rgba(255,255,255,0.03)',
+                                                            }}
+                                                        >
+                                                            {opt}
+                                                        </motion.button>
+                                                    ))}
+                                                </div>
                                             ) : (
-                                                <>
-                                                    {currentStep ===
-                                                    allQuestions.length - 1
-                                                        ? "Finalizar"
-                                                        : "Continuar"}
-                                                    <ChevronRight className="w-4 h-4" />
-                                                </>
+                                                <textarea
+                                                    placeholder="Describe tu respuesta aquí..."
+                                                    className="w-full flex-1 rounded-xl text-white/90 font-medium outline-none transition-all resize-none placeholder:text-white/25"
+                                                    style={{ 
+                                                        padding: 'clamp(0.625rem, 1.5dvh, 1rem)', 
+                                                        fontSize: 'clamp(0.75rem, 1.6dvh, 0.875rem)', 
+                                                        minHeight: 'clamp(60px, 15dvh, 150px)',
+                                                        background: 'rgba(255,255,255,0.04)',
+                                                        border: '1px solid rgba(255,255,255,0.08)',
+                                                        boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)',
+                                                    }}
+                                                    value={
+                                                        answers[
+                                                            allQuestions[
+                                                                currentStep
+                                                            ].id ||
+                                                                `q-${currentStep}`
+                                                        ] || ""
+                                                    }
+                                                    onChange={(e) =>
+                                                        setAnswers({
+                                                            ...answers,
+                                                            [allQuestions[
+                                                                currentStep
+                                                            ].id ||
+                                                            `q-${currentStep}`]:
+                                                                e.target.value,
+                                                        })
+                                                    }
+                                                />
                                             )}
-                                        </motion.button>
+                                        </div>
+
+                                        {/* Navigation */}
+                                        <div className="flex items-center justify-between shrink-0" style={{ paddingTop: 'clamp(0.5rem, 1dvh, 1rem)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                                            <button
+                                                onClick={handleBackBtn}
+                                                disabled={currentStep === 0}
+                                                className="flex items-center font-semibold uppercase tracking-[0.15em] text-white/30 hover:text-white/60 disabled:opacity-0 transition-colors"
+                                                style={{ gap: 'clamp(0.25rem, 0.5dvh, 0.5rem)', fontSize: 'clamp(0.563rem, 1.1dvh, 0.688rem)' }}
+                                            >
+                                                <ArrowLeft style={{ width: 'clamp(0.75rem, 1.8dvh, 1rem)', height: 'clamp(0.75rem, 1.8dvh, 1rem)' }} />
+                                                Atrás
+                                            </button>
+
+                                            <motion.button
+                                                whileHover={{ scale: 1.03, y: -1 }}
+                                                whileTap={{ scale: 0.97 }}
+                                                onClick={() =>
+                                                    handleNext(
+                                                        allQuestions.length,
+                                                    )
+                                                }
+                                                disabled={
+                                                    isSubmitting ||
+                                                    (allQuestions[currentStep]
+                                                        .type !== "text" &&
+                                                        !answers[
+                                                            allQuestions[
+                                                                currentStep
+                                                            ].id ||
+                                                                `q-${currentStep}`
+                                                        ])
+                                                }
+                                                className="rounded-xl font-bold uppercase tracking-[0.12em] transition-all flex items-center disabled:opacity-40 disabled:cursor-not-allowed text-white"
+                                                style={{ 
+                                                    padding: 'clamp(0.5rem, 1.3dvh, 0.875rem) clamp(1rem, 2.5dvw, 1.75rem)', 
+                                                    fontSize: 'clamp(0.563rem, 1.1dvh, 0.688rem)', 
+                                                    gap: 'clamp(0.375rem, 0.7dvh, 0.5rem)',
+                                                    background: 'linear-gradient(135deg, #06b6d4, #3b82f6)',
+                                                    boxShadow: '0 0 20px rgba(6,182,212,0.25), 0 4px 12px rgba(0,0,0,0.3)',
+                                                }}
+                                            >
+                                                {isSubmitting ? (
+                                                    <>
+                                                        <Loader2 className="animate-spin" style={{ width: 'clamp(0.75rem, 1.8dvh, 1rem)', height: 'clamp(0.75rem, 1.8dvh, 1rem)' }} />{" "}
+                                                        Procesando...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        {currentStep ===
+                                                        allQuestions.length - 1
+                                                            ? "Finalizar"
+                                                            : "Continuar"}
+                                                        <ChevronRight style={{ width: 'clamp(0.75rem, 1.8dvh, 1rem)', height: 'clamp(0.75rem, 1.8dvh, 1rem)' }} />
+                                                    </>
+                                                )}
+                                            </motion.button>
+                                        </div>
                                     </div>
-                                </div>
-                            </motion.div>
-                        </AnimatePresence>
+                                </motion.div>
+                            </AnimatePresence>
+                        </div>
                     </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center py-24 space-y-8 animate-fade-in relative z-10">
@@ -734,8 +849,8 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                             <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center border border-blue-100 shadow-xl shadow-blue-500/10 relative z-10 ring-4 ring-blue-50/50">
                                 <Atom className="w-10 h-10 text-blue-600 animate-[spin_5s_linear_infinite]" />
                             </div>
+                            <div className="absolute -inset-4 bg-blue-500/10 blur-3xl rounded-full -z-10 animate-pulse"></div>
                         </div>
-
                         <div className="text-center space-y-3 max-w-md mx-auto relative h-24">
                              <h3 className="text-xl font-display font-semibold text-navy-950 tracking-tight">
                                 Generando Protocolo...
