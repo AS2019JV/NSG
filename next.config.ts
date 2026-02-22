@@ -1,13 +1,17 @@
 import type { NextConfig } from "next";
 
+// Only use standalone output for Docker deployments (not Vercel)
+const isDocker = process.env.DOCKER === 'true';
+
 const nextConfig: NextConfig = {
   // ============================================
   // PRODUCTION OPTIMIZATION
   // ============================================
-  
-  // Output standalone build for Docker/containerization
-  output: 'standalone',
-  
+
+  // Output standalone build for Docker/containerization only
+  // Vercel handles its own build output - standalone breaks API routes on Vercel
+  ...(isDocker ? { output: 'standalone' as const } : {}),
+
   // Compress images automatically
   images: {
     formats: ['image/avif', 'image/webp'],

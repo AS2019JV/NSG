@@ -14,7 +14,11 @@ interface ContentChatProps {
     onUpdate?: (item: EducationContent) => void;
 }
 
-export default function ContentChat({ item, onInteract, onUpdate }: ContentChatProps) {
+export default function ContentChat({
+    item,
+    onInteract,
+    onUpdate,
+}: ContentChatProps) {
     const { strategyPreferences } = useAppStore();
     const [messages, setMessages] = useState<Message[]>([
         {
@@ -47,7 +51,10 @@ export default function ContentChat({ item, onInteract, onUpdate }: ContentChatP
             const isCompleted = fullData?.question_process?.completed;
 
             // Guard: Only trigger if not completed AND we haven't triggered it for THIS item.id yet
-            if (isCompleted === false && hasTriggeredWebhook.current !== item.id) {
+            if (
+                isCompleted === false &&
+                hasTriggeredWebhook.current !== item.id
+            ) {
                 hasTriggeredWebhook.current = item.id;
 
                 try {
@@ -60,6 +67,12 @@ export default function ContentChat({ item, onInteract, onUpdate }: ContentChatP
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
+                                ...(typeof window !== "undefined" &&
+                                localStorage.getItem("nsg-token")
+                                    ? {
+                                          Authorization: `Bearer ${localStorage.getItem("nsg-token")}`,
+                                      }
+                                    : {}),
                             },
                             body: JSON.stringify({
                                 action: "start_questions",
@@ -70,13 +83,22 @@ export default function ContentChat({ item, onInteract, onUpdate }: ContentChatP
 
                     const result = await response.json();
 
-                    if (result.status === "success" || result.success === true) {
-                        console.log("[ContentChat] Webhook exitoso, actualizando datos del recurso...");
+                    if (
+                        result.status === "success" ||
+                        result.success === true
+                    ) {
+                        console.log(
+                            "[ContentChat] Webhook exitoso, actualizando datos del recurso...",
+                        );
                         // Traer datos actualizados del backend
-                        const updated = await educationService.getContent(item.id);
+                        const updated = await educationService.getContent(
+                            item.id,
+                        );
                         if (updated && onUpdate) {
                             onUpdate(updated);
-                            console.log("[ContentChat] Parent notified with updated content");
+                            console.log(
+                                "[ContentChat] Parent notified with updated content",
+                            );
                         }
                     }
                 } catch (error) {
@@ -205,4 +227,3 @@ export default function ContentChat({ item, onInteract, onUpdate }: ContentChatP
         </div>
     );
 }
-
