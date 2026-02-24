@@ -61,27 +61,10 @@ export default function ContentChat({
                     console.log(
                         `[ContentChat] Disparando webhook de preguntas para: ${item.id}`,
                     );
-                    const response = await fetch(
-                        `/api/nsg-education/content/${item.id}/questions`,
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                ...(typeof window !== "undefined" &&
-                                localStorage.getItem("nsg-token")
-                                    ? {
-                                          Authorization: `Bearer ${localStorage.getItem("nsg-token")}`,
-                                      }
-                                    : {}),
-                            },
-                            body: JSON.stringify({
-                                action: "start_questions",
-                                telegramId: fullData?.telegram_id,
-                            }),
-                        },
+                    const result = await educationService.startQuestions(
+                        item.id,
+                        fullData?.telegram_id,
                     );
-
-                    const result = await response.json();
 
                     if (
                         result.status === "success" ||

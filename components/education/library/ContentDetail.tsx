@@ -162,49 +162,17 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
 
                 try {
                     const fullData = currentItem.fullData as any;
-
-                    const res = await fetch(
-                        `/api/nsg-education/content/${currentItem.id}/questions`,
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                ...(typeof window !== "undefined" &&
-                                localStorage.getItem("nsg-token")
-                                    ? {
-                                          Authorization: `Bearer ${localStorage.getItem("nsg-token")}`,
-                                      }
-                                    : {}),
-                            },
-                            body: JSON.stringify({
-                                action: "start_questions",
-                                telegramId: fullData?.telegram_id,
-                            }),
-                        },
+                    const data = await educationService.startQuestions(
+                        currentItem.id,
+                        fullData?.telegram_id,
                     );
 
-                    if (res.ok) {
-                        const responseText = await res.text();
-                        let raw;
-                        try {
-                            raw = responseText ? JSON.parse(responseText) : {};
-                        } catch {
-                            raw = {};
-                        }
-
-                        // Normalize n8n array response [ { ... } ]
-                        const data = Array.isArray(raw) ? raw[0] : raw;
-
-                        if (data && data.question_process) {
-                            setCurrentItem((prev) => ({
-                                ...prev,
-                                question_process: data.question_process,
-                            }));
-                            showToast(
-                                "Protocolo de preguntas generado",
-                                "success",
-                            );
-                        }
+                    if (data && data.question_process) {
+                        setCurrentItem((prev) => ({
+                            ...prev,
+                            question_process: data.question_process,
+                        }));
+                        showToast("Protocolo de preguntas generado", "success");
                     }
 
                     setTimeout(refreshContent, 3000);
