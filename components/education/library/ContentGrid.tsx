@@ -110,7 +110,7 @@ export default function ContentGrid({
 
                     {/* Content */}
                     <div className="flex-1 space-y-3 relative z-10">
-                        <div className="font-display font-bold text-navy-900 group-hover:text-blue-600 transition-colors text-lg line-clamp-2 leading-tight prose prose-p:my-0 prose-strong:text-inherit">
+                        <div className="font-display font-semibold text-navy-950 group-hover:text-blue-600 transition-colors text-lg tracking-tight leading-snug line-clamp-2 prose prose-p:my-0 prose-strong:text-inherit">
                             <ReactMarkdown>{item.title}</ReactMarkdown>
                         </div>
                         <div className="text-sm text-slate-500 line-clamp-3 leading-relaxed font-medium prose prose-p:my-0 prose-strong:text-slate-700">
