@@ -8,6 +8,7 @@ import ContentDetail from "./ContentDetail";
 import EmptyLibrary from "./EmptyLibrary";
 import { Loader2, Database } from "lucide-react";
 import { Banner } from "@/components/ui/Banner";
+import BrandAtom from "@/components/ui/BrandAtom";
 import { useToast } from "@/components/ui/ToastProvider";
 import api from "@/lib/api";
 import { educationService } from "@/lib/education";
@@ -153,9 +154,9 @@ export default function ContentLibrary() {
     if (isProcessing) {
         return (
             <div className="flex flex-col h-full items-center justify-center p-8 animate-fade-in bg-white">
-                <div className="relative">
-                    <div className="absolute inset-0 bg-blue-500 blur-xl opacity-20 rounded-full animate-pulse"></div>
-                    <Loader2 className="w-12 h-12 text-blue-600 animate-spin relative z-10" />
+                <div className="relative flex items-center justify-center">
+                    <div className="absolute inset-0 bg-blue-500 blur-2xl opacity-20 rounded-full animate-pulse"></div>
+                    <BrandAtom variant="colored" className="w-24 h-24 relative z-10" />
                 </div>
                 <h2 className="mt-8 text-xl font-display font-bold text-navy-900 tracking-tight">
                     Procesando Inteligencia...
@@ -202,7 +203,7 @@ export default function ContentLibrary() {
 
                 {isLoadingLibrary ? (
                     <div className="flex flex-col items-center justify-center py-20 grayscale opacity-50">
-                        <Loader2 className="w-8 h-8 animate-spin text-slate-400 mb-4" />
+                        <BrandAtom variant="colored" className="w-12 h-12 mb-4" />
                         <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">
                             Sincronizando...
                         </span>

@@ -9,11 +9,16 @@ import {
     Zap,
     ListChecks,
     ChevronRight,
-    Trophy,
     Lightbulb,
     CheckCircle2,
-    Atom,
+    TrendingUp,
+    Compass,
+    Rocket,
+    Milestone,
+    Briefcase,
+    Layers
 } from "lucide-react";
+import BrandAtom from "@/components/ui/BrandAtom";
 import { useToast } from "@/components/ui/ToastProvider";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { educationService } from "@/lib/education";
@@ -268,15 +273,16 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                     variants={itemVariants}
                     className="bg-white rounded-[2.5rem] p-8 md:p-12 border border-slate-100 shadow-2xl shadow-blue-500/5 relative overflow-hidden"
                 >
-                    <div className="absolute top-0 right-0 p-8 opacity-5">
-                        <Trophy className="w-32 h-32 text-navy-900" />
-                    </div>
                     <div className="relative z-10 space-y-4">
-                        <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200">
-                                <Brain className="w-6 h-6 text-white" />
+                        <div className="flex items-center gap-5 relative z-10">
+                            <div className="relative group w-16 h-16 flex items-center justify-center shrink-0">
+                                <div className="absolute inset-0 bg-blue-500 blur-xl opacity-20 group-hover:opacity-40 transition-opacity duration-700 rounded-full animate-pulse"></div>
+                                <div className="absolute inset-1 bg-gradient-to-br from-white to-blue-50/80 rounded-2xl border border-white shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex items-center justify-center overflow-hidden transition-transform duration-500 group-hover:scale-105">
+                                    <div className="absolute top-0 left-[-100%] w-full h-full bg-gradient-to-r from-transparent via-blue-100/40 to-transparent skew-x-[-20deg] group-hover:translate-x-[200%] transition-transform duration-1000 ease-in-out"></div>
+                                    <Brain className="w-8 h-8 text-blue-600 relative z-10 drop-shadow-sm stroke-[1.5]" />
+                                </div>
                             </div>
-                            <div className="text-2xl md:text-3xl font-display font-semibold text-navy-900 tracking-tight prose prose-p:my-0 prose-strong:text-navy-900">
+                            <div className="text-2xl md:text-3xl font-display font-bold text-navy-950 tracking-tight prose prose-p:my-0 prose-strong:text-navy-900 drop-shadow-sm">
                                 <ReactMarkdown>
                                     Análisis Estratégico
                                 </ReactMarkdown>
@@ -308,21 +314,30 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                                 (
                                     insight: { icon?: string; text: string },
                                     i: number,
-                                ) => (
-                                    <div
-                                        key={i}
-                                        className="flex gap-4 p-4 bg-slate-50/50 rounded-2xl border border-slate-100/50 group hover:bg-white hover:shadow-md transition-all"
-                                    >
-                                        <span className="text-xl shrink-0">
-                                            {insight.icon || "💡"}
-                                        </span>
-                                        <div className="text-sm font-medium text-slate-700 leading-relaxed prose prose-p:my-0 prose-strong:text-slate-900">
-                                            <ReactMarkdown>
-                                                {insight.text}
-                                            </ReactMarkdown>
+                                ) => {
+                                    const INSIGHT_ICONS = [Lightbulb, Briefcase, Layers, TrendingUp, Compass, Rocket, Milestone];
+                                    const IconComponent = INSIGHT_ICONS[i % INSIGHT_ICONS.length];
+                                    const isFirst = i === 0;
+
+                                    return (
+                                        <div
+                                            key={i}
+                                            className="flex gap-4 p-5 bg-white rounded-2xl border border-slate-100/60 group hover:border-blue-200 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300 relative overflow-hidden"
+                                        >
+                                            <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-400 to-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            <div className={clsx("w-10 h-10 shrink-0 rounded-xl flex items-center justify-center border transition-colors",
+                                                isFirst ? "bg-blue-600 text-white border-blue-500 shadow-md shadow-blue-500/20 group-hover:bg-blue-700" : "bg-blue-50/50 group-hover:bg-blue-50 border-blue-100/50 group-hover:border-blue-200"
+                                            )}>
+                                                <IconComponent className={clsx("w-5 h-5", isFirst ? "text-white" : "text-blue-500")} />
+                                            </div>
+                                            <div className="flex-1 text-sm font-medium text-slate-600 leading-relaxed prose prose-p:my-0 prose-strong:text-navy-900 prose-strong:font-bold">
+                                                <ReactMarkdown>
+                                                    {insight.text?.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')}
+                                                </ReactMarkdown>
+                                            </div>
                                         </div>
-                                    </div>
-                                ),
+                                    );
+                                },
                             )}
                         </div>
                     </motion.div>
@@ -1029,13 +1044,10 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                     </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center py-24 space-y-8 animate-fade-in relative z-10">
-                        {/* Orange Atom Icon Box */}
-                        <div className="relative group">
-                            <div className="absolute inset-0 bg-blue-500 blur-2xl opacity-20 rounded-full animate-pulse"></div>
-                            <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center border border-blue-100 shadow-xl shadow-blue-500/10 relative z-10 ring-4 ring-blue-50/50">
-                                <Atom className="w-10 h-10 text-blue-600 animate-[spin_5s_linear_infinite]" />
-                            </div>
-                            <div className="absolute -inset-4 bg-blue-500/10 blur-3xl rounded-full -z-10 animate-pulse"></div>
+                        {/* Original Brand Atom Box */}
+                        <div className="relative group flex items-center justify-center">
+                            <div className="absolute inset-0 bg-blue-500 blur-3xl opacity-20 rounded-full animate-pulse"></div>
+                            <BrandAtom variant="colored" className="w-24 h-24 relative z-10" />
                         </div>
                         <div className="text-center space-y-3 max-w-md mx-auto relative h-24">
                             <h3 className="text-xl font-display font-semibold text-navy-950 tracking-tight">

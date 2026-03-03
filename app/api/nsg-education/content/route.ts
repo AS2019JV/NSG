@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { CONFIG } from '@/lib/config';
 
+export const maxDuration = 60; // Extend Vercel timeout to 60 seconds (Hobby limit)
+
 export async function POST(req: Request) {
   try {
     const contentType = req.headers.get('content-type') || '';
