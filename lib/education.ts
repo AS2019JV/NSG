@@ -228,5 +228,22 @@ export const educationService = {
             console.error("Failed to ingest content", error);
             throw error;
         }
-    }
+    },
+
+    /**
+     * Activates Telegram tracking for a content's actionables
+     */
+    async activateTracking(contentId: string): Promise<{ success: boolean; data: any }> {
+        const response = await api.post(`/education/content/${contentId}/tracking`);
+        return response.data;
+    },
+
+    /**
+     * Gets the current tracking status for the user
+     */
+    async getTrackingStatus(): Promise<{ active: boolean; resource_id?: string; activated_at?: string; title?: string }> {
+        const response = await api.get("/education/tracking/status");
+        return response.data.data;
+    },
 };
+

@@ -16,7 +16,8 @@ import {
     Rocket,
     Milestone,
     Briefcase,
-    Layers
+    Layers,
+    Send,
 } from "lucide-react";
 import BrandAtom from "@/components/ui/BrandAtom";
 import { useToast } from "@/components/ui/ToastProvider";
@@ -80,6 +81,12 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
     const hasTriggeredRef = useRef<boolean>(false);
     const [phraseIndex, setPhraseIndex] = useState(0);
 
+    // Telegram tracking state
+    const [isTrackingThis, setIsTrackingThis] = useState(false);
+    const [isTrackingOther, setIsTrackingOther] = useState<string | null>(null);
+    const [isActivatingTracking, setIsActivatingTracking] = useState(false);
+    const [trackingChecked, setTrackingChecked] = useState(false);
+
     const qProcess =
         currentItem.question_process || currentItem.fullData?.question_process;
 
@@ -122,6 +129,53 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
     }, [currentItem.id]);
 
     // Initial Sync on mount
+    // Check current tracking status
+    useEffect(() => {
+        const checkTracking = async () => {
+            try {
+                const status = await educationService.getTrackingStatus();
+                if (status.active && status.resource_id === currentItem.id) {
+                    setIsTrackingThis(true);
+                    setIsTrackingOther(null);
+                } else if (status.active) {
+                    setIsTrackingThis(false);
+                    setIsTrackingOther(status.title || "otro recurso");
+                } else {
+                    setIsTrackingThis(false);
+                    setIsTrackingOther(null);
+                }
+            } catch (err) {
+                console.error("Error checking tracking status:", err);
+            } finally {
+                setTrackingChecked(true);
+            }
+        };
+        checkTracking();
+    }, [currentItem.id]);
+
+    // Handle tracking activation
+    const handleActivateTracking = async () => {
+        if (isTrackingOther) {
+            const confirmed = window.confirm(
+                `Ya tienes accionables en seguimiento ("${isTrackingOther}"). ¿Deseas reemplazarlos con los de este recurso?`
+            );
+            if (!confirmed) return;
+        }
+
+        try {
+            setIsActivatingTracking(true);
+            await educationService.activateTracking(currentItem.id);
+            setIsTrackingThis(true);
+            setIsTrackingOther(null);
+            showToast("Seguimiento activado. El agente de Telegram dará seguimiento a estos accionables.", "success");
+        } catch (error) {
+            console.error("Error activating tracking:", error);
+            showToast("No se pudo activar el seguimiento. Intenta de nuevo.", "error");
+        } finally {
+            setIsActivatingTracking(false);
+        }
+    };
+
     useEffect(() => {
         setInitialCheckDone(false);
         refreshContent().finally(() => setInitialCheckDone(true));
@@ -445,6 +499,96 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                         )}
                     </div>
                 </motion.div>
+
+                {/* Telegram Tracking CTA */}
+                {trackingChecked && (
+                    <motion.div
+                        variants={itemVariants}
+                        className="relative overflow-hidden rounded-4xl border shadow-xl"
+                        style={{
+                            background: isTrackingThis
+                                ? "linear-gradient(135deg, #059669, #10b981)"
+                                : "linear-gradient(135deg, #0f172a, #1e293b)",
+                            borderColor: isTrackingThis
+                                ? "rgba(16, 185, 129, 0.3)"
+                                : "rgba(255,255,255,0.08)",
+                        }}
+                    >
+                        <div className="absolute -top-20 -right-20 opacity-5">
+                            <Send className="w-60 h-60 text-white" />
+                        </div>
+                        <div className="relative z-10 p-8 md:p-10">
+                            <div className="flex items-center gap-4 mb-4">
+                                <div
+                                    className="w-12 h-12 rounded-2xl flex items-center justify-center"
+                                    style={{
+                                        background: isTrackingThis
+                                            ? "rgba(255,255,255,0.2)"
+                                            : "linear-gradient(135deg, #0ea5e9, #6366f1)",
+                                        boxShadow: isTrackingThis
+                                            ? "none"
+                                            : "0 0 30px rgba(14,165,233,0.3)",
+                                    }}
+                                >
+                                    <Send className="w-6 h-6 text-white" />
+                                </div>
+                                <div>
+                                    <h4 className="font-display font-bold text-white text-lg">
+                                        {isTrackingThis
+                                            ? "En Seguimiento por Telegram"
+                                            : "Seguimiento por Telegram"}
+                                    </h4>
+                                    <p className="text-white/60 text-xs font-medium">
+                                        {isTrackingThis
+                                            ? "El agente de Telegram está dando seguimiento activo a estos accionables"
+                                            : "Activa el agente de Telegram para dar seguimiento a estos accionables"}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {!isTrackingThis ? (
+                                <motion.button
+                                    whileHover={{ scale: 1.02, y: -2 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    onClick={handleActivateTracking}
+                                    disabled={isActivatingTracking}
+                                    className="w-full rounded-2xl font-bold text-sm uppercase tracking-wider text-white py-4 px-6 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                                    style={{
+                                        background:
+                                            "linear-gradient(135deg, #0ea5e9, #6366f1)",
+                                        boxShadow:
+                                            "0 0 30px rgba(14,165,233,0.2), 0 8px 20px rgba(0,0,0,0.3)",
+                                    }}
+                                >
+                                    {isActivatingTracking ? (
+                                        <>
+                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                            Activando...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Send className="w-5 h-5" />
+                                            Activar Seguimiento Telegram
+                                        </>
+                                    )}
+                                </motion.button>
+                            ) : (
+                                <div className="flex items-center gap-3 bg-white/10 rounded-2xl py-4 px-6">
+                                    <CheckCircle2 className="w-6 h-6 text-white" />
+                                    <span className="font-bold text-white text-sm uppercase tracking-wider">
+                                        Seguimiento Activo
+                                    </span>
+                                </div>
+                            )}
+
+                            {isTrackingOther && !isTrackingThis && (
+                                <p className="text-amber-300/80 text-xs mt-3 text-center font-medium">
+                                    ⚠️ Ya tienes otro recurso en seguimiento. Activar este lo reemplazará.
+                                </p>
+                            )}
+                        </div>
+                    </motion.div>
+                )}
             </motion.div>
         );
     };
