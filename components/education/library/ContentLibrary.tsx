@@ -5,10 +5,13 @@ import { useState, useEffect, useCallback } from "react";
 import IngestInput from "./IngestInput";
 import ContentGrid from "./ContentGrid";
 import ContentDetail from "./ContentDetail";
-import { Loader2, Database, Sparkles } from "lucide-react";
+import EmptyLibrary from "./EmptyLibrary";
+import { Loader2, Database } from "lucide-react";
 import { Banner } from "@/components/ui/Banner";
+import BrandAtom from "@/components/ui/BrandAtom";
 import { useToast } from "@/components/ui/ToastProvider";
 import api from "@/lib/api";
+import { educationService } from "@/lib/education";
 import { EducationContent } from "@/types/education";
 
 export default function ContentLibrary() {
@@ -65,28 +68,7 @@ export default function ContentLibrary() {
             if (data.document) formData.append("document", data.document);
             if (data.image) formData.append("image", data.image);
 
-            const token =
-                typeof window !== "undefined"
-                    ? localStorage.getItem("nsg-token")
-                    : null;
-
-            const response = await fetch("/api/nsg-education/content", {
-                method: "POST",
-                headers: {
-                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                },
-                body: formData,
-            });
-
-            const result = await response.json().catch(() => ({}));
-
-            if (!response.ok) {
-                const err = new Error(
-                    result.error || `Error: ${response.status}`,
-                ) as any;
-                err.details = result.details;
-                throw err;
-            }
+            const result = await educationService.ingestContent(formData);
 
             if (result.status === "success" || result.success === true) {
                 showToast(`Recurso procesado exitosamente`, "success");
@@ -95,10 +77,41 @@ export default function ContentLibrary() {
 
                 // Si n8n devolvió un ID de recurso, intentamos abrirlo directamente
                 if (result.resource_id) {
-                    const newItem = updatedItems.find(
+                    let newItem = updatedItems.find(
                         (item: EducationContent) =>
                             item.id === result.resource_id,
                     );
+
+                    // ⚡ RAPID HYDRATION: If webhook returns questions directly, inject them immediately
+                    if (
+                        newItem &&
+                        (result.question_process || result.questions)
+                    ) {
+                        try {
+                            const directProcess = result.question_process || {
+                                completed: false,
+                                meta: result.meta || {},
+                                question_blocks: Array.isArray(result.questions)
+                                    ? result.questions
+                                    : [],
+                            };
+
+                            newItem = {
+                                ...newItem,
+                                question_process: directProcess,
+                            };
+
+                            // Update local library state to reflect this enhanced item
+                            setLibraryItems((prev) =>
+                                prev.map((i) =>
+                                    i.id === newItem!.id ? newItem! : i,
+                                ),
+                            );
+                        } catch (e) {
+                            console.error("Hydration error:", e);
+                        }
+                    }
+
                     if (newItem) {
                         setSelectedItem(newItem);
                     }
@@ -108,8 +121,10 @@ export default function ContentLibrary() {
                     result.message || "Error al procesar el recurso",
                 );
             }
-        } catch (error: any) {
-            showToast(error.message || "Error en la ingesta", "error");
+        } catch (error: unknown) {
+            const message =
+                error instanceof Error ? error.message : "Error en la ingesta";
+            showToast(message, "error");
         } finally {
             setIsProcessing(false);
         }
@@ -122,7 +137,7 @@ export default function ContentLibrary() {
             await api.delete(`/education/content/${id}`);
             showToast("Recurso eliminado correctamente", "success");
             setLibraryItems((prev) => prev.filter((item) => item.id !== id));
-        } catch (error) {
+        } catch {
             showToast("No se pudo eliminar el recurso", "error");
         }
     };
@@ -139,9 +154,9 @@ export default function ContentLibrary() {
     if (isProcessing) {
         return (
             <div className="flex flex-col h-full items-center justify-center p-8 animate-fade-in bg-white">
-                <div className="relative">
-                    <div className="absolute inset-0 bg-blue-500 blur-xl opacity-20 rounded-full animate-pulse"></div>
-                    <Loader2 className="w-12 h-12 text-blue-600 animate-spin relative z-10" />
+                <div className="relative flex items-center justify-center">
+                    <div className="absolute inset-0 bg-blue-500 blur-2xl opacity-20 rounded-full animate-pulse"></div>
+                    <BrandAtom variant="colored" className="w-24 h-24 relative z-10" />
                 </div>
                 <h2 className="mt-8 text-xl font-display font-bold text-navy-900 tracking-tight">
                     Procesando Inteligencia...
@@ -180,7 +195,6 @@ export default function ContentLibrary() {
             <section className="mt-4">
                 <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
                     <div className="flex items-center gap-2 text-navy-900">
-                        <Sparkles className="w-5 h-5 text-blue-600" />
                         <h3 className="font-display font-bold text-lg">
                             Recursos en Red
                         </h3>
@@ -189,17 +203,19 @@ export default function ContentLibrary() {
 
                 {isLoadingLibrary ? (
                     <div className="flex flex-col items-center justify-center py-20 grayscale opacity-50">
-                        <Loader2 className="w-8 h-8 animate-spin text-slate-400 mb-4" />
+                        <BrandAtom variant="colored" className="w-12 h-12 mb-4" />
                         <span className="text-sm font-bold text-slate-400 uppercase tracking-widest">
                             Sincronizando...
                         </span>
                     </div>
-                ) : (
+                ) : libraryItems.length > 0 ? (
                     <ContentGrid
                         extraItems={libraryItems}
                         onSelect={setSelectedItem}
                         onDelete={handleDelete}
                     />
+                ) : (
+                    <EmptyLibrary />
                 )}
             </section>
         </div>

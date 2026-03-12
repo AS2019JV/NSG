@@ -12,6 +12,7 @@ import {
     Clock,
 } from "lucide-react";
 import clsx from "clsx";
+import ReactMarkdown from "react-markdown";
 
 interface ContentGridProps {
     onSelect: (item: EducationContent) => void;
@@ -43,7 +44,7 @@ export default function ContentGrid({
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {extraItems.map((item) => (
+            {[...extraItems].sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()).map((item) => (
                 <div
                     key={item.id}
                     onClick={() => onSelect(item)}
@@ -109,13 +110,15 @@ export default function ContentGrid({
 
                     {/* Content */}
                     <div className="flex-1 space-y-3 relative z-10">
-                        <h4 className="font-display font-bold text-navy-900 group-hover:text-blue-600 transition-colors text-lg line-clamp-2 leading-tight">
-                            {item.title}
-                        </h4>
-                        <p className="text-sm text-slate-500 line-clamp-3 leading-relaxed font-medium">
-                            {item.summary ||
-                                "Analizando el contenido estratégico del recurso..."}
-                        </p>
+                        <div className="font-display font-semibold text-navy-950 group-hover:text-blue-600 transition-colors text-lg tracking-tight leading-snug line-clamp-2 prose prose-p:my-0 prose-strong:text-inherit">
+                            <ReactMarkdown>{item.title?.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '') || ''}</ReactMarkdown>
+                        </div>
+                        <div className="text-sm text-slate-500 line-clamp-3 leading-relaxed font-medium prose prose-p:my-0 prose-strong:text-slate-700">
+                            <ReactMarkdown>
+                                {item.summary?.replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '') ||
+                                    "Analizando el contenido estratégico del recurso..."}
+                            </ReactMarkdown>
+                        </div>
                     </div>
 
                     {/* Footer */}

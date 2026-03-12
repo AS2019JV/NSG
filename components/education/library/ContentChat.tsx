@@ -2,7 +2,7 @@
 
 import { EducationContent, Message } from "@/types/education";
 import { useState, useRef, useEffect } from "react";
-import { Send, User, Bot, Loader2, Sparkles } from "lucide-react";
+import { Send, User, Bot, Loader2 } from "lucide-react";
 import { educationService } from "@/lib/education";
 import { useAppStore } from "@/store/useAppStore";
 import clsx from "clsx";
@@ -14,7 +14,11 @@ interface ContentChatProps {
     onUpdate?: (item: EducationContent) => void;
 }
 
-export default function ContentChat({ item, onInteract, onUpdate }: ContentChatProps) {
+export default function ContentChat({
+    item,
+    onInteract,
+    onUpdate,
+}: ContentChatProps) {
     const { strategyPreferences } = useAppStore();
     const [messages, setMessages] = useState<Message[]>([
         {
@@ -47,36 +51,37 @@ export default function ContentChat({ item, onInteract, onUpdate }: ContentChatP
             const isCompleted = fullData?.question_process?.completed;
 
             // Guard: Only trigger if not completed AND we haven't triggered it for THIS item.id yet
-            if (isCompleted === false && hasTriggeredWebhook.current !== item.id) {
+            if (
+                isCompleted === false &&
+                hasTriggeredWebhook.current !== item.id
+            ) {
                 hasTriggeredWebhook.current = item.id;
 
                 try {
                     console.log(
                         `[ContentChat] Disparando webhook de preguntas para: ${item.id}`,
                     );
-                    const response = await fetch(
-                        `/api/nsg-education/content/${item.id}/questions`,
-                        {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({
-                                action: "start_questions",
-                                telegramId: fullData?.telegram_id,
-                            }),
-                        },
+                    const result = await educationService.startQuestions(
+                        item.id,
+                        fullData?.telegram_id,
                     );
 
-                    const result = await response.json();
-
-                    if (result.status === "success" || result.success === true) {
-                        console.log("[ContentChat] Webhook exitoso, actualizando datos del recurso...");
+                    if (
+                        result.status === "success" ||
+                        result.success === true
+                    ) {
+                        console.log(
+                            "[ContentChat] Webhook exitoso, actualizando datos del recurso...",
+                        );
                         // Traer datos actualizados del backend
-                        const updated = await educationService.getContent(item.id);
+                        const updated = await educationService.getContent(
+                            item.id,
+                        );
                         if (updated && onUpdate) {
                             onUpdate(updated);
-                            console.log("[ContentChat] Parent notified with updated content");
+                            console.log(
+                                "[ContentChat] Parent notified with updated content",
+                            );
                         }
                     }
                 } catch (error) {
@@ -146,7 +151,7 @@ export default function ContentChat({ item, onInteract, onUpdate }: ContentChatP
                             {msg.role === "user" ? (
                                 <User className="w-5 h-5" />
                             ) : (
-                                <Sparkles className="w-5 h-5" />
+                                <Bot className="w-5 h-5" />
                             )}
                         </div>
                         <div
@@ -164,7 +169,7 @@ export default function ContentChat({ item, onInteract, onUpdate }: ContentChatP
                 {isTyping && (
                     <div className="flex gap-4 mr-auto animate-pulse">
                         <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0">
-                            <Sparkles className="w-5 h-5" />
+                            <Bot className="w-5 h-5" />
                         </div>
                         <div className="bg-slate-50 border border-slate-100 p-5 rounded-[2rem] rounded-tl-none flex items-center gap-2">
                             <div className="flex gap-1">
@@ -205,4 +210,3 @@ export default function ContentChat({ item, onInteract, onUpdate }: ContentChatP
         </div>
     );
 }
-

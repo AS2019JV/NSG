@@ -1,21 +1,6 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/ToastProvider";
-
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-inter"
-});
-
-
-
-const mono = JetBrains_Mono({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-mono"
-});
 
 export const metadata: Metadata = {
   title: "BS Intelligence | Deep Processing v14.6",
@@ -32,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${inter.variable} ${mono.variable} antialiased h-full`} suppressHydrationWarning>
+    <html lang="es" className="antialiased h-full" suppressHydrationWarning>
       <body className="h-full overflow-auto font-sans selection:bg-blue-100 selection:text-blue-900" suppressHydrationWarning>
         <ThemeProvider>
           <Suspense fallback={<div className="h-screen w-screen bg-slate-50 animate-pulse" />}>

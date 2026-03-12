@@ -68,7 +68,7 @@ export default function TokenVerifier({
                 } catch (error: any) {
                     // Silenciar logs si es un timeout/error de red (ya lo maneja el interceptor de api.ts si no es verify-token)
                     // Solo loguear si es un error real de respuesta (401, 500, etc)
-                    if (error.response) {
+                    if (error.response && error.response.status !== 401) {
                         console.error(
                             "[TokenVerifier] Error verifying session:",
                             error.response.status,

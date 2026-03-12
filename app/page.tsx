@@ -48,10 +48,16 @@ export default function LandingPage() {
                                 Precios
                             </Link>
                             <Link
-                                href="/privacy"
+                                href="/politica-de-privacidad"
                                 className="text-sm font-medium text-slate-600 hover:text-navy-950 transition-colors"
                             >
                                 Privacidad
+                            </Link>
+                            <Link
+                                href="/condiciones-del-servicio"
+                                className="text-sm font-medium text-slate-600 hover:text-navy-950 transition-colors"
+                            >
+                                Condiciones
                             </Link>
                             <Link
                                 href="/auth/login"
@@ -104,10 +110,16 @@ export default function LandingPage() {
                                 Precios
                             </Link>
                             <Link
-                                href="/privacy"
+                                href="/politica-de-privacidad"
                                 className="text-base font-medium text-slate-600 hover:text-navy-950 py-1"
                             >
                                 Privacidad
+                            </Link>
+                            <Link
+                                href="/condiciones-del-servicio"
+                                className="text-base font-medium text-slate-600 hover:text-navy-950 py-1"
+                            >
+                                Condiciones
                             </Link>
 
                             <div className="h-px bg-slate-100 w-full my-2"></div>
@@ -509,7 +521,7 @@ export default function LandingPage() {
                             </h4>
                             <div className="flex flex-col gap-3">
                                 <Link
-                                    href="/privacy"
+                                    href="/politica-de-privacidad"
                                     className="text-sm text-slate-400 hover:text-white transition-colors duration-300"
                                 >
                                     Política de Privacidad
@@ -518,7 +530,7 @@ export default function LandingPage() {
                                     href="/condiciones-del-servicio"
                                     className="text-sm text-slate-400 hover:text-white transition-colors duration-300"
                                 >
-                                    Términos
+                                    Condiciones de Servicio
                                 </Link>
                             </div>
                         </div>
@@ -526,7 +538,7 @@ export default function LandingPage() {
 
                     <div className="pt-8 border-t border-navy-900 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
                         <p className="text-xs text-slate-500 font-light">
-                            © 2024 BS Intelligence. Todos los derechos
+                            © 2026 Next Strategy Group. Todos los derechos
                             reservados.
                         </p>
                         <div className="flex gap-6">
