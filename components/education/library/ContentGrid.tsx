@@ -10,6 +10,7 @@ import {
     Trash2,
     CheckCircle2,
     Clock,
+    Send,
 } from "lucide-react";
 import clsx from "clsx";
 import ReactMarkdown from "react-markdown";
@@ -95,6 +96,13 @@ export default function ContentGrid({
                                     </>
                                 )}
                             </div>
+
+                            {(item.copilot_tracking_active || item.telegram_tracking?.active) && (
+                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-600 text-white border-blue-500 shadow-md shadow-blue-500/20">
+                                    <Send className="w-3 h-3" />
+                                    <span>Copilot Tracking</span>
+                                </div>
+                            )}
 
                             <button
                                 onClick={(e) => {

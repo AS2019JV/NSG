@@ -6,7 +6,6 @@ import {
     Brain,
     Loader2,
     Target,
-    Zap,
     ListChecks,
     ChevronRight,
     Lightbulb,
@@ -18,6 +17,7 @@ import {
     Briefcase,
     Layers,
     Send,
+    X,
 } from "lucide-react";
 import BrandAtom from "@/components/ui/BrandAtom";
 import { useToast } from "@/components/ui/ToastProvider";
@@ -81,14 +81,13 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
     const hasTriggeredRef = useRef<boolean>(false);
     const [phraseIndex, setPhraseIndex] = useState(0);
 
-    // Telegram tracking state
+    // Copilot tracking state
     const [isTrackingThis, setIsTrackingThis] = useState(false);
     const [isTrackingOther, setIsTrackingOther] = useState<string | null>(null);
     const [isActivatingTracking, setIsActivatingTracking] = useState(false);
-    const [trackingChecked, setTrackingChecked] = useState(false);
 
     const qProcess =
-        currentItem.question_process || currentItem.fullData?.question_process;
+        currentItem.question_process || (currentItem.fullData?.question_process as any);
 
     const isCompleted = qProcess?.completed === true || !!generatedData;
     const blocks: QuestionBlock[] = (qProcess?.question_blocks ||
@@ -129,33 +128,33 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
     }, [currentItem.id]);
 
     // Initial Sync on mount
-    // Check current tracking status
-    useEffect(() => {
-        const checkTracking = async () => {
-            try {
-                const status = await educationService.getTrackingStatus();
-                if (status.active && status.resource_id === currentItem.id) {
-                    setIsTrackingThis(true);
-                    setIsTrackingOther(null);
-                } else if (status.active) {
-                    setIsTrackingThis(false);
-                    setIsTrackingOther(status.title || "otro recurso");
-                } else {
-                    setIsTrackingThis(false);
-                    setIsTrackingOther(null);
-                }
-            } catch (err) {
-                console.error("Error checking tracking status:", err);
-            } finally {
-                setTrackingChecked(true);
+    const checkTrackingStatus = useCallback(async () => {
+        try {
+            const status = await educationService.getTrackingStatus();
+            if (status.active && status.resource_id === currentItem.id) {
+                setIsTrackingThis(true);
+                setIsTrackingOther(null);
+            } else if (status.active) {
+                setIsTrackingThis(false);
+                setIsTrackingOther(status.title || "otro recurso");
+            } else {
+                setIsTrackingThis(false);
+                setIsTrackingOther(null);
             }
-        };
-        checkTracking();
+        } catch (err) {
+            console.error("Error checking tracking status:", err);
+        }
     }, [currentItem.id]);
+
+    // Check current tracking status on mount/id change
+    useEffect(() => {
+        checkTrackingStatus();
+    }, [checkTrackingStatus]);
 
     // Handle tracking activation
     const handleActivateTracking = async () => {
-        if (isTrackingOther) {
+        // Solo preguntar si vamos a activar uno nuevo y ya hay otro activo
+        if (!isTrackingThis && isTrackingOther) {
             const confirmed = window.confirm(
                 `Ya tienes accionables en seguimiento ("${isTrackingOther}"). ¿Deseas reemplazarlos con los de este recurso?`
             );
@@ -164,13 +163,28 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
 
         try {
             setIsActivatingTracking(true);
-            await educationService.activateTracking(currentItem.id);
-            setIsTrackingThis(true);
-            setIsTrackingOther(null);
-            showToast("Seguimiento activado. El agente de Telegram dará seguimiento a estos accionables.", "success");
+            const response = await educationService.activateTracking(currentItem.id);
+            
+            // La respuesta ahora contiene el nuevo estado (true o false)
+            // Backend devuelve { success, data: { copilot_tracking_active } }
+            const newStatus = !!response.data?.copilot_tracking_active;
+            setIsTrackingThis(newStatus);
+            
+            if (newStatus) {
+                setIsTrackingOther(null);
+                showToast("Activado", "success");
+            } else {
+                showToast("Desactivado", "success");
+            }
+            
+            // Refrescar datos y estado del servidor para asegurar consistencia total
+            await Promise.all([
+                refreshContent(),
+                checkTrackingStatus()
+            ]);
         } catch (error) {
-            console.error("Error activating tracking:", error);
-            showToast("No se pudo activar el seguimiento. Intenta de nuevo.", "error");
+            console.error("Error toggling tracking:", error);
+            showToast("Error", "error");
         } finally {
             setIsActivatingTracking(false);
         }
@@ -220,7 +234,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                 hasTriggeredRef.current = true;
 
                 try {
-                    const fullData = currentItem.fullData as any;
+                    const fullData = currentItem.fullData;
                     const data = await educationService.startQuestions(
                         currentItem.id,
                         fullData?.telegram_id,
@@ -500,95 +514,54 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                     </div>
                 </motion.div>
 
-                {/* Telegram Tracking CTA */}
-                {trackingChecked && (
-                    <motion.div
+                {/* Copilot Tracking Button with Toggle Interaction */}
+                <div className="flex flex-col items-center gap-4 py-4 w-full">
+                    <motion.button
                         variants={itemVariants}
-                        className="relative overflow-hidden rounded-4xl border shadow-xl"
-                        style={{
-                            background: isTrackingThis
-                                ? "linear-gradient(135deg, #059669, #10b981)"
-                                : "linear-gradient(135deg, #0f172a, #1e293b)",
-                            borderColor: isTrackingThis
-                                ? "rgba(16, 185, 129, 0.3)"
-                                : "rgba(255,255,255,0.08)",
-                        }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={handleActivateTracking}
+                        disabled={isActivatingTracking}
+                        className={clsx(
+                            "w-full max-w-md rounded-2xl font-bold text-sm uppercase tracking-wider py-4 px-8 transition-all disabled:opacity-50 flex items-center justify-center gap-3 shadow-lg",
+                            isTrackingThis 
+                                ? "bg-white text-emerald-600 border border-emerald-100 shadow-emerald-500/10" 
+                                : "text-white shadow-blue-500/20"
+                        )}
+                        style={!isTrackingThis ? {
+                            background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
+                        } : {}}
                     >
-                        <div className="absolute -top-20 -right-20 opacity-5">
-                            <Send className="w-60 h-60 text-white" />
-                        </div>
-                        <div className="relative z-10 p-8 md:p-10">
-                            <div className="flex items-center gap-4 mb-4">
-                                <div
-                                    className="w-12 h-12 rounded-2xl flex items-center justify-center"
-                                    style={{
-                                        background: isTrackingThis
-                                            ? "rgba(255,255,255,0.2)"
-                                            : "linear-gradient(135deg, #0ea5e9, #6366f1)",
-                                        boxShadow: isTrackingThis
-                                            ? "none"
-                                            : "0 0 30px rgba(14,165,233,0.3)",
-                                    }}
-                                >
-                                    <Send className="w-6 h-6 text-white" />
-                                </div>
-                                <div>
-                                    <h4 className="font-display font-bold text-white text-lg">
-                                        {isTrackingThis
-                                            ? "En Seguimiento por Telegram"
-                                            : "Seguimiento por Telegram"}
-                                    </h4>
-                                    <p className="text-white/60 text-xs font-medium">
-                                        {isTrackingThis
-                                            ? "El agente de Telegram está dando seguimiento activo a estos accionables"
-                                            : "Activa el agente de Telegram para dar seguimiento a estos accionables"}
-                                    </p>
-                                </div>
-                            </div>
+                        {isActivatingTracking ? (
+                            <>
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                                Procesando...
+                            </>
+                        ) : isTrackingThis ? (
+                            <>
+                                <X className="w-5 h-5" />
+                                Quitar
+                            </>
+                        ) : (
+                            <>
+                                <Send className="w-5 h-5" />
+                                Activar
+                            </>
+                        )}
+                    </motion.button>
+                    
+                    {!isTrackingThis && isTrackingOther && (
+                        <p className="text-amber-600 text-[10px] font-bold uppercase tracking-widest text-center">
+                            ⚠️ Reemplazará seguimiento activo: "{isTrackingOther}"
+                        </p>
+                    )}
 
-                            {!isTrackingThis ? (
-                                <motion.button
-                                    whileHover={{ scale: 1.02, y: -2 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    onClick={handleActivateTracking}
-                                    disabled={isActivatingTracking}
-                                    className="w-full rounded-2xl font-bold text-sm uppercase tracking-wider text-white py-4 px-6 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
-                                    style={{
-                                        background:
-                                            "linear-gradient(135deg, #0ea5e9, #6366f1)",
-                                        boxShadow:
-                                            "0 0 30px rgba(14,165,233,0.2), 0 8px 20px rgba(0,0,0,0.3)",
-                                    }}
-                                >
-                                    {isActivatingTracking ? (
-                                        <>
-                                            <Loader2 className="w-5 h-5 animate-spin" />
-                                            Activando...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Send className="w-5 h-5" />
-                                            Activar Seguimiento Telegram
-                                        </>
-                                    )}
-                                </motion.button>
-                            ) : (
-                                <div className="flex items-center gap-3 bg-white/10 rounded-2xl py-4 px-6">
-                                    <CheckCircle2 className="w-6 h-6 text-white" />
-                                    <span className="font-bold text-white text-sm uppercase tracking-wider">
-                                        Seguimiento Activo
-                                    </span>
-                                </div>
-                            )}
-
-                            {isTrackingOther && !isTrackingThis && (
-                                <p className="text-amber-300/80 text-xs mt-3 text-center font-medium">
-                                    ⚠️ Ya tienes otro recurso en seguimiento. Activar este lo reemplazará.
-                                </p>
-                            )}
-                        </div>
-                    </motion.div>
-                )}
+                    {isTrackingThis && (
+                        <p className="text-emerald-600 text-[10px] font-bold uppercase tracking-widest text-center">
+                            Este recurso está siendo monitoreado por Copilot
+                        </p>
+                    )}
+                </div>
             </motion.div>
         );
     };
@@ -611,7 +584,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                                     {generatedData?.question_process_generated
                                         ?.title ||
                                         currentItem.title ||
-                                        (currentItem.fullData as any)?.title ||
+                                        currentItem.fullData?.title ||
                                         "Recurso de Inteligencia"}
                                 </ReactMarkdown>
                             </div>

@@ -1,5 +1,5 @@
 import api from "./api";
-import { Message, EducationContent } from "@/types/education";
+import { Message, EducationContent, GeneratedContent, TrackingResponse } from "@/types/education";
 import { StrategyPreferences } from "@/store/useAppStore";
 
 // ==========================================
@@ -37,6 +37,7 @@ export const educationService = {
         userContext: Partial<StrategyPreferences>
     ): Promise<ChatResponse> {
         try {
+            console.log("Strategy Chat Context:", { messages, userContext });
             // FALLBACK: Mock Logic (simulating backend latency)
             await new Promise(resolve => setTimeout(resolve, 1500));
 
@@ -58,8 +59,8 @@ export const educationService = {
     async contentChat(
         contentId: string,
         message: string,
-        history: any[],
-        preferences: any
+        history: Message[],
+        preferences: StrategyPreferences
     ): Promise<Message> {
         try {
             const response = await api.post<{ message: Message; }>(`/education/content/${contentId}/chat`, {
@@ -178,7 +179,7 @@ export const educationService = {
     /**
      * Gets the final generated analysis from the backend
      */
-    async getGeneratedContent(contentId: string): Promise<any> {
+    async getGeneratedContent(contentId: string): Promise<GeneratedContent> {
         const response = await api.get(`/education/content/${contentId}/generated`);
         return response.data.data;
     },
@@ -186,7 +187,7 @@ export const educationService = {
     /**
      * Starts the questions process for a specific content item
      */
-    async startQuestions(contentId: string, telegramId?: number): Promise<any> {
+    async startQuestions(contentId: string, telegramId?: number): Promise<{ question_process?: any }> {
         try {
             const response = await api.post(`/education/content/${contentId}/questions`, {
                 action: 'start_questions',
@@ -202,7 +203,7 @@ export const educationService = {
     /**
      * Ingests new content (text, document, or image)
      */
-    async ingestContent(formData: FormData): Promise<any> {
+    async ingestContent(formData: FormData): Promise<EducationContent | EducationContent[]> {
         try {
             // We use a custom fetch here instead of 'api' because 'api' (axios) 
             // instance in this project is configured with 'Content-Type: application/json'
@@ -231,9 +232,9 @@ export const educationService = {
     },
 
     /**
-     * Activates Telegram tracking for a content's actionables
+     * Activates Copilot tracking for a content's actionables
      */
-    async activateTracking(contentId: string): Promise<{ success: boolean; data: any }> {
+    async activateTracking(contentId: string): Promise<TrackingResponse> {
         const response = await api.post(`/education/content/${contentId}/tracking`);
         return response.data;
     },

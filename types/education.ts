@@ -34,6 +34,38 @@ export interface EducationContent {
         completed: boolean;
         question_blocks: QuestionBlock[];
     };
+    telegram_tracking?: {
+        active: boolean;
+        activated_at: string | null;
+    };
+    copilot_tracking_active?: boolean;
+}
+
+export interface GeneratedContent {
+    question_process_generated?: {
+        title?: string;
+        summary?: string;
+        key_insights?: Array<{ icon: string; text: string }>;
+        strategic_analysis?: {
+            alignment: string;
+            friction_bypass: string;
+        };
+        action_plan?: Array<{
+            task: string;
+            impact: string;
+            time: string;
+        }>;
+    };
+}
+
+export interface TrackingResponse {
+    success: boolean;
+    data?: {
+        active: boolean;
+        resource_id?: string;
+        activated_at?: string;
+        title?: string;
+    };
 }
 
 interface QuestionBlock {
