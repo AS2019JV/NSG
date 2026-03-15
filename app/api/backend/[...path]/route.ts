@@ -128,14 +128,37 @@ async function forwardRequest(
         // Forward the request to the backend
         const response = await fetch(fullUrl, options);
         
+        if (process.env.NODE_ENV === 'development') {
+            console.log(`[Backend Proxy] Response from ${fullUrl}: ${response.status}`);
+        }
+
         // Get response data
         const contentType = response.headers.get('content-type');
-        let data;
+        let data: any;
         
         if (contentType?.includes('application/json')) {
-            data = await response.json();
+            try {
+                data = await response.json();
+                if (process.env.NODE_ENV === 'development' && response.status >= 400) {
+                    console.error(`[Backend Proxy] Error data:`, data);
+                }
+            } catch (pErr) {
+                console.error('[Backend Proxy] Error parsing JSON:', pErr);
+                data = { message: 'Error parsing response from backend' };
+            }
         } else {
-            data = await response.text();
+            const text = await response.text();
+            data = { message: text || `Backend returned status ${response.status}` };
+        }
+
+        // Ensure data is an object and has a message if it's an error status
+        if (typeof data !== 'object' || data === null) {
+            data = { message: String(data) };
+        }
+
+        // If it's an error status but no message is present, add a generic one
+        if (response.status >= 400 && !data.message && !data.error) {
+            data.message = `Backend request failed with status ${response.status}`;
         }
 
         // Return the response with the same status code

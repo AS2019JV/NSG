@@ -203,7 +203,7 @@ export const educationService = {
     /**
      * Ingests new content (text, document, or image)
      */
-    async ingestContent(formData: FormData): Promise<EducationContent | EducationContent[]> {
+    async ingestContent(formData: FormData): Promise<any> {
         try {
             // We use a custom fetch here instead of 'api' because 'api' (axios) 
             // instance in this project is configured with 'Content-Type: application/json'

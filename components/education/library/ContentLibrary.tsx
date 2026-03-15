@@ -147,6 +147,18 @@ export default function ContentLibrary() {
             <ContentDetail
                 item={selectedItem}
                 onBack={() => setSelectedItem(null)}
+                onTrackingChange={(contentId, isActive) => {
+                    setLibraryItems(prev => prev.map(item => {
+                        if (item.id === contentId) {
+                            return { ...item, copilot_tracking_active: isActive };
+                        }
+                        // If we are activating a new one, deactivate all others
+                        if (isActive) {
+                            return { ...item, copilot_tracking_active: false };
+                        }
+                        return item;
+                    }));
+                }}
             />
         );
     }

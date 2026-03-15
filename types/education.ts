@@ -61,7 +61,8 @@ export interface GeneratedContent {
 export interface TrackingResponse {
     success: boolean;
     data?: {
-        active: boolean;
+        active?: boolean;
+        copilot_tracking_active?: boolean;
         resource_id?: string;
         activated_at?: string;
         title?: string;

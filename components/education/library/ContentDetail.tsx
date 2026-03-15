@@ -30,6 +30,7 @@ import ReactMarkdown from "react-markdown";
 interface ContentDetailProps {
     item: EducationContent;
     onBack: () => void;
+    onTrackingChange?: (contentId: string, isActive: boolean) => void;
 }
 
 interface QuestionBlock {
@@ -66,7 +67,7 @@ const LOADING_PHRASES = [
     "Finalizando. Tu protocolo estará listo en breve.",
 ];
 
-export default function ContentDetail({ item, onBack }: ContentDetailProps) {
+export default function ContentDetail({ item, onBack, onTrackingChange }: ContentDetailProps) {
     const { showToast } = useToast();
     const [currentItem, setCurrentItem] = useState<EducationContent>(item);
     const [currentStep, setCurrentStep] = useState(0);
@@ -170,18 +171,14 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
             const newStatus = !!response.data?.copilot_tracking_active;
             setIsTrackingThis(newStatus);
             
-            if (newStatus) {
-                setIsTrackingOther(null);
-                showToast("Activado", "success");
-            } else {
-                showToast("Desactivado", "success");
+            // Inform parent about the change to keep UI in sync
+            if (onTrackingChange) {
+                onTrackingChange(currentItem.id, newStatus);
             }
-            
-            // Refrescar datos y estado del servidor para asegurar consistencia total
-            await Promise.all([
-                refreshContent(),
-                checkTrackingStatus()
-            ]);
+
+            // Sync with server for full consistency
+            await checkTrackingStatus();
+            await refreshContent();
         } catch (error) {
             console.error("Error toggling tracking:", error);
             showToast("Error", "error");
