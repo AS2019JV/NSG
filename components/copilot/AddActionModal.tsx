@@ -5,9 +5,9 @@ import { X, Plus, Target, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Design constants aligned with NSGCopilot
-const GLASS_DRAWER = "bg-white/95 backdrop-blur-3xl border-l border-white/50 shadow-[-20px_0_50px_rgba(0,0,0,0.05)]";
-const BTN_PRIMARY = "bg-[#007AFF] hover:bg-[#0062CC] text-white shadow-[0_4px_14px_0_rgba(0,122,255,0.3)] transition-all duration-300 rounded-2xl font-medium tracking-wide active:scale-95";
-const INPUT_GLASS = "bg-slate-50/50 hover:bg-slate-100/80 focus:bg-white border-transparent focus:border-blue-500/30 focus:ring-4 focus:ring-blue-500/10 transition-all duration-300 rounded-xl outline-none";
+const GLASS_DRAWER = "bg-navy-950/95 backdrop-blur-3xl border-l border-white/10 shadow-2xl";
+const BTN_PRIMARY = "bg-blue-600 hover:bg-blue-500 text-white shadow-[0_8px_20px_rgba(59,130,246,0.25)] transition-all duration-400 rounded-2xl font-bold tracking-tight active:scale-[0.97]";
+const INPUT_GLASS = "bg-white/5 hover:bg-white/10 focus:bg-white/15 border border-white/10 focus:border-blue-500/30 transition-all duration-300 rounded-xl outline-none text-white";
 
 const cn = (...classes: (string | boolean | undefined)[]) => classes.filter(Boolean).join(' ');
 
@@ -39,7 +39,7 @@ export default function AddActionModal({ isOpen, onClose, onSave }: AddActionMod
                         initial={{ opacity: 0 }} 
                         animate={{ opacity: 1 }} 
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-[#323232]/20 backdrop-blur-sm z-[110]"
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[110]"
                         onClick={onClose}
                     />
                     <motion.div
@@ -51,12 +51,12 @@ export default function AddActionModal({ isOpen, onClose, onSave }: AddActionMod
                     >
                         <div className="flex items-center justify-between mb-10">
                             <div className="flex items-center gap-3">
-                                <div className="p-2.5 bg-blue-50 rounded-xl">
-                                    <Plus className="w-5 h-5 text-[#007AFF]" />
+                                <div className="p-3 bg-white/5 rounded-2xl border border-white/10">
+                                    <Plus className="w-5 h-5 text-blue-400" />
                                 </div>
-                                <h2 className="text-2xl font-bold tracking-tight text-[#1D1D1F]">Nueva Acción</h2>
+                                <h2 className="text-3xl font-black tracking-tighter text-white text-bright-white">Nueva Acción</h2>
                             </div>
-                            <button onClick={onClose} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400">
+                            <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors text-slate-400">
                                 <X className="w-6 h-6" />
                             </button>
                         </div>
@@ -64,7 +64,7 @@ export default function AddActionModal({ isOpen, onClose, onSave }: AddActionMod
                         <form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-8">
                             <div className="space-y-6">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-[#86868B] uppercase tracking-widest ml-1">Título de la Acción</label>
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Título de la Acción</label>
                                     <input 
                                         autoFocus
                                         value={title}
@@ -86,17 +86,17 @@ export default function AddActionModal({ isOpen, onClose, onSave }: AddActionMod
 
                                 <div className="space-y-3">
                                     <label className="text-xs font-bold text-[#86868B] uppercase tracking-widest ml-1">Nivel de Impacto</label>
-                                    <div className="grid grid-cols-3 gap-2 p-1.5 bg-slate-100/50 rounded-2xl border border-slate-200/30">
+                                    <div className="grid grid-cols-3 gap-2 p-1.5 bg-white/5 rounded-2xl border border-white/10">
                                         {['Bajo', 'Medio', 'Alto'].map((level) => (
                                             <button
                                                 key={level}
                                                 type="button"
                                                 onClick={() => setImpact(level)}
                                                 className={cn(
-                                                    "py-2.5 rounded-xl text-xs font-bold transition-all duration-300",
+                                                    "py-3 rounded-[1.2rem] text-[10px] font-black uppercase tracking-wider transition-all duration-300",
                                                     impact === level 
-                                                        ? "bg-white text-blue-600 shadow-sm scale-[1.02]" 
-                                                        : "text-slate-500 hover:text-slate-700 hover:bg-white/50"
+                                                        ? "bg-blue-600 text-white shadow-[0_0_20px_rgba(59,130,246,0.4)] scale-[1.05]" 
+                                                        : "text-slate-500 hover:text-white hover:bg-white/10"
                                                 )}
                                             >
                                                 {level}
@@ -107,9 +107,9 @@ export default function AddActionModal({ isOpen, onClose, onSave }: AddActionMod
                             </div>
 
                             <div className="mt-auto space-y-4">
-                                <div className="p-4 bg-blue-50/50 rounded-2xl border border-blue-100/50 flex gap-3 items-start">
-                                    <Info className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
-                                    <p className="text-[11px] text-blue-700 leading-relaxed font-medium">
+                                <div className="p-5 bg-blue-600/10 rounded-2xl border border-blue-500/20 flex gap-4 items-start">
+                                    <Info className="w-5 h-5 text-blue-400 mt-0.5 shrink-0" />
+                                    <p className="text-[12px] text-blue-100/70 leading-relaxed font-bold">
                                         Esta acción se integrará en tu Lista de Acción Inteligente. El Agente I monitorizará su progreso automáticamente.
                                     </p>
                                 </div>

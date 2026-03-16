@@ -43,7 +43,7 @@ function PortfolioRow({ name, sector, share, val, perf }: PortfolioRowProps) {
       <td className="p-6 text-slate-500">{sector}</td>
       <td className="p-6 text-slate-500">{share}</td>
       <td className="p-6 font-bold text-navy-900">{val}</td>
-      <td className="p-6 font-bold text-emerald-500">{perf}</td>
+      <td className="p-6 font-bold text-blue-500">{perf}</td>
     </tr>
   );
 }

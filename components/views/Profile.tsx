@@ -165,7 +165,7 @@ export default function Profile() {
                 <div className="relative z-10">
                     <h2 className="font-display font-bold text-2xl sm:text-3xl lg:text-4xl tracking-tight mb-2">
                         <span className="text-white">Gestión de </span>
-                        <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 via-cyan-400 to-emerald-400">
+                        <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 via-cyan-400 to-blue-400">
                             Mi Perfil
                         </span>
                     </h2>

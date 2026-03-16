@@ -12,7 +12,6 @@ import {
     TrendingUp,
     Activity,
     Plus,
-    BrainCircuit,
     MessageCircle,
     Clock,
     ChevronRight,
@@ -25,6 +24,7 @@ import {
     FileText,
     GripVertical,
 } from "lucide-react";
+import BrandAtom from "@/components/ui/BrandAtom";
 import {
     motion,
     AnimatePresence,
@@ -50,19 +50,19 @@ const cn = (...classes: (string | boolean | undefined)[]) =>
     classes.filter(Boolean).join(" ");
 
 // Constantes de Diseño "Apple Glass" Refinado
-const GLASS_PANEL = `bg-white/80 backdrop-blur-2xl border border-white/60 shadow-[0_4px_20px_rgb(0,0,0,0.03)] rounded-[1.8rem]`;
+const GLASS_PANEL = `bg-navy-900/60 backdrop-blur-2xl border border-white/10 shadow-2xl rounded-[2.5rem]`;
 const BTN_PRIMARY =
-    "bg-[#007AFF] hover:bg-[#0071E3] text-white shadow-[0_8px_20px_rgba(0,122,255,0.25)] transition-all duration-400 rounded-2xl font-semibold tracking-tight active:scale-[0.97]";
+    "bg-blue-600 hover:bg-blue-500 text-white shadow-[0_8px_20px_rgba(59,130,246,0.25)] transition-all duration-400 rounded-2xl font-semibold tracking-tight active:scale-[0.97]";
 const INPUT_GLASS =
-    "bg-white/40 hover:bg-white/60 focus:bg-white/90 border border-white/60 focus:border-[#007AFF]/30 transition-all duration-300 rounded-xl outline-none shadow-sm";
+    "bg-white/5 hover:bg-white/10 focus:bg-white/20 border border-white/10 focus:border-blue-500/30 transition-all duration-300 rounded-xl outline-none shadow-sm text-white";
 
 // Checkbox estilo "Sky Crystal" (Dopamina Visual)
 const CHECKBOX_BASE =
     "min-w-[26px] h-[26px] rounded-full flex items-center justify-center transition-all duration-500 shadow-sm border border-slate-200";
 const CHECKBOX_UNCHECKED =
-    "bg-white/50 hover:bg-white hover:border-cyan-300 hover:shadow-[0_0_10px_rgba(103,232,249,0.3)]";
+    "bg-white/50 hover:bg-white hover:border-blue-300 hover:shadow-[0_0_10px_rgba(16,185,129,0.3)]";
 const CHECKBOX_CHECKED =
-    "bg-linear-to-tr from-cyan-400 to-blue-500 border-transparent text-white shadow-[0_0_20px_rgba(6,182,212,0.6)] scale-110 rotate-[360deg]";
+    "bg-linear-to-tr from-blue-400 to-blue-600 border-transparent text-white shadow-[0_0_20px_rgba(16,185,129,0.6)] scale-110 rotate-[360deg]";
 
 const ImpactBadge = ({ level }: { level: string }) => {
     const colors: Record<string, string> = {
@@ -85,10 +85,10 @@ const ImpactBadge = ({ level }: { level: string }) => {
 const AgentStatusPill = ({ state }: { state: string }) => {
     const states: Record<
         string,
-        { icon: typeof BrainCircuit; label: string; color: string }
+        { icon: React.ElementType; label: string; color: string }
     > = {
         detected: {
-            icon: BrainCircuit,
+            icon: BrandAtom,
             label: "Detectado",
             color: "text-slate-400",
         },
@@ -105,7 +105,7 @@ const AgentStatusPill = ({ state }: { state: string }) => {
         verified: {
             icon: Check,
             label: "Verificado",
-            color: "text-emerald-500",
+            color: "text-blue-500",
         },
     };
     const config = states[state] || states.detected;
@@ -292,7 +292,7 @@ const ReorderItem = ({
                                 "text-[17px] font-semibold bg-transparent border-none outline-none w-full p-0 m-0 focus:ring-0 truncate transition-colors font-display tracking-tight",
                                 task.completed
                                     ? "text-[#86868B] line-through decoration-slate-300"
-                                    : "text-[#1D1D1F]",
+                                    : "text-bright-white",
                             )}
                         >
                             {task.title}
@@ -301,8 +301,8 @@ const ReorderItem = ({
                             className={cn(
                                 "text-[14px] bg-transparent border-none outline-none w-full p-0 m-0 focus:ring-0 truncate transition-colors",
                                 task.completed
-                                    ? "text-slate-300"
-                                    : "text-[#86868B]",
+                                    ? "text-slate-500"
+                                    : "text-slate-400",
                             )}
                         >
                             {task.description}
@@ -312,10 +312,10 @@ const ReorderItem = ({
                     <div className="flex items-center gap-4 flex-wrap">
                         {!task.completed && (
                             <div className="flex items-center gap-1.5 pr-3 border-r border-slate-200/60">
-                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
                                     Score
                                 </span>
-                                <span className="text-xs font-bold text-[#007AFF]">
+                                <span className="text-sm font-black text-bright-white">
                                     {task.score}
                                 </span>
                             </div>
@@ -431,47 +431,47 @@ function TimelineItem({
     const styles: Record<string, ActionStyle> = {
         emerald: {
             active: {
-                bg: "bg-emerald-50/50",
-                border: "border-emerald-500/30",
-                text: "text-emerald-900",
-                accent: "text-emerald-600",
-                dot: "bg-emerald-500",
-                iconBg: "bg-emerald-500/10",
-                bar: "bg-emerald-500",
-            },
-            inactive: {
-                border: "border-slate-200",
-                dotBorder: "border-slate-200",
-            },
-        },
-        blue: {
-            active: {
-                bg: "bg-blue-50/50",
+                bg: "bg-blue-600/10",
                 border: "border-blue-500/30",
-                text: "text-blue-900",
-                accent: "text-blue-600",
+                text: "text-bright-white",
+                accent: "text-blue-400",
                 dot: "bg-blue-500",
                 iconBg: "bg-blue-500/10",
                 bar: "bg-blue-500",
             },
             inactive: {
-                border: "border-slate-200",
-                dotBorder: "border-slate-200",
+                border: "border-white/5",
+                dotBorder: "border-white/10",
+            },
+        },
+        blue: {
+            active: {
+                bg: "bg-blue-600/10",
+                border: "border-blue-500/30",
+                text: "text-bright-white",
+                accent: "text-blue-400",
+                dot: "bg-blue-500",
+                iconBg: "bg-blue-500/10",
+                bar: "bg-blue-500",
+            },
+            inactive: {
+                border: "border-white/5",
+                dotBorder: "border-white/10",
             },
         },
         indigo: {
             active: {
-                bg: "bg-indigo-50/50",
-                border: "border-indigo-500/30",
-                text: "text-indigo-900",
-                accent: "text-indigo-600",
-                dot: "bg-indigo-500",
-                iconBg: "bg-indigo-500/10",
-                bar: "bg-indigo-500",
+                bg: "bg-blue-600/10",
+                border: "border-blue-500/30",
+                text: "text-bright-white",
+                accent: "text-blue-400",
+                dot: "bg-blue-600",
+                iconBg: "bg-blue-500/10",
+                bar: "bg-blue-500",
             },
             inactive: {
-                border: "border-slate-200",
-                dotBorder: "border-slate-200",
+                border: "border-white/5",
+                dotBorder: "border-white/10",
             },
         },
     };
@@ -516,10 +516,10 @@ function TimelineItem({
             </div>
             <div
                 className={clsx(
-                    "flex-1 p-5 rounded-3xl border transition-all duration-500 ease-out relative overflow-hidden",
+                    "flex-1 p-5 rounded-3xl border transition-all duration-500 ease-out relative overflow-hidden backdrop-blur-3xl",
                     isChecked
-                        ? `${style.active.bg} ${style.active.border} shadow-sm`
-                        : "bg-white border-slate-200 hover:border-slate-300 hover:shadow-md",
+                        ? `${style.active.bg} ${style.active.border} shadow-lg ring-1 ring-white/10`
+                        : "bg-navy-900/40 border-white/5 hover:border-white/10 hover:shadow-2xl",
                 )}
             >
                 {isChecked && (
@@ -535,7 +535,7 @@ function TimelineItem({
                         <h4
                             className={clsx(
                                 "font-display font-bold text-lg tracking-tight transition-all duration-700",
-                                isChecked ? style.active.text : "text-navy-950",
+                                isChecked ? style.active.text : "text-white/90",
                             )}
                         >
                             {title}
@@ -578,7 +578,7 @@ function TimelineItem({
                 <p
                     className={clsx(
                         "text-sm font-medium leading-relaxed transition-all duration-500 relative z-10",
-                        isChecked ? "text-slate-500/70" : "text-slate-500/90",
+                        isChecked ? "text-slate-400/70" : "text-slate-400",
                     )}
                 >
                     {desc}
@@ -598,7 +598,7 @@ function StrategyCard({ strategy }: { strategy: Strategy }) {
     const parseAction = (text: string, index: number) => {
         const keywords = [
             { kw: "Quick Win", label: "Ejecución Inmediata", color: "emerald" },
-            { kw: "Optimización", label: "Mejora de Procesos", color: "blue" },
+            { kw: "Optimización", label: "Mejora de Procesos", color: "emerald" },
             {
                 kw: "Transformación",
                 label: "Cambio Estructural",
@@ -626,7 +626,7 @@ function StrategyCard({ strategy }: { strategy: Strategy }) {
             title: `Acción Táctica ${index + 1}`,
             label: "Estrategia de Ejecución",
             description: text,
-            color: "blue",
+            color: "emerald",
         };
     };
 
@@ -634,10 +634,10 @@ function StrategyCard({ strategy }: { strategy: Strategy }) {
         <div className="transition-all duration-500 group overflow-hidden relative flex flex-col h-full">
             {/* Meta Title */}
             <div className="mb-8 relative z-10 pt-1 pr-12">
-                <h4 className="font-display font-bold text-sm lg:text-base tracking-tight text-navy-950 mb-1.5 leading-tight transition-all duration-500 group-hover:text-blue-700">
+                <h4 className="font-display font-bold text-lg lg:text-xl tracking-tighter text-bright-white mb-2 leading-tight transition-all duration-500 group-hover:text-blue-400">
                     {strategy.meta_detectada}
                 </h4>
-                <div className="text-[8px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                <div className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500">
                     Objetivo Estratégico Detectado
                 </div>
             </div>
@@ -653,11 +653,11 @@ function StrategyCard({ strategy }: { strategy: Strategy }) {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const styles: any = {
                             emerald: {
-                                bg: "bg-emerald-50/40",
-                                border: "border-emerald-500/10",
-                                text: "text-emerald-900",
-                                accent: "text-emerald-600",
-                                numBg: "bg-emerald-500",
+                                bg: "bg-blue-50/40",
+                                border: "border-blue-500/10",
+                                text: "text-blue-900",
+                                accent: "text-blue-600",
+                                numBg: "bg-blue-500",
                             },
                             blue: {
                                 bg: "bg-blue-50/40",
@@ -667,11 +667,11 @@ function StrategyCard({ strategy }: { strategy: Strategy }) {
                                 numBg: "bg-blue-500",
                             },
                             indigo: {
-                                bg: "bg-indigo-50/40",
-                                border: "border-indigo-500/10",
-                                text: "text-indigo-900",
-                                accent: "text-indigo-600",
-                                numBg: "bg-indigo-500",
+                                bg: "bg-blue-100/40",
+                                border: "border-blue-500/10",
+                                text: "text-blue-900",
+                                accent: "text-blue-600",
+                                numBg: "bg-blue-600",
                             },
                         };
                         const style = (styles[color] ||
@@ -681,7 +681,7 @@ function StrategyCard({ strategy }: { strategy: Strategy }) {
                             <div
                                 key={i}
                                 className={clsx(
-                                    "p-5 rounded-3xl border border-slate-200 bg-white transition-all duration-500 flex flex-col gap-3 group/action hover:shadow-md hover:border-slate-300 relative overflow-hidden animate-fade-in",
+                                    "p-6 rounded-[2rem] border border-white/5 bg-navy-950/40 transition-all duration-500 flex flex-col gap-4 group/action hover:shadow-2xl hover:border-white/20 relative overflow-hidden animate-fade-in",
                                 )}
                                 style={{ animationDelay: `${i * 100}ms` }}
                             >
@@ -705,8 +705,7 @@ function StrategyCard({ strategy }: { strategy: Strategy }) {
                                         </div>
                                         <h5
                                             className={clsx(
-                                                "font-display font-bold text-lg tracking-tight transition-colors",
-                                                style.text,
+                                                "font-display font-bold text-xl tracking-tight transition-colors text-bright-white",
                                             )}
                                         >
                                             {title}
@@ -1337,7 +1336,7 @@ export default function ICopilot() {
                 <Banner
                     onClick={() => syncObjectives(true)}
                     badge="PROTOCOLO FUNDAMENTAL: I CLARITY"
-                    title="I Copilot"
+                    title="I COPILOT"
                     titleSuffix="PRO"
                     description={
                         <>
@@ -1352,11 +1351,11 @@ export default function ICopilot() {
                 />
 
                 {/* 2. INTEGRATION BAR - Matches toolbar row in image */}
-                <div className="flex flex-col lg:flex-row items-center justify-between gap-4 mb-8 bg-white/80 backdrop-blur-md px-6 py-4 rounded-3xl border border-slate-200/60 shadow-sm transition-all hover:bg-white">
+                <div className="flex flex-col lg:flex-row items-center justify-between gap-6 mb-12 bg-navy-900/60 backdrop-blur-md px-10 py-6 rounded-[2.5rem] border border-white/10 shadow-2xl transition-all hover:bg-navy-900/80">
                     <div className="flex items-center gap-6">
-                        <div className="flex items-center gap-2.5 px-3.5 py-2 bg-slate-100 rounded-xl border border-slate-200">
-                            <Activity className="w-3.5 h-3.5 text-blue-500" />
-                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                        <div className="flex items-center gap-3 px-5 py-3 bg-white/5 rounded-2xl border border-white/10">
+                            <Activity className="w-4 h-4 text-blue-400" />
+                            <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">
                                 Sincronización de Ecosistema
                             </span>
                         </div>
@@ -1384,16 +1383,16 @@ export default function ICopilot() {
                         <button
                             onClick={() => handleConnect("Telegram")}
                             className={clsx(
-                                "group flex items-center gap-3 px-4 py-2 border rounded-2xl transition-all duration-300",
+                                "group flex items-center gap-3 px-4 py-2 border rounded-2xl transition-all duration-300 backdrop-blur-xl",
                                 telegramId
-                                    ? "bg-emerald-50 border-emerald-100"
-                                    : "bg-white border-slate-200 hover:border-blue-400 hover:bg-slate-50",
+                                    ? "bg-blue-500/10 border-blue-500/20 shadow-[0_0_20px_rgba(59,130,246,0.1)]"
+                                    : "bg-white/5 border-white/10 hover:border-blue-500/30 hover:bg-white/10",
                             )}
                         >
-                            <div className="w-6 h-6 flex items-center justify-center bg-[#0088cc]/10 rounded-lg text-[#0088cc]">
+                            <div className="w-8 h-8 flex items-center justify-center bg-[#0088cc]/20 rounded-xl border border-[#0088cc]/30 group-hover:border-[#0088cc]/50 transition-all text-[#0088cc]">
                                 <svg
                                     viewBox="0 0 24 24"
-                                    className="w-3.5 h-3.5 fill-current"
+                                    className="w-4 h-4 fill-current"
                                     xmlns="http://www.w3.org/2000/svg"
                                 >
                                     <path d="M11.944 0C5.352 0 0 5.352 0 11.944c0 6.592 5.352 11.944 11.944 11.944c6.592 0 11.944-5.352 11.944-11.944C23.888 5.352 18.536 0 11.944 0zm5.66 8.16l-1.928 9.096c-.144.644-.528.804-1.068.5l-2.936-2.164l-1.416 1.364c-.156.156-.288.288-.588.288l.212-3.04l5.524-4.992c.24-.212-.052-.332-.372-.12l-6.828 4.3l-2.948-.92c-.64-.2-.652-.64.132-.948l11.524-4.44c.532-.2.996.12.804.976z" />
@@ -1403,7 +1402,7 @@ export default function ICopilot() {
                                 <p className="text-[8px] font-bold uppercase tracking-widest text-slate-400 leading-none mb-0.5">
                                     Telegram
                                 </p>
-                                <p className="text-[11px] font-bold text-navy-900 leading-none">
+                                <p className="text-[11px] font-black text-white leading-none">
                                     {telegramId
                                         ? `@${telegramData?.username || "Conectado"}`
                                         : "Vincular"}
@@ -1415,16 +1414,16 @@ export default function ICopilot() {
                         <button
                             onClick={() => handleConnect("Calendar")}
                             className={clsx(
-                                "group flex items-center gap-3 px-4 py-2 border rounded-2xl transition-all duration-300",
+                                "group flex items-center gap-3 px-4 py-2 border rounded-2xl transition-all duration-300 backdrop-blur-xl",
                                 isConnected
-                                    ? "bg-emerald-50 border-emerald-100"
-                                    : "bg-white border-slate-200 hover:border-red-400 hover:bg-slate-50",
+                                    ? "bg-blue-500/10 border-blue-500/20 shadow-[0_0_20px_rgba(59,130,246,0.1)]"
+                                    : "bg-white/5 border-white/10 hover:border-red-500/30 hover:bg-white/10",
                             )}
                         >
-                            <div className="w-6 h-6 flex items-center justify-center bg-slate-100 rounded-lg">
+                            <div className="w-8 h-8 flex items-center justify-center bg-white/10 rounded-xl border border-white/10 group-hover:border-white/20 transition-all">
                                 <svg
                                     viewBox="0 0 24 24"
-                                    className="w-3.5 h-3.5"
+                                    className="w-4 h-4 opacity-100"
                                 >
                                     <path
                                         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -1448,7 +1447,7 @@ export default function ICopilot() {
                                 <p className="text-[8px] font-bold uppercase tracking-widest text-slate-400 leading-none mb-0.5">
                                     Calendar
                                 </p>
-                                <p className="text-[11px] font-bold text-navy-900 leading-none">
+                                <p className="text-[11px] font-black text-white leading-none">
                                     {isConnected ? "Conectado" : "Vincular"}
                                 </p>
                             </div>
@@ -1457,14 +1456,14 @@ export default function ICopilot() {
                 </div>
 
                 {/* 3. TAB NAVIGATION */}
-                <div className="flex p-1.5 bg-slate-100/50 backdrop-blur-md rounded-2xl w-full sm:w-fit mb-6 border border-slate-200/50 self-center">
+                <div className="flex p-2 bg-white/5 backdrop-blur-xl rounded-[2rem] w-full sm:w-fit mb-12 border border-white/10 self-center shadow-2xl">
                     <button
                         onClick={() => setActiveTab("execution")}
                         className={clsx(
-                            "flex items-center justify-center gap-2.5 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 flex-1 sm:flex-none whitespace-nowrap",
+                            "flex items-center justify-center gap-3 px-8 py-3.5 rounded-[1.5rem] font-black text-xs transition-all duration-500 uppercase tracking-widest flex-1 sm:flex-none whitespace-nowrap",
                             activeTab === "execution"
-                                ? "bg-white text-blue-600 shadow-sm ring-1 ring-slate-200"
-                                : "text-slate-500 hover:text-slate-700 hover:bg-white/50",
+                                ? "bg-blue-600 text-white shadow-[0_0_30px_rgba(59,130,246,0.5)] scale-105"
+                                : "text-slate-500 hover:text-white hover:bg-white/5",
                         )}
                     >
                         <Activity className="w-4 h-4" />
@@ -1473,10 +1472,10 @@ export default function ICopilot() {
                     <button
                         onClick={() => setActiveTab("analysis")}
                         className={clsx(
-                            "flex items-center justify-center gap-2.5 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 flex-1 sm:flex-none whitespace-nowrap",
+                            "flex items-center justify-center gap-3 px-8 py-3.5 rounded-[1.5rem] font-black text-xs transition-all duration-500 uppercase tracking-widest flex-1 sm:flex-none whitespace-nowrap",
                             activeTab === "analysis"
-                                ? "bg-white text-blue-600 shadow-sm ring-1 ring-slate-200"
-                                : "text-slate-500 hover:text-slate-700 hover:bg-white/50",
+                                ? "bg-blue-600 text-white shadow-[0_0_30px_rgba(59,130,246,0.5)] scale-105"
+                                : "text-slate-500 hover:text-white hover:bg-white/5",
                         )}
                     >
                         <BarChart3 className="w-4 h-4" />
@@ -1497,27 +1496,26 @@ export default function ICopilot() {
                                 {/* Brillito de fondo */}
                                 <div className="absolute -top-24 -right-24 w-64 h-64 bg-linear-to-br from-cyan-300/20 to-blue-500/20 rounded-full blur-3xl" />
 
-                                <div className="flex justify-between items-end mb-5 relative z-10">
+                                <div className="flex justify-between items-end mb-6 relative z-10">
                                     <div>
-                                        <h2 className="text-2xl font-bold tracking-tight text-[#1D1D1F] mb-1 flex items-center gap-2">
+                                        <h2 className="text-3xl font-black tracking-tighter text-white mb-2 flex items-center gap-2 text-bright-white">
                                             Progreso Diario
                                         </h2>
-                                        <p className="text-[#86868B] font-medium text-sm">
-                                            Tu momentum se construye acción a
-                                            acción.
+                                        <p className="text-slate-500 font-bold text-base uppercase tracking-widest">
+                                            Tu momentum se construye acción a acción.
                                         </p>
                                     </div>
                                     <div className="flex items-baseline gap-1">
-                                        <span className="text-4xl font-bold text-[#1D1D1F] tracking-tighter">
+                                        <span className="text-6xl font-black text-white tracking-tighter text-bright-white">
                                             {Math.round(progress)}
                                         </span>
-                                        <span className="text-lg font-medium text-[#86868B]">
+                                        <span className="text-2xl font-black text-blue-400">
                                             %
                                         </span>
                                     </div>
                                 </div>
 
-                                <div className="h-5 w-full bg-[#E5E5EA]/70 rounded-full overflow-hidden p-[3px] shadow-inner relative z-10">
+                                <div className="h-4 w-full bg-white/5 rounded-full overflow-hidden p-[2px] border border-white/5 relative z-10">
                                     <motion.div
                                         layout
                                         className="h-full bg-linear-to-r from-cyan-400 via-[#007AFF] to-[#5856D6] rounded-full shadow-[0_0_20px_rgba(0,122,255,0.3)] relative"
@@ -1545,7 +1543,7 @@ export default function ICopilot() {
                             {/* LEFT: MAIN TASK LIST */}
                             <div className="lg:col-span-8 space-y-8">
                                 <div className="flex items-center justify-between">
-                                    <h3 className="text-2xl font-bold text-[#1D1D1F] tracking-tight">
+                                    <h3 className="text-3xl font-black text-white tracking-tighter text-bright-white">
                                         Lista de Acción Inteligente
                                     </h3>
 
@@ -1583,10 +1581,10 @@ export default function ICopilot() {
                                             />
                                         </div>
 
-                                        <div className="flex items-center gap-1 bg-white/30 backdrop-blur-md p-1 rounded-full border border-white/40 ring-1 ring-white/10">
+                                        <div className="flex items-center gap-1 bg-white/5 backdrop-blur-xl p-1 rounded-full border border-white/10 ring-1 ring-white/5 shadow-2xl">
                                             <button
                                                 onClick={() => changeWeek(-1)}
-                                                className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:bg-white/60 hover:text-blue-500 transition-all"
+                                                className="w-7 h-7 rounded-full flex items-center justify-center text-slate-500 hover:bg-white/10 hover:text-blue-400 transition-all"
                                             >
                                                 <ChevronLeft className="w-4 h-4" />
                                             </button>
@@ -1602,8 +1600,8 @@ export default function ICopilot() {
                                                     className={cn(
                                                         "w-8 h-8 rounded-full flex flex-col items-center justify-center transition-all duration-300 relative group",
                                                         d.active
-                                                            ? "bg-[#1D1D1F] text-white shadow-[0_4px_12px_rgba(0,0,0,0.15)] scale-105 z-10"
-                                                            : "text-[#86868B] hover:bg-white/60 hover:text-black",
+                                                            ? "bg-blue-600 text-white shadow-[0_0_20px_rgba(59,130,246,0.5)] scale-105 z-10"
+                                                            : "text-slate-500 hover:bg-white/10 hover:text-white",
                                                     )}
                                                 >
                                                     <span className="text-[7px] font-black leading-none mb-0.5 opacity-50 group-hover:opacity-100">
@@ -1623,7 +1621,7 @@ export default function ICopilot() {
 
                                             <button
                                                 onClick={() => changeWeek(1)}
-                                                className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:bg-white/60 hover:text-blue-500 transition-all"
+                                                className="w-7 h-7 rounded-full flex items-center justify-center text-slate-500 hover:bg-white/10 hover:text-blue-400 transition-all"
                                             >
                                                 <ChevronRight className="w-4 h-4" />
                                             </button>
@@ -1638,17 +1636,17 @@ export default function ICopilot() {
                                                 key={f}
                                                 onClick={() => setFilter(f)}
                                                 className={cn(
-                                                    "px-4 py-1.5 rounded-full text-[13px] font-medium transition-all capitalize border",
+                                                    "px-4 py-1.5 rounded-full text-[13px] font-bold transition-all capitalize border",
                                                     filter === f
-                                                        ? "bg-white border-blue-200 text-blue-600 shadow-sm"
-                                                        : "bg-transparent border-transparent text-[#86868B] hover:bg-white/50",
+                                                        ? "bg-blue-600/20 border-blue-500/30 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]"
+                                                        : "bg-white/5 border-white/5 text-slate-500 hover:bg-white/10 hover:text-slate-300",
                                                 )}
                                             >
                                                 {f === "all"
                                                     ? "Todas"
                                                     : f === "high"
-                                                      ? "Alto Impacto"
-                                                      : "Protocolo de Calidad"}
+                                                        ? "Alto Impacto"
+                                                        : "Protocolo de Calidad"}
                                             </button>
                                         ))}
                                     </div>
@@ -1696,11 +1694,11 @@ export default function ICopilot() {
                                 <div
                                     className={cn(
                                         GLASS_PANEL,
-                                        "p-6 bg-white/60 min-h-[300px] flex flex-col",
+                                        "p-6 bg-navy-900/60 min-h-[300px] flex flex-col backdrop-blur-3xl border-white/5 shadow-2xl hover:border-blue-500/20 transition-all duration-500",
                                     )}
                                 >
-                                    <h4 className="text-sm font-semibold text-[#1D1D1F] mb-4 flex items-center gap-2">
-                                        <FileText className="w-4 h-4 text-[#007AFF]" />
+                                    <h4 className="text-sm font-bold text-bright-white mb-4 flex items-center gap-2 uppercase tracking-wider">
+                                        <FileText className="w-4 h-4 text-blue-400" />
                                         Lista de Documentos Importantes
                                     </h4>
                                     <div className="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-1 flex items-center justify-center">
@@ -1721,12 +1719,12 @@ export default function ICopilot() {
                                 <div
                                     className={cn(
                                         GLASS_PANEL,
-                                        "p-6 bg-white/60 flex flex-col",
+                                        "p-6 bg-navy-900/60 flex flex-col backdrop-blur-3xl border-white/5 shadow-2xl hover:border-blue-500/20 transition-all duration-500",
                                     )}
                                 >
                                     <div className="flex items-center justify-between mb-4">
-                                        <h4 className="text-sm font-semibold text-[#1D1D1F] flex items-center gap-2">
-                                            <Target className="w-4 h-4 text-[#5856D6]" />
+                                        <h4 className="text-sm font-bold text-bright-white flex items-center gap-2 uppercase tracking-wider">
+                                            <Target className="w-4 h-4 text-blue-400" />
                                             Protocolo de Acción
                                         </h4>
                                         <button
@@ -1737,7 +1735,7 @@ export default function ICopilot() {
                                                 className={cn(
                                                     "w-3.5 h-3.5",
                                                     isLoadingStrategies &&
-                                                        "animate-spin",
+                                                    "animate-spin",
                                                 )}
                                             />
                                         </button>
@@ -1785,8 +1783,8 @@ export default function ICopilot() {
                                                 );
                                             })
                                         ) : (
-                                            <div className="py-8 text-center bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
-                                                <Target className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                                            <div className="py-8 text-center bg-white/5 rounded-2xl border border-dashed border-white/10">
+                                                <Target className="w-8 h-8 text-slate-500 mx-auto mb-2" />
                                                 <p className="text-[10px] text-slate-400 font-medium">
                                                     Sin protocolos activos
                                                 </p>
@@ -1799,16 +1797,16 @@ export default function ICopilot() {
                     </>
                 ) : (
                     <div className="space-y-4 xs:space-y-6 mb-8 xs:mb-12 animate-fade-in pb-4">
-                        <div className="bg-white/50 backdrop-blur-sm p-5 sm:p-6 rounded-[2.5rem] border border-slate-200/60 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                        <div className="bg-navy-900/60 backdrop-blur-3xl p-5 sm:p-6 rounded-[2.5rem] border border-white/10 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
                             <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 bg-linear-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+                                <div className="w-12 h-12 bg-linear-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
                                     <TrendingUp className="w-6 h-6 text-white" />
                                 </div>
                                 <div>
-                                    <h3 className="font-display font-bold text-xl text-navy-950">
+                                    <h3 className="font-display font-bold text-xl text-bright-white">
                                         Análisis de Rendimiento
                                     </h3>
-                                    <p className="text-xs text-slate-500 font-medium">
+                                    <p className="text-xs text-slate-400 font-medium">
                                         Estadísticas detalladas sobre tu
                                         constancia y ejecución de objetivos.
                                     </p>
@@ -2005,7 +2003,7 @@ export default function ICopilot() {
                                     {/* Agent Activity Timeline */}
                                     <div className="bg-[#F5F5F7]/50 rounded-3xl p-6 border border-white/50">
                                         <h4 className="text-sm font-semibold text-[#1D1D1F] mb-6 flex items-center gap-2">
-                                            <BrainCircuit className="w-4 h-4 text-[#007AFF]" />
+                                            <BrandAtom className="w-4 h-4 text-blue-600" />
                                             Actividad del Agente
                                         </h4>
 

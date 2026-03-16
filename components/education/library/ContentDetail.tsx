@@ -378,7 +378,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                                             key={i}
                                             className="flex gap-4 p-5 bg-white rounded-2xl border border-slate-100/60 group hover:border-blue-200 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300 relative overflow-hidden"
                                         >
-                                            <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-400 to-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                            <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-400 to-blue-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                                             <div className={clsx("w-10 h-10 shrink-0 rounded-xl flex items-center justify-center border transition-colors",
                                                 isFirst ? "bg-blue-600 text-white border-blue-500 shadow-md shadow-blue-500/20 group-hover:bg-blue-700" : "bg-blue-50/50 group-hover:bg-blue-50 border-blue-100/50 group-hover:border-blue-200"
                                             )}>
@@ -443,13 +443,13 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                     className="bg-white rounded-4xl p-8 md:p-10 border border-slate-100 shadow-xl shadow-blue-500/5 space-y-8"
                 >
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3 text-emerald-600">
+                        <div className="flex items-center gap-3 text-blue-600">
                             <ListChecks className="w-6 h-6" />
-                            <div className="font-bold text-lg uppercase tracking-wider prose prose-p:my-0 prose-strong:text-emerald-600">
+                            <div className="font-bold text-lg uppercase tracking-wider prose prose-p:my-0 prose-strong:text-blue-600">
                                 <ReactMarkdown>Plan de Acción</ReactMarkdown>
                             </div>
                         </div>
-                        <span className="text-[10px] font-black bg-emerald-50 text-emerald-600 px-4 py-1.5 rounded-full uppercase">
+                        <span className="text-[10px] font-black bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full uppercase">
                             Próximos Pasos
                         </span>
                     </div>
@@ -466,9 +466,9 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                             ) => (
                                 <div
                                     key={i}
-                                    className="flex items-center gap-6 p-6 bg-slate-50/50 rounded-2xl group hover:bg-emerald-50/30 transition-all border border-transparent hover:border-emerald-100"
+                                    className="flex items-center gap-6 p-6 bg-slate-50/50 rounded-2xl group hover:bg-blue-50/30 transition-all border border-transparent hover:border-blue-100"
                                 >
-                                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center font-bold text-navy-900 shadow-sm group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center font-bold text-navy-900 shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-colors">
                                         {i + 1}
                                     </div>
                                     <div className="flex-1">
@@ -493,7 +493,7 @@ export default function ContentDetail({ item, onBack }: ContentDetailProps) {
                                             </span>
                                         </div>
                                     </div>
-                                    <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-emerald-500 transition-colors" />
+                                    <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-blue-500 transition-colors" />
                                 </div>
                             ),
                         )}

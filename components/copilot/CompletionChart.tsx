@@ -63,8 +63,8 @@ export default function CompletionChart({
                 0,
             );
             return (
-                <div className="bg-white p-4 rounded-xl shadow-2xl border border-slate-200">
-                    <p className="font-bold text-navy-950 mb-2">
+                <div className="bg-navy-950/90 p-4 rounded-xl shadow-2xl border border-white/10 backdrop-blur-xl">
+                    <p className="font-bold text-white text-bright-white mb-2">
                         {payload[0].payload.date}
                     </p>
                     <div className="space-y-1">
@@ -78,20 +78,20 @@ export default function CompletionChart({
                                         className="w-3 h-3 rounded-sm"
                                         style={{ backgroundColor: entry.color }}
                                     ></div>
-                                    <span className="text-slate-600 font-medium capitalize">
+                                    <span className="text-slate-300 font-medium capitalize">
                                         {entry.name.replace(/_/g, " ")}
                                     </span>
                                 </div>
-                                <span className="font-bold text-navy-950">
+                                <span className="font-bold text-white text-bright-white">
                                     {entry.value}
                                 </span>
                             </div>
                         ))}
-                        <div className="pt-2 mt-2 border-t border-slate-100 flex justify-between items-center">
+                        <div className="pt-2 mt-2 border-t border-white/5 flex justify-between items-center">
                             <span className="text-slate-500 font-bold text-xs uppercase">
                                 Total
                             </span>
-                            <span className="font-bold text-blue-600">
+                            <span className="font-bold text-blue-400 text-bright-white">
                                 {total}
                             </span>
                         </div>
@@ -108,14 +108,14 @@ export default function CompletionChart({
 
     if (!chartData || chartData.length === 0) {
         return (
-            <div className="bg-white p-8 sm:p-12 rounded-4xl border-2 border-dashed border-slate-200 text-center">
-                <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <Calendar className="w-8 h-8 text-slate-300" />
+            <div className="bg-navy-900/60 p-8 sm:p-12 rounded-4xl border border-white/5 border-dashed text-center backdrop-blur-3xl">
+                <div className="w-16 h-16 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Calendar className="w-8 h-8 text-slate-500" />
                 </div>
-                <p className="text-slate-500 font-medium">
+                <p className="text-slate-300 font-bold text-bright-white">
                     No hay datos suficientes para mostrar
                 </p>
-                <p className="text-slate-400 text-sm mt-1">
+                <p className="text-slate-500 text-sm mt-1 uppercase tracking-wider font-bold">
                     Completa protocolos para ver tu progreso
                 </p>
             </div>
@@ -123,16 +123,16 @@ export default function CompletionChart({
     }
 
     return (
-        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-navy-900/60 p-6 sm:p-8 rounded-3xl border border-white/5 shadow-2xl backdrop-blur-3xl hover:border-blue-500/30 transition-all duration-500">
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h4 className="font-display font-bold text-lg sm:text-xl text-navy-950 flex items-center gap-2">
-                        <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                            <Calendar className="w-4 h-4 text-blue-600" />
+                    <h4 className="font-display font-black text-lg sm:text-xl text-bright-white flex items-center gap-2 tracking-tight">
+                        <div className="w-8 h-8 bg-blue-500/10 border border-blue-500/20 rounded-lg flex items-center justify-center">
+                            <Calendar className="w-4 h-4 text-blue-400" />
                         </div>
                         Tu Constancia en los Hábitos
                     </h4>
-                    <p className="text-sm text-slate-500 mt-1">
+                    <p className="text-sm text-slate-500 mt-1 font-bold italic">
                         Seguimiento de cumplimiento:{" "}
                         {period === "week"
                             ? "Última semana"
@@ -148,30 +148,30 @@ export default function CompletionChart({
                 >
                     <CartesianGrid
                         strokeDasharray="3 3"
-                        stroke="#E2E8F0"
+                        stroke="rgba(255,255,255,0.05)"
                         vertical={false}
                     />
                     <XAxis
                         dataKey="name"
-                        stroke="#94A3B8"
-                        style={{ fontSize: "12px", fontWeight: "600" }}
+                        stroke="#64748B"
+                        style={{ fontSize: "12px", fontWeight: "700" }}
                         tickLine={false}
                     />
                     <YAxis
-                        stroke="#94A3B8"
-                        style={{ fontSize: "12px", fontWeight: "600" }}
+                        stroke="#64748B"
+                        style={{ fontSize: "12px", fontWeight: "700" }}
                         tickLine={false}
                         axisLine={false}
                     />
                     <Tooltip
                         content={<CustomTooltip />}
-                        cursor={{ fill: "#F1F5F9", opacity: 0.3 }}
+                        cursor={{ fill: "rgba(255,255,255,0.05)", opacity: 0.1 }}
                     />
                     <Legend
                         wrapperStyle={{ paddingTop: "20px" }}
                         iconType="circle"
                         formatter={(value) => (
-                            <span className="text-sm font-medium text-slate-600 capitalize">
+                            <span className="text-sm font-bold text-slate-400 capitalize">
                                 {value.replace(/_/g, " ")}
                             </span>
                         )}
@@ -201,15 +201,15 @@ export default function CompletionChart({
             </ResponsiveContainer>
 
             {/* Summary Stats */}
-            <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-slate-100">
+            <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/5">
                 <div className="text-center">
                     <div className="flex items-center justify-center gap-1.5 mb-1">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                        <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
+                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-slate-500">
                             Mañana
                         </p>
                     </div>
-                    <p className="font-bold text-lg text-navy-950">
+                    <p className="font-black text-xl text-white text-bright-white">
                         {chartData.reduce(
                             (sum, d) => sum + d.morning_clarity,
                             0,
@@ -218,23 +218,23 @@ export default function CompletionChart({
                 </div>
                 <div className="text-center">
                     <div className="flex items-center justify-center gap-1.5 mb-1">
-                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                        <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
+                        <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-slate-500">
                             Mediodía
                         </p>
                     </div>
-                    <p className="font-bold text-lg text-navy-950">
+                    <p className="font-black text-xl text-white text-bright-white">
                         {chartData.reduce((sum, d) => sum + d.power_check, 0)}
                     </p>
                 </div>
                 <div className="text-center">
                     <div className="flex items-center justify-center gap-1.5 mb-1">
-                        <div className="w-2 h-2 rounded-full bg-indigo-500"></div>
-                        <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
+                        <div className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]"></div>
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-slate-500">
                             Noche
                         </p>
                     </div>
-                    <p className="font-bold text-lg text-navy-950">
+                    <p className="font-black text-xl text-white text-bright-white">
                         {chartData.reduce(
                             (sum, d) => sum + d.next_day_planning,
                             0,

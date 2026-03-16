@@ -61,7 +61,7 @@ export default function ContentGrid({
                                 item.type === "video"
                                     ? "bg-amber-50 text-amber-600 group-hover:bg-amber-100"
                                     : item.type === "image"
-                                      ? "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100"
+                                      ? "bg-blue-50 text-blue-600 group-hover:bg-blue-100"
                                       : "bg-blue-50 text-blue-600 group-hover:bg-blue-100",
                             )}
                         >
@@ -79,7 +79,7 @@ export default function ContentGrid({
                                 className={clsx(
                                     "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider border transition-all duration-300",
                                     item.status === "ready"
-                                        ? "bg-emerald-50/50 text-emerald-600 border-emerald-100/50"
+                                        ? "bg-blue-50/50 text-blue-600 border-blue-100/50"
                                         : "bg-amber-50/50 text-amber-600 border-amber-100/50",
                                 )}
                             >

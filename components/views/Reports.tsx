@@ -33,7 +33,7 @@ interface ReportCardProps {
 function ReportCard({ name, meta, icon: Icon, color }: ReportCardProps) {
   const colors: Record<string, string> = {
     red: "bg-red-50 text-red-600 hover:bg-red-100",
-    emerald: "bg-emerald-50 text-emerald-600 hover:bg-emerald-100",
+    emerald: "bg-blue-50 text-blue-600 hover:bg-blue-100",
     blue: "bg-blue-50 text-blue-600 hover:bg-blue-100",
     orange: "bg-orange-50 text-orange-600 hover:bg-orange-100"
   };

@@ -72,10 +72,10 @@ export default function CalendarHeatmap({
     };
 
     const getIntensityColor = (intensity: number): string => {
-        if (intensity === 0) return "bg-slate-100 border-slate-200";
-        if (intensity === 1) return "bg-blue-200 border-blue-300";
-        if (intensity === 2) return "bg-blue-400 border-blue-500";
-        return "bg-blue-600 border-blue-700"; // 3 protocols
+        if (intensity === 0) return "bg-white/5 border-white/5";
+        if (intensity === 1) return "bg-blue-900/40 border-blue-500/20";
+        if (intensity === 2) return "bg-blue-600/40 border-blue-500/40";
+        return "bg-blue-500 border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.5)]"; // 3 protocols
     };
 
     const getDayData = (date: Date | null) => {
@@ -123,10 +123,10 @@ export default function CalendarHeatmap({
     }
 
     return (
-        <div className="bg-white p-6 sm:p-8 rounded-4xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-navy-900/60 p-6 sm:p-8 rounded-4xl border border-white/5 shadow-2xl backdrop-blur-3xl hover:border-blue-500/30 transition-all duration-500">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
-                <h4 className="font-display font-bold text-lg sm:text-xl text-navy-950 capitalize">
+                <h4 className="font-display font-black text-lg sm:text-xl text-bright-white capitalize tracking-tight">
                     {monthName}
                 </h4>
 
@@ -144,8 +144,8 @@ export default function CalendarHeatmap({
                         className={clsx(
                             "p-2 rounded-lg transition-colors",
                             isCurrentMonthOrFuture()
-                                ? "text-slate-300 cursor-not-allowed"
-                                : "hover:bg-slate-100 text-slate-600 hover:text-navy-950",
+                                ? "text-slate-600 cursor-not-allowed opacity-30"
+                                : "hover:bg-white/10 text-slate-400 hover:text-white",
                         )}
                         aria-label="Mes siguiente"
                     >
@@ -197,10 +197,10 @@ export default function CalendarHeatmap({
                                                 className={clsx(
                                                     "text-xs font-bold transition-colors",
                                                     intensity === 0
-                                                        ? "text-slate-400"
+                                                        ? "text-slate-500"
                                                         : intensity < 3
-                                                          ? "text-slate-700"
-                                                          : "text-white",
+                                                          ? "text-blue-100"
+                                                          : "text-white text-bright-white",
                                                 )}
                                             >
                                                 {date.getDate()}
@@ -233,7 +233,7 @@ export default function CalendarHeatmap({
                                                         {dayData.protocols.includes(
                                                             "morning_clarity",
                                                         ) && (
-                                                            <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded text-[10px] font-bold">
+                                                            <span className="px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded text-[10px] font-bold">
                                                                 Mañana
                                                             </span>
                                                         )}
@@ -268,7 +268,7 @@ export default function CalendarHeatmap({
             </div>
 
             {/* Legend */}
-            <div className="flex items-center justify-between mt-6 pt-6 border-t border-slate-100">
+            <div className="flex items-center justify-between mt-6 pt-6 border-t border-white/5">
                 <div className="flex items-center gap-2">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                         Menos
@@ -290,10 +290,10 @@ export default function CalendarHeatmap({
                 </div>
 
                 <div className="text-right">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
                         Días al 100%
                     </p>
-                    <p className="font-bold text-lg text-blue-600">
+                    <p className="font-black text-xl text-blue-400 text-bright-white">
                         {data.filter((d) => d.count === 3).length}
                     </p>
                 </div>

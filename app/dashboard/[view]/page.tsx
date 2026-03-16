@@ -17,6 +17,9 @@ const Views: Record<string, any> = {
     nsg_copilot: dynamic(() => import("@/components/views/NSGCopilot")),
     nsg_horizon: dynamic(() => import("@/components/views/NSGHorizon")),
 
+    // CRM
+    nsg_crm: dynamic(() => import("@/components/views/NSGCRM")),
+
     // Features
     calendar: dynamic(() => import("@/components/views/CalendarView")),
     metrics: dynamic(() => import("@/components/views/Metrics")),
@@ -46,7 +49,7 @@ export default function ViewPage({ params }: PageProps) {
         return notFound();
     }
 
-    if (resolvedParams.view === "nsg_intelligence") {
+    if (resolvedParams.view === "nsg_intelligence" || resolvedParams.view === "nsg_crm") {
         return <Component />;
     }
 

@@ -73,7 +73,7 @@ export default function ContextHUD({ currentStep, answers }: ContextHUDProps) {
 
                 <div className="mt-auto pt-5 border-t border-slate-100/50 relative z-10">
                     <div className="flex items-center gap-2">
-                        <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                        <div className="w-1 h-1 rounded-full bg-blue-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
                         <p className="text-[9px] text-slate-400 font-medium leading-relaxed tracking-wide">
                             Análisis en tiempo real activo
                         </p>

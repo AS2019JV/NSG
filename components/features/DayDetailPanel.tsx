@@ -59,7 +59,7 @@ export default function DayDetailPanel() {
               {/* Status Bar */}
               <div className="px-8 py-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between shrink-0 relative z-10">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                  <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Sincronizado con Google</span>
                 </div>
                 <div className="text-[10px] font-bold text-navy-900 border border-slate-200 px-2 py-0.5 rounded uppercase">Q1 Performance</div>

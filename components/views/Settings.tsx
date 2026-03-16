@@ -501,9 +501,9 @@ function ToggleItem({
                 "bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white",
         },
         emerald: {
-            container: "hover:border-emerald-300",
+            container: "hover:border-blue-300",
             iconBox:
-                "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white",
+                "bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white",
         },
         amber: {
             container: "hover:border-amber-300",
@@ -547,7 +547,7 @@ function ToggleItem({
                 <div
                     className={clsx(
                         "relative w-12 h-6 rounded-full transition-colors shrink-0 ml-3",
-                        active ? "bg-emerald-500" : "bg-slate-300",
+                        active ? "bg-blue-500" : "bg-slate-300",
                     )}
                 >
                     <div
@@ -644,7 +644,7 @@ function IntegrationCard({
                 <span
                     className={clsx(
                         "font-bold text-[0.65rem]",
-                        connected ? "text-emerald-600" : "text-slate-400",
+                        connected ? "text-blue-600" : "text-slate-400",
                     )}
                 >
                     {connectedText ||

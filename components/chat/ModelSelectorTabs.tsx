@@ -32,14 +32,14 @@ export default function ModelSelectorTabs({ content }: ModelSelectorTabsProps) {
               className={clsx(
                 "group flex items-center gap-2 px-4 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 border select-none",
                 isActive
-                  ? "bg-blue-50 text-[#0b57d0] border-blue-100 shadow-sm" // Active: Gentle Blue (Google style)
-                  : "bg-transparent text-slate-500 border-slate-200 hover:bg-slate-50 hover:text-slate-700 hover:border-slate-300" // Inactive
+                  ? "bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-sm" // Active: Emerald
+                  : "bg-transparent text-slate-500 border-white/10 hover:bg-white/5 hover:text-slate-300 hover:border-white/20" // Inactive
               )}
             >
               <Icon
                 className={clsx(
                   "w-3.5 h-3.5 transition-colors",
-                  isActive ? "text-[#0b57d0]" : "text-slate-400 group-hover:text-slate-500"
+                  isActive ? "text-blue-400" : "text-slate-500 group-hover:text-slate-400"
                 )}
               />
               {model.label}
@@ -50,7 +50,7 @@ export default function ModelSelectorTabs({ content }: ModelSelectorTabsProps) {
 
       {/* Active Content Area */}
       {/* Active Content Area */}
-      <div className="mt-2 text-[16px] text-[#1f1f1f] leading-8 font-normal tracking-normal animate-fade-in">
+      <div className="mt-2 text-[16px] text-slate-300 leading-8 font-normal tracking-normal animate-fade-in">
         {(() => {
           let openAIContent = content;
           let geminiContent = null;
@@ -79,9 +79,9 @@ export default function ModelSelectorTabs({ content }: ModelSelectorTabsProps) {
             return geminiContent ? (
               <p className="whitespace-pre-wrap">{geminiContent}</p>
             ) : (
-              <div className="flex flex-col items-center justify-center py-6 text-slate-400 gap-2 border border-dashed border-slate-200 rounded-lg bg-slate-50/50 mt-2">
+              <div className="flex flex-col items-center justify-center py-6 text-slate-500 gap-2 border border-dashed border-white/10 rounded-lg bg-white/5 mt-2">
                 <IconPlaceholder model="Gemini" />
-                <span className="text-[13px] font-medium">Waiting for Gemini response...</span>
+                <span className="text-[13px] font-medium text-slate-400">Waiting for Gemini response...</span>
               </div>
             );
           }
@@ -90,9 +90,9 @@ export default function ModelSelectorTabs({ content }: ModelSelectorTabsProps) {
             return claudeContent ? (
               <p className="whitespace-pre-wrap">{claudeContent}</p>
             ) : (
-              <div className="flex flex-col items-center justify-center py-6 text-slate-400 gap-2 border border-dashed border-slate-200 rounded-lg bg-slate-50/50 mt-2">
+              <div className="flex flex-col items-center justify-center py-6 text-slate-500 gap-2 border border-dashed border-white/10 rounded-lg bg-white/5 mt-2">
                 <IconPlaceholder model="Claude" />
-                <span className="text-[13px] font-medium">Waiting for Claude response...</span>
+                <span className="text-[13px] font-medium text-slate-400">Waiting for Claude response...</span>
               </div>
             );
           }

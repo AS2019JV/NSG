@@ -178,7 +178,7 @@ export default function IngestInput({
                             selectedType === "document" &&
                                 "border-blue-100 shadow-blue-500/5",
                             selectedType === "image" &&
-                                "border-emerald-100 shadow-emerald-500/5",
+                                "border-blue-100 shadow-blue-500/5",
                         )}
                     >
                         <div className="flex items-center justify-between mb-6">
@@ -191,7 +191,7 @@ export default function IngestInput({
                                         selectedType === "document" &&
                                             "bg-blue-100 text-blue-600",
                                         selectedType === "image" &&
-                                            "bg-emerald-100 text-emerald-600",
+                                            "bg-blue-100 text-blue-600",
                                     )}
                                 >
                                     {selectedType === "text" && (
@@ -328,7 +328,7 @@ export default function IngestInput({
                                                     "p-4 rounded-2xl text-white shadow-lg",
                                                     selectedType === "document"
                                                         ? "bg-blue-600 shadow-blue-500/30"
-                                                        : "bg-emerald-600 shadow-emerald-500/30",
+                                                        : "bg-blue-600 shadow-blue-500/30",
                                                 )}
                                             >
                                                 {selectedType === "document" ? (
@@ -380,7 +380,7 @@ export default function IngestInput({
                                             ? "bg-purple-600 text-white shadow-purple-500/25 hover:bg-purple-700"
                                             : selectedType === "document"
                                               ? "bg-blue-600 text-white shadow-blue-500/25 hover:bg-blue-700"
-                                              : "bg-emerald-600 text-white shadow-emerald-500/25 hover:bg-emerald-700"
+                                              : "bg-blue-600 text-white shadow-blue-500/25 hover:bg-blue-700"
                                         : "bg-slate-100 text-slate-400 cursor-not-allowed",
                                 )}
                             >

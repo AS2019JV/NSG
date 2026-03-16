@@ -62,7 +62,7 @@ export default function Dashboard() {
               <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                 <div className="bg-blue-500 w-[92%] h-full rounded-full transition-all duration-1000"></div>
               </div>
-              <div className="flex items-center gap-2 text-xs text-emerald-600 font-bold">
+              <div className="flex items-center gap-2 text-xs text-blue-600 font-bold">
                 <TrendingUp className="w-3 h-3" />
                 <span>Optimal Performance</span>
               </div>
@@ -73,18 +73,18 @@ export default function Dashboard() {
             title="Active Users"
             subtitle="Engagement"
             icon={Users}
-            iconColor="text-emerald-600"
-            iconBg="bg-emerald-50"
+            iconColor="text-blue-600"
+            iconBg="bg-blue-50"
           >
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-3xl font-display font-bold text-navy-900">1,240</span>
-                <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">
+                <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg">
                   +12.5%
                 </span>
               </div>
               <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                <div className="bg-emerald-500 w-[78%] h-full rounded-full transition-all duration-1000"></div>
+                <div className="bg-blue-500 w-[78%] h-full rounded-full transition-all duration-1000"></div>
               </div>
             </div>
           </DashboardCard>
@@ -158,11 +158,11 @@ export default function Dashboard() {
                 </span>
                 <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <button className="w-full flex items-center justify-between p-3 bg-slate-50 hover:bg-emerald-50 rounded-xl transition-all border border-transparent hover:border-emerald-200 group">
-                <span className="font-medium text-slate-700 group-hover:text-emerald-600">
+              <button className="w-full flex items-center justify-between p-3 bg-slate-50 hover:bg-blue-50 rounded-xl transition-all border border-transparent hover:border-blue-200 group">
+                <span className="font-medium text-slate-700 group-hover:text-blue-600">
                   Upload Documents
                 </span>
-                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-transform" />
               </button>
               <button className="w-full flex items-center justify-between p-3 bg-slate-50 hover:bg-purple-50 rounded-xl transition-all border border-transparent hover:border-purple-200 group">
                 <span className="font-medium text-slate-700 group-hover:text-purple-600">

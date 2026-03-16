@@ -18,7 +18,7 @@ export default function Strategy() {
     blue: "text-blue-600 bg-blue-50",
     orange: "text-orange-600 bg-orange-50",
     purple: "text-purple-600 bg-purple-50",
-    emerald: "text-emerald-600 bg-emerald-50",
+    emerald: "text-blue-600 bg-blue-50",
   };
 
   return (

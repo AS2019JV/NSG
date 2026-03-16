@@ -10,6 +10,7 @@ export const CONTEXT = {
             { id: 'nsg_copilot', label: 'I Copilot Pro', subtitle: 'Claridad en tus Objetivos', icon: Target },
             { id: 'nsg_horizon', label: 'I Horizon', subtitle: 'Planificación y Proyección', icon: Sunrise },
             { id: 'nsg_education', label: 'I Education', subtitle: 'Estrategia y Aprendizaje', icon: GraduationCap },
+            { id: 'nsg_crm', label: 'I CRM', subtitle: 'Pipeline Comercial con IA', icon: Briefcase },
             { id: 'nsg_news', label: 'I News', subtitle: 'Actualidad y Análisis Global', icon: Newspaper },
 
             // Clinic Modules
@@ -37,6 +38,7 @@ export const CONTEXT = {
             { id: 'nsg_copilot', label: 'I Copilot Pro', subtitle: 'Claridad en tus Objetivos', icon: Target },
             { id: 'nsg_horizon', label: 'I Horizon', subtitle: 'Planificación y Proyección', icon: Sunrise },
             { id: 'nsg_education', label: 'I Education', subtitle: 'Estrategia y Aprendizaje', icon: GraduationCap },
+            { id: 'nsg_crm', label: 'I CRM', subtitle: 'Pipeline Comercial con IA', icon: Briefcase },
             { id: 'nsg_news', label: 'I News', subtitle: 'Actualidad y Análisis Global', icon: Newspaper },
 
             { id: 'calendar', label: 'Agenda Maestra', subtitle: 'Cronograma de Actividades', icon: Calendar },
@@ -54,6 +56,7 @@ export const CONTEXT = {
             { id: 'nsg_copilot', label: 'I Copilot Pro', subtitle: 'Claridad en tus Objetivos', icon: Target },
             { id: 'nsg_horizon', label: 'I Horizon', subtitle: 'Planificación y Proyección', icon: Sunrise },
             { id: 'nsg_education', label: 'I Education', subtitle: 'Estrategia y Aprendizaje', icon: GraduationCap },
+            { id: 'nsg_crm', label: 'I CRM', subtitle: 'Pipeline Comercial con IA', icon: Briefcase },
             { id: 'nsg_news', label: 'I News', subtitle: 'Actualidad y Análisis Global', icon: Newspaper },
             { id: 'clinical_radar', label: 'Análisis Multiaxial', subtitle: 'Evaluación Clínica Integral', icon: Hexagon },
             { id: 'calendar', label: 'Agenda Maestra', subtitle: 'Cronograma de Actividades', icon: Calendar },
@@ -73,6 +76,7 @@ export const CONTEXT = {
             { id: 'nsg_copilot', label: 'I Copilot Pro', subtitle: 'Claridad en tus Objetivos', icon: Target },
             { id: 'nsg_horizon', label: 'I Horizon', subtitle: 'Planificación y Proyección', icon: Sunrise },
             { id: 'nsg_education', label: 'I Education', subtitle: 'Estrategia y Aprendizaje', icon: GraduationCap },
+            { id: 'nsg_crm', label: 'I CRM', subtitle: 'Pipeline Comercial con IA', icon: Briefcase },
             { id: 'nsg_news', label: 'I News', subtitle: 'Actualidad y Análisis Global', icon: Newspaper },
             { id: 'calendar', label: 'Agenda Maestra', subtitle: 'Cronograma de Actividades', icon: Calendar },
             { id: 'reports', label: 'Reportes Board', subtitle: 'Informes Ejecutivos', icon: FileSpreadsheet },
@@ -102,6 +106,7 @@ export const CONTEXT = {
             { id: 'nsg_copilot', label: 'I Copilot Pro', subtitle: 'Claridad en tus Objetivos', icon: Target },
             { id: 'nsg_horizon', label: 'I Horizon', subtitle: 'Planificación y Proyección', icon: Sunrise },
             { id: 'nsg_education', label: 'I Education', subtitle: 'Estrategia y Aprendizaje', icon: GraduationCap },
+            { id: 'nsg_crm', label: 'I CRM', subtitle: 'Pipeline Comercial con IA', icon: Briefcase },
             { id: 'nsg_news', label: 'I News', subtitle: 'Actualidad y Análisis Global', icon: Newspaper },
             { id: 'wellness', label: 'Bienestar', subtitle: 'Salud y Balance Integral', icon: HeartPulse },
             { id: 'calendar', label: 'Agenda', subtitle: 'Citas y Recordatorios', icon: Calendar },

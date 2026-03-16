@@ -249,7 +249,7 @@ export default function ForgotPasswordPage() {
 
                     {step === 3 && (
                         <div className="text-center animate-fade-in py-6">
-                            <div className="w-20 h-20 bg-emerald-50 rounded-3xl flex items-center justify-center mx-auto mb-6 text-emerald-500 shadow-xl shadow-emerald-500/10">
+                            <div className="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center mx-auto mb-6 text-blue-500 shadow-xl shadow-blue-500/10">
                                 <BrandAtom
                                     className="w-10 h-10"
                                     variant="colored"

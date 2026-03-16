@@ -16,8 +16,9 @@
     --color-navy-850: #111827;
     --color-navy-800: #1f2937;
     --color-slate-850: #1e293b;
-    --color-slate-900: #0f172a;
     --color-deep-900: #020410;
+    --color-electric-green: #00ff88;
+    --color-electric-green-glow: rgba(0, 255, 136, 0.4);
 
     /* Custom Shadows */
     --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
@@ -26,6 +27,7 @@
     --shadow-precision:
         0 0 0 1px rgba(15, 23, 42, 0.05), 0 10px 30px -5px rgba(0, 0, 0, 0.05);
     --shadow-glow: 0 0 40px rgba(59, 130, 246, 0.25);
+    --shadow-glow-green: 0 0 40px rgba(0, 255, 136, 0.3);
     --shadow-island:
         0 15px 40px -10px rgba(0, 0, 0, 0.6),
         0 0 0 1px rgba(255, 255, 255, 0.08) inset;
@@ -83,6 +85,21 @@ body {
 /* --- UTILITIES --- */
 .hidden-view {
     display: none !important;
+}
+
+/* Typography Refinements */
+.text-bright-white {
+    color: #ffffff !important;
+    filter: brightness(1.25) drop-shadow(0 2px 10px rgba(255, 255, 255, 0.2));
+}
+
+.text-white-soft {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.glow-green-subtle {
+    box-shadow: 0 0 25px rgba(0, 255, 136, 0.15);
+    border-color: rgba(0, 255, 136, 0.2) !important;
 }
 
 .will-change-transform {
@@ -183,10 +200,10 @@ body {
         rgba(255, 255, 255, 0.08) 0%,
         rgba(255, 255, 255, 0.02) 100%
     );
-    border-right: 3px solid #60a5fa;
+    border-right: 3px solid #3b82f6;
     color: white !important;
     font-weight: 600;
-    text-shadow: 0 0 20px rgba(96, 165, 250, 0.5);
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
 }
 
 .nsg-ios-btn {
@@ -195,8 +212,8 @@ body {
         rgba(30, 58, 138, 0.4) 0%,
         rgba(15, 23, 42, 0.3) 100%
     );
-    border: 1px solid rgba(96, 165, 250, 0.3);
-    box-shadow: 0 0 30px rgba(37, 99, 235, 0.15) inset;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.15) inset;
     position: relative;
     overflow: hidden;
 }
@@ -210,7 +227,7 @@ body {
     background: linear-gradient(
         90deg,
         transparent,
-        rgba(147, 197, 253, 0.6),
+        rgba(96, 165, 250, 0.6),
         transparent
     );
 }

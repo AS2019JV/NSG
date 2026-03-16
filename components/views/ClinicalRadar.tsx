@@ -150,8 +150,8 @@ export default function ClinicalRadar() {
               <StatItem
                 label="Eje III: Médico"
                 value="Sin Hallazgos"
-                colorClass="text-emerald-500"
-                bgColorClass="bg-emerald-50"
+                colorClass="text-blue-500"
+                bgColorClass="bg-blue-50"
               />
               <StatItem
                 label="Eje IV: Psicosocial"

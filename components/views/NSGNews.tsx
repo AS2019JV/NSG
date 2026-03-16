@@ -86,7 +86,7 @@ export default function INews() {
     }
 
     return (
-        <div className="flex-1 overflow-y-auto custom-scroll safe-bottom-scroll scroll-smooth w-full animate-fade-in-up flex flex-col items-center bg-slate-50/10">
+        <div className="flex-1 overflow-y-auto custom-scroll safe-bottom-scroll scroll-smooth w-full animate-fade-in-up flex flex-col items-center bg-navy-950 text-white selection:bg-blue-600/40">
             <div className="w-full px-2 xs:px-4 lg:px-12 py-8 max-w-[1700px]">
                 {/* 1. HERO BANNER - Dashboard Optimized Style */}
                 <Banner
@@ -96,100 +96,82 @@ export default function INews() {
                 />
 
                 {/* Sub-header Controls */}
-                <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 bg-white/80 backdrop-blur-md px-6 py-4 rounded-3xl border border-slate-200/60 shadow-sm">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8 bg-white/[0.03] backdrop-blur-md px-6 py-4 rounded-3xl border border-white/5 shadow-2xl mt-12">
                     <div className="flex items-center gap-3">
-                        <span className="text-[10px] font-bold bg-blue-50 text-blue-600 px-4 py-2 rounded-xl border border-blue-100 flex items-center gap-2 shadow-sm">
-                            <Zap className="w-3.5 h-3.5 fill-blue-600" />
-                            Precision Filter Active
-                        </span>
+                        <div className="flex bg-navy-900/50 p-1 rounded-2xl border border-white/5">
+                            {["market", "archive"].map((t) => (
+                                <button
+                                    key={t}
+                                    onClick={() => setActiveTab(t as any)}
+                                    className={clsx(
+                                        "px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                        activeTab === t
+                                            ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                                            : "text-slate-500 hover:text-slate-300",
+                                    )}
+                                >
+                                    {t === "market" ? "Neural Feed" : "Archivo Táctico"}
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
-                    <div className="flex bg-slate-100 p-1 rounded-2xl border border-slate-200/50 shadow-sm w-full md:w-auto">
-                        <button
-                            onClick={() => setActiveTab("market")}
-                            className={clsx(
-                                "flex-1 md:flex-none px-6 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2",
-                                activeTab === "market"
-                                    ? "bg-white text-navy-950 shadow-sm"
-                                    : "text-slate-500 hover:text-navy-950 hover:bg-white/50",
-                            )}
-                        >
-                            Inteligencia
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("archive")}
-                            className={clsx(
-                                "flex-1 md:flex-none px-6 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2",
-                                activeTab === "archive"
-                                    ? "bg-white text-navy-950 shadow-sm"
-                                    : "text-slate-500 hover:text-navy-950 hover:bg-white/50",
-                            )}
-                        >
-                            Archivo
-                        </button>
+                    <div className="flex items-center gap-3 bg-navy-900/50 border border-white/5 px-5 py-2.5 rounded-2xl w-full md:w-80 group focus-within:border-blue-500/50 transition-all">
+                        <Search className="h-4 w-4 text-slate-500 group-focus-within:text-blue-400" />
+                        <input
+                            placeholder="Buscar inteligencia..."
+                            className="bg-transparent text-xs font-bold outline-none w-full text-white placeholder:text-slate-700"
+                        />
                     </div>
                 </div>
 
-                {/* Search Bar */}
-                <div className="mb-10 relative max-w-xl group">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-                    <input
-                        type="text"
-                        placeholder="Buscar noticias o tendencias estratégicas..."
-                        className="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-3xl shadow-sm focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500/50 transition-all outline-none text-slate-800 font-medium"
-                    />
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 px-3 py-1 bg-slate-100 rounded-full text-[10px] font-bold text-slate-400">
-                        K
-                    </div>
+                {/* Content Area */}
+                <div className="w-full">
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-32 gap-6">
+                            <div className="relative">
+                                <div className="w-16 h-16 border-4 border-white/5 border-t-blue-600 rounded-full animate-spin"></div>
+                                <Sparkles className="w-6 h-6 text-blue-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                            </div>
+                            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] animate-pulse">
+                                Decodificando Frecuencias Globales...
+                            </p>
+                        </div>
+                    ) : news.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {news.map((item) => (
+                                <NewsCard
+                                    key={item._id}
+                                    source={item.source || "NSG"}
+                                    title={item.title}
+                                    tag={item.tag || item.categories[0] || "Global"}
+                                    color={item.color || "emerald"}
+                                    description={item.content}
+                                    time={new Date(item.createdAt).toLocaleDateString("es-ES", {
+                                        day: "numeric",
+                                        month: "short",
+                                    })}
+                                    isAnalyzed={!!item.analysis}
+                                    onAnalyze={() => handleAnalyze(item._id)}
+                                    isAnalyzing={analyzingId === item._id}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="bg-navy-900/40 rounded-[3rem] p-24 border-2 border-dashed border-white/5 flex flex-col items-center text-center max-w-3xl mx-auto backdrop-blur-3xl">
+                            <div className="w-20 h-20 bg-blue-600/10 rounded-3xl flex items-center justify-center mb-6 border border-blue-500/20">
+                                <Newspaper className="w-10 h-10 text-blue-400" />
+                            </div>
+                            <h3 className="text-2xl font-black text-bright-white mb-2 font-display uppercase tracking-tight">
+                                Feed Silencioso
+                            </h3>
+                            <p className="text-slate-400 max-w-sm font-medium">
+                                No se han detectado nuevas señales en este canal.
+                                Vuelve pronto para nuevos insights estratégicos.
+                            </p>
+                        </div>
+                    )}
                 </div>
-
-                {/* News Grid */}
-                {loading ? (
-                    <div className="flex flex-col items-center justify-center py-32 gap-6">
-                        <div className="relative">
-                            <div className="w-16 h-16 border-4 border-slate-100 border-t-blue-600 rounded-full animate-spin"></div>
-                            <Sparkles className="w-6 h-6 text-blue-600 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-                        </div>
-                        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] animate-pulse">
-                            Decodificando Frecuencias Globales...
-                        </p>
-                    </div>
-                ) : news.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {news.map((item) => (
-                            <NewsCard
-                                key={item._id}
-                                source={item.source || "NSG"}
-                                title={item.title}
-                                tag={item.tag || item.categories[0] || "Global"}
-                                color={item.color || "blue"}
-                                description={item.content}
-                                time={new Date(
-                                    item.createdAt,
-                                ).toLocaleDateString("es-ES", {
-                                    day: "numeric",
-                                    month: "short",
-                                })}
-                                isAnalyzed={!!item.analysis}
-                                onAnalyze={() => handleAnalyze(item._id)}
-                                isAnalyzing={analyzingId === item._id}
-                            />
-                        ))}
-                    </div>
-                ) : (
-                    <div className="bg-white rounded-[3rem] p-24 border-2 border-dashed border-slate-100 flex flex-col items-center text-center max-w-3xl mx-auto shadow-sm">
-                        <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mb-6 border border-slate-100">
-                            <Newspaper className="w-10 h-10 text-slate-200" />
-                        </div>
-                        <h3 className="text-2xl font-bold text-navy-950 mb-2 font-display">
-                            Feed Silencioso
-                        </h3>
-                        <p className="text-slate-500 max-w-sm">
-                            No se han detectado nuevas señales en este canal.
-                            Vuelve pronto para nuevos insights estratégicos.
-                        </p>
-                    </div>
-                )}
             </div>
         </div>
     );

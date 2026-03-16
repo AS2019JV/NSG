@@ -83,8 +83,8 @@ export default function Sidebar() {
         const colors = [
             "bg-blue-600",
             "bg-teal-600",
-            "bg-emerald-600",
-            "bg-green-600",
+            "bg-blue-600",
+            "bg-blue-600",
             "bg-orange-600",
             "bg-cyan-600",
         ];
@@ -113,6 +113,7 @@ export default function Sidebar() {
                     "nsg_horizon",
                     "nsg_news",
                     "nsg_education",
+                    "nsg_crm",
                 ].includes(item.id)
             ) {
                 acc.nsgModules.push(item);
@@ -249,7 +250,7 @@ export default function Sidebar() {
                                     if (window.innerWidth < 1024)
                                         toggleSidebar();
                                 }}
-                                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer group relative overflow-hidden bg-linear-to-r from-blue-600/20 to-blue-500/10 border border-blue-500/30 text-blue-200 hover:text-white hover:border-blue-400/50 shadow-[0_0_20px_rgba(59,130,246,0.15)] hover:shadow-[0_0_30px_rgba(59,130,246,0.3)]"
+                                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer group relative overflow-hidden bg-linear-to-r from-blue-600/20 to-blue-500/10 border border-blue-500/30 text-blue-200 hover:text-white hover:border-blue-400/50 shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:shadow-[0_0_30px_rgba(16,185,129,0.3)]"
                             >
                                 <BrandAtom className="w-5 h-5 relative z-10" />
                                 <span className="truncate flex-1 relative z-10 font-semibold">
@@ -302,7 +303,7 @@ export default function Sidebar() {
                                                     "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer group relative",
                                                     "focus:outline-none active:scale-[0.98]",
                                                     isActive
-                                                        ? "text-white bg-white/10 border-l-4 border-blue-500 pl-3 shadow-[inset_0_0_10px_rgba(59,130,246,0.1)]"
+                                                        ? "text-white bg-white/10 border-l-4 border-blue-500 pl-3 shadow-[inset_0_0_10px_rgba(16,185,129,0.1)]"
                                                         : "text-slate-400 hover:bg-white/5 hover:text-white hover:translate-x-1 border-l-4 border-transparent pl-3",
                                                 )}
                                             >
@@ -367,7 +368,7 @@ export default function Sidebar() {
                                                 "w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all cursor-pointer group relative",
                                                 "focus:outline-none active:scale-[0.98]",
                                                 isActive
-                                                    ? "text-white bg-white/10 border-l-4 border-blue-500 pl-3 shadow-[inset_0_0_10px_rgba(59,130,246,0.1)]"
+                                                    ? "text-white bg-white/10 border-l-4 border-blue-500 pl-3 shadow-[inset_0_0_10px_rgba(16,185,129,0.1)]"
                                                     : "text-slate-400 hover:bg-white/5 hover:text-white hover:translate-x-1 border-l-4 border-transparent pl-3",
                                             )}
                                         >
@@ -399,12 +400,12 @@ export default function Sidebar() {
                 {/* BOTTOM SECTION */}
                 <div className="p-4 border-t border-navy-900 bg-navy-950 shrink-0 space-y-3">
                     <div className="space-y-1">
-                        <div className="flex items-center justify-between px-2 py-1 text-[0.5rem] font-medium uppercase tracking-wider bg-emerald-500/5 rounded border border-emerald-500/10">
+                        <div className="flex items-center justify-between px-2 py-1 text-[0.5rem] font-medium uppercase tracking-wider bg-blue-500/5 rounded border border-blue-500/10">
                             <span className="text-slate-500 flex items-center gap-1">
-                                <Activity className="w-2 h-2 text-emerald-400" />{" "}
+                                <Activity className="w-2 h-2 text-blue-400" />{" "}
                                 System
                             </span>
-                            <span className="text-emerald-400 font-bold">
+                            <span className="text-blue-400 font-bold">
                                 OPTIMAL
                             </span>
                         </div>

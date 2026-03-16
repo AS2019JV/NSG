@@ -39,9 +39,9 @@ const ROLE_OPTIONS: RoleOption[] = [
     label: "Paciente",
     description: "Bienestar & Análisis de Conducta",
     icon: TrendingUp,
-    color: "text-emerald-600",
-    bgColor: "bg-emerald-50",
-    borderColor: "border-emerald-200 hover:border-emerald-400",
+    color: "text-blue-600",
+    bgColor: "bg-blue-50",
+    borderColor: "border-blue-200 hover:border-blue-400",
   },
   {
     id: "manager",
@@ -82,7 +82,7 @@ export default function RoleSelector() {
           </p>
         </div>
         <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
-          <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+          <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
           <span className="text-xs font-bold text-slate-600 uppercase tracking-widest">
             {CONTEXT[currentRole].roleDesc}
           </span>

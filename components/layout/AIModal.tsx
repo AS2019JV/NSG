@@ -50,7 +50,7 @@ export default function AIModal() {
                                 damping: 30,
                                 mass: 0.8, // Snappy but smooth "Google" feel
                             }}
-                            className="fixed inset-0 z-120 bg-[#F8FAFF]/95 backdrop-blur-3xl flex flex-col shadow-2xl overflow-hidden supports-backdrop-filter:bg-[#F8FAFF]/85"
+                            className="fixed inset-0 z-120 bg-[#020617]/95 backdrop-blur-3xl flex flex-col shadow-2xl overflow-hidden supports-backdrop-filter:bg-[#020617]/85"
                         >
                             {/* Dynamic Abstract Background Blobs */}
                             <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
@@ -78,7 +78,7 @@ export default function AIModal() {
                                         repeat: Infinity,
                                         ease: "linear",
                                     }}
-                                    className="absolute bottom-[10%] -right-[5%] w-[40%] h-[40%] bg-indigo-400/20 rounded-full blur-[100px]"
+                                    className="absolute bottom-[10%] -right-[5%] w-[40%] h-[40%] bg-blue-600/20 rounded-full blur-[100px]"
                                 />
                                 <m.div
                                     animate={{
@@ -91,12 +91,12 @@ export default function AIModal() {
                                         repeat: Infinity,
                                         ease: "linear",
                                     }}
-                                    className="absolute top-[20%] right-[10%] w-[35%] h-[45%] bg-purple-400/15 rounded-full blur-[110px]"
+                                    className="absolute top-[20%] right-[10%] w-[35%] h-[45%] bg-teal-400/15 rounded-full blur-[110px]"
                                 />
                             </div>
 
                             {/* Header Gradient Overlay - Subtle Ambience */}
-                            <div className="absolute top-0 left-0 right-0 h-48 bg-linear-to-b from-white via-white/40 to-transparent z-30 pointer-events-none" />
+                            <div className="absolute top-0 left-0 right-0 h-48 bg-linear-to-b from-navy-950 via-navy-950/40 to-transparent z-30 pointer-events-none" />
 
                             {/* Dynamic Back Button - Responsive & Pro UI */}
                             <m.div
@@ -107,13 +107,13 @@ export default function AIModal() {
                             >
                                 <button
                                     onClick={toggleAI}
-                                    className="group flex items-center justify-center gap-2 p-2 md:pl-4 md:pr-3 md:py-2.5 rounded-full bg-white/80 backdrop-blur-md border border-white/50 shadow-sm hover:shadow-md hover:bg-white transition-all duration-300 transform active:scale-95 cursor-pointer"
+                                    className="group flex items-center justify-center gap-2 p-2 md:pl-4 md:pr-3 md:py-2.5 rounded-full bg-white/5 backdrop-blur-md border border-white/10 shadow-sm hover:shadow-md hover:bg-white/10 transition-all duration-300 transform active:scale-95 cursor-pointer text-white"
                                     aria-label="Volver"
                                 >
-                                    <span className="hidden md:block text-sm font-semibold text-slate-600 group-hover:text-slate-900 tracking-tight">
+                                    <span className="hidden md:block text-sm font-semibold text-slate-300 group-hover:text-white tracking-tight">
                                         Volver
                                     </span>
-                                    <div className="bg-slate-100 group-hover:bg-blue-50 text-slate-500 group-hover:text-blue-600 rounded-full p-1.5 transition-colors">
+                                    <div className="bg-white/5 group-hover:bg-blue-500/20 text-slate-400 group-hover:text-blue-400 rounded-full p-1.5 transition-colors">
                                         <ArrowLeft className="w-5 h-5 md:w-4 md:h-4 rotate-180" />
                                     </div>
                                 </button>

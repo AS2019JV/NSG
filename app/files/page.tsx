@@ -85,9 +85,9 @@ export default function FilesPage() {
                  </div>
               </div>
            </DashboardCard>
-           <DashboardCard title="Processing Status" icon={Eye} iconColor="text-emerald-600" iconBg="bg-emerald-50">
+           <DashboardCard title="Processing Status" icon={Eye} iconColor="text-blue-600" iconBg="bg-blue-50">
               <div className="flex items-center gap-2">
-                 <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                 <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
                  <span className="font-bold text-navy-900">System Ready</span>
               </div>
            </DashboardCard>
@@ -122,7 +122,7 @@ export default function FilesPage() {
                   <td className="px-6 py-4 text-slate-500">{file.date}</td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold capitalize ${
-                      file.status === 'processed' ? 'bg-emerald-50 text-emerald-600' :
+                      file.status === 'processed' ? 'bg-blue-50 text-blue-600' :
                       file.status === 'processing' ? 'bg-amber-50 text-amber-600' :
                       'bg-red-50 text-red-600'
                     }`}>

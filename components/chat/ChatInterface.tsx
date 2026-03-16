@@ -252,8 +252,8 @@ const MessageItem = React.memo(
                 )}
             >
                 {msg.role === "user" ? (
-                    // USER MESSAGE - Apple Pro Blue Bubble
-                    <div className="bg-[#007AFF] text-white px-5 py-3 rounded-[20px] rounded-br-[4px] shadow-sm text-[16px] max-w-[85%] leading-relaxed font-normal tracking-wide selection:bg-white/30">
+                    // USER MESSAGE - Apple Pro Emerald Bubble
+                    <div className="bg-blue-600 text-white px-5 py-3 rounded-[20px] rounded-br-[4px] shadow-sm text-[16px] max-w-[85%] leading-relaxed font-normal tracking-wide selection:bg-white/30">
                         {msg.content}
                     </div>
                 ) : (
@@ -286,12 +286,12 @@ const MessageItem = React.memo(
                                 <div className="text-[16px] text-navy-850 leading-7 font-normal tracking-normal pt-0.5">
                                     {isComingSoon ? (
                                         // COMING SOON STATE (Professional Branding)
-                                        <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-slate-50/80 border border-slate-200/60 shadow-sm max-w-sm mt-1 animate-fade-in">
-                                            <div className="p-2 bg-white rounded-xl border border-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+                                        <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/5 border border-white/10 shadow-sm max-w-sm mt-1 animate-fade-in">
+                                            <div className="p-2 bg-white/5 rounded-xl border border-white/10 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
                                                 <Clock className="w-4 h-4 text-slate-400" />
                                             </div>
                                             <div className="flex flex-col gap-0.5">
-                                                <span className="text-[13px] font-bold text-slate-700 tracking-tight font-display">
+                                                <span className="text-[13px] font-bold text-slate-300 tracking-tight font-display">
                                                     Próximamente
                                                 </span>
                                                 <span className="text-[12px] text-slate-500 font-medium">
@@ -301,7 +301,7 @@ const MessageItem = React.memo(
                                             </div>
                                         </div>
                                     ) : !isWaiting ? (
-                                        <div className="prose prose-slate max-w-none prose-p:text-slate-800 prose-headings:text-slate-900 prose-strong:text-slate-900 prose-a:text-[#007AFF] prose-code:text-[#eb5757] prose-li:text-slate-800 [&>*:first-child]:mt-0">
+                                        <div className="prose prose-slate max-w-none prose-p:text-slate-300 prose-headings:text-white prose-strong:text-white prose-a:text-blue-400 prose-code:text-blue-400 prose-li:text-slate-300 [&>*:first-child]:mt-0">
                                             <ReactMarkdown
                                                 remarkPlugins={[remarkGfm]}
                                                 rehypePlugins={[rehypeRaw]}
@@ -1348,11 +1348,11 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                 const newMessages = currentSession.messages.map((m) =>
                     m.id === assistantId
                         ? {
-                              ...m,
-                              content: assistantContent,
-                              type: messageType,
-                              metadata: messageMetadata,
-                          }
+                            ...m,
+                            content: assistantContent,
+                            type: messageType,
+                            metadata: messageMetadata,
+                        }
                         : m,
                 );
                 updateChatSession(effectiveSessionId, {
@@ -1381,9 +1381,9 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                 const newMessages = freshSession.messages.map((m) =>
                     m.id === assistantId
                         ? {
-                              ...m,
-                              content: errorMessage,
-                          }
+                            ...m,
+                            content: errorMessage,
+                        }
                         : m,
                 );
                 updateChatSession(effectiveSessionId, {
@@ -1562,7 +1562,7 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
     // ... (rest of render)
 
     return (
-        <div className="flex w-full h-full relative overflow-hidden bg-[#F8FAFF]">
+        <div className="flex w-full h-full relative overflow-hidden bg-[#020617]">
             {/* --- SIDEBAR: DESKTOP (Relative, Push Content) --- */}
             <AnimatePresence mode="wait">
                 {isSidebarOpen && (
@@ -1575,7 +1575,7 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                             stiffness: 300,
                             damping: 30,
                         }}
-                        className="hidden md:flex flex-col h-full bg-[#F0F4F9] border-r border-[#E5E7EB] shrink-0 z-50"
+                        className="hidden md:flex flex-col h-full bg-navy-950/50 border-r border-white/5 shrink-0 z-50"
                     >
                         {/* Sidebar Header */}
                         <div className="p-4 flex items-center justify-between">
@@ -1624,8 +1624,8 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                                             className={clsx(
                                                 "group flex items-center justify-between w-full p-2.5 rounded-full text-left transition-all duration-200 text-sm cursor-pointer border border-transparent",
                                                 currentSessionId === session.id
-                                                    ? "bg-[#D3E3FD] text-[#001D35] font-medium border-blue-200/50 shadow-sm"
-                                                    : "text-slate-700 hover:bg-[#E0E4E9] hover:border-slate-200",
+                                                    ? "bg-blue-500/10 text-white font-medium border-blue-500/20 shadow-sm"
+                                                    : "text-slate-400 hover:bg-white/5 hover:border-white/10",
                                             )}
                                         >
                                             <div className="flex items-center gap-2 overflow-hidden flex-1 min-w-0">
@@ -1634,8 +1634,8 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                                                         "w-4 h-4 shrink-0",
                                                         currentSessionId ===
                                                             session.id
-                                                            ? "text-blue-600"
-                                                            : "text-slate-400",
+                                                            ? "text-blue-400"
+                                                            : "text-slate-500",
                                                     )}
                                                 />
                                                 <span className="truncate pr-2">
@@ -1647,19 +1647,19 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                                             {/* Delete Button (Visible on Hover or Active) */}
                                             {currentSessionId ===
                                                 session.id && (
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        deleteChatSession(
-                                                            session.id,
-                                                        );
-                                                    }}
-                                                    className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-100 hover:text-red-600 rounded-full transition-all shrink-0 focus:opacity-100"
-                                                    title="Eliminar chat"
-                                                >
-                                                    <Trash2 className="w-3.5 h-3.5" />
-                                                </button>
-                                            )}
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            deleteChatSession(
+                                                                session.id,
+                                                            );
+                                                        }}
+                                                        className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-100 hover:text-red-600 rounded-full transition-all shrink-0 focus:opacity-100"
+                                                        title="Eliminar chat"
+                                                    >
+                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                    </button>
+                                                )}
                                         </div>
                                     ))}
                                 </div>
@@ -1744,7 +1744,7 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                                             className={clsx(
                                                 "group flex items-center justify-between w-full p-3 rounded-xl text-left transition-all duration-200 text-sm cursor-pointer border border-transparent",
                                                 currentSessionId === session.id
-                                                    ? "bg-[#D3E3FD] text-[#001D35] font-medium border-blue-200/50 shadow-sm"
+                                                    ? "bg-blue-500/20 text-blue-300 font-medium border-blue-500/30 shadow-sm"
                                                     : "text-slate-700 hover:bg-[#E0E4E9] hover:border-slate-200",
                                             )}
                                         >
@@ -1754,7 +1754,7 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                                                         "w-4 h-4 shrink-0",
                                                         currentSessionId ===
                                                             session.id
-                                                            ? "text-blue-600"
+                                                            ? "text-blue-500"
                                                             : "text-slate-400",
                                                     )}
                                                 />
@@ -1766,7 +1766,7 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                                                     <span className="text-[10px] text-slate-400 font-normal">
                                                         {new Date(
                                                             session.updatedAt ||
-                                                                0,
+                                                            0,
                                                         ).toLocaleDateString()}
                                                     </span>
                                                 </div>
@@ -1775,19 +1775,19 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                                             {/* Delete Button (Visible on Hover or Active) */}
                                             {currentSessionId ===
                                                 session.id && (
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        deleteChatSession(
-                                                            session.id,
-                                                        );
-                                                    }}
-                                                    className="p-2 hover:bg-red-100 hover:text-red-600 rounded-full transition-all shrink-0 focus:opacity-100"
-                                                    title="Eliminar chat"
-                                                >
-                                                    <Trash2 className="w-4 h-4 text-slate-400 hover:text-red-600" />
-                                                </button>
-                                            )}
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            deleteChatSession(
+                                                                session.id,
+                                                            );
+                                                        }}
+                                                        className="p-2 hover:bg-red-100 hover:text-red-600 rounded-full transition-all shrink-0 focus:opacity-100"
+                                                        title="Eliminar chat"
+                                                    >
+                                                        <Trash2 className="w-4 h-4 text-slate-400 hover:text-red-600" />
+                                                    </button>
+                                                )}
                                         </div>
                                     ))}
                                 </div>
@@ -1853,7 +1853,7 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                     <div className="flex flex-col gap-6 max-w-3xl mx-auto w-full">
                         {isHydrating ? (
                             <div className="flex flex-col items-center justify-center p-10 mt-10 text-center animate-pulse">
-                                <div className="w-12 h-12 rounded-full border-4 border-slate-200 border-t-blue-500 animate-spin mb-4"></div>
+                                <div className="w-12 h-12 rounded-full border-4 border-white/5 border-t-blue-500 animate-spin mb-4"></div>
                                 <p className="text-sm text-slate-500 font-medium">
                                     Cargando conversación...
                                 </p>
@@ -1893,7 +1893,7 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                 </div>
 
                 {/* --- LAYER 3: INPUT AREA --- */}
-                <div className="absolute bottom-0 left-0 w-full z-40 px-4 pb-6 md:pb-8 pt-12 bg-linear-to-t from-[#F8FAFF] via-[#F8FAFF] via-60% to-transparent pointer-events-none">
+                <div className="absolute bottom-0 left-0 w-full z-40 px-4 pb-6 md:pb-8 pt-12 bg-linear-to-t from-[#020617] via-[#020617] via-60% to-transparent pointer-events-none">
                     <div className="max-w-3xl mx-auto pointer-events-auto">
                         {!isContextCached ? (
                             <div className="flex items-center justify-center gap-4 text-[15px] text-[#0b57d0] font-medium py-5 bg-white rounded-[24px] shadow-sm animate-pulse">
@@ -1918,20 +1918,20 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                                         className={clsx(
                                             "flex items-center h-[34px] rounded-full transition-all duration-300 border shadow-[0_4px_12px_rgba(0,0,0,0.05)] select-none overflow-hidden relative backdrop-blur-md",
                                             isDeep
-                                                ? "gap-1.5 pl-2 pr-3.5 bg-blue-50/90 border-blue-200 ring-4 ring-white" // Active
-                                                : "gap-0 px-2.5 bg-white/90 border-slate-200 hover:bg-white hover:border-slate-300 ring-4 ring-white" // Inactive
+                                                ? "gap-1.5 pl-2 pr-3.5 bg-blue-500/20 border-blue-500/30 ring-4 ring-navy-950" // Active
+                                                : "gap-0 px-2.5 bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 ring-4 ring-navy-950" // Inactive
                                         )}
                                     >
-                                        <motion.div 
+                                        <motion.div
                                             layout="position"
                                             className="relative w-4 h-4 flex-shrink-0"
                                         >
-                                             <BrandAtom 
-                                                className={clsx("w-full h-full transition-transform duration-300", isDeep ? "scale-110 rotate-180" : "scale-100 opacity-60 grayscale group-hover:grayscale-0 group-hover:opacity-100")} 
+                                            <BrandAtom
+                                                className={clsx("w-full h-full transition-transform duration-300", isDeep ? "scale-110 rotate-180" : "scale-100 opacity-60 grayscale group-hover:grayscale-0 group-hover:opacity-100")}
                                                 variant="colored"
                                             />
                                         </motion.div>
-                                        
+
                                         <AnimatePresence>
                                             {isDeep && (
                                                 <motion.span
@@ -1939,7 +1939,7 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                                                     animate={{ opacity: 1, width: "auto" }}
                                                     exit={{ opacity: 0, width: 0 }}
                                                     transition={{ duration: 0.2 }}
-                                                    className="text-[12px] font-bold leading-none pt-0.5 text-blue-700 whitespace-nowrap"
+                                                    className="text-[12px] font-bold leading-none pt-0.5 text-blue-400 whitespace-nowrap"
                                                 >
                                                     Deep
                                                 </motion.span>
@@ -1948,11 +1948,11 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                                     </motion.button>
                                 </div>
 
-                                <div className="relative flex flex-col bg-white rounded-[28px] shadow-[0_4px_20px_rgba(0,0,0,0.08)] focus-within:shadow-[0_8px_30px_rgba(0,0,0,0.12)] transition-shadow duration-300">
+                                <div className="relative flex flex-col bg-white/5 backdrop-blur-xl rounded-[28px] shadow-[0_4px_20px_rgba(0,0,0,0.08)] focus-within:shadow-[0_8px_30px_rgba(16,185,129,0.12)] border border-white/10 transition-shadow duration-300">
                                     {/* Attachment Preview */}
                                     {attachment && (
                                         <div className="px-6 pb-2 pt-0 flex">
-                                            <div className="flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full text-sm animate-fade-in">
+                                            <div className="flex items-center gap-2 bg-blue-500/10 text-blue-400 px-3 py-1.5 rounded-full text-sm animate-fade-in border border-blue-500/20">
                                                 <FileText className="w-4 h-4" />
                                                 <span className="max-w-[150px] truncate">
                                                     {attachment.name}
@@ -1962,7 +1962,7 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                                                     onClick={
                                                         handleRemoveAttachment
                                                     }
-                                                    className="ml-1 p-0.5 hover:bg-blue-100 rounded-full cursor-pointer"
+                                                    className="ml-1 p-0.5 hover:bg-blue-100/10 rounded-full cursor-pointer"
                                                 >
                                                     <X className="w-3 h-3" />
                                                 </button>
@@ -1992,8 +1992,8 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                                             isRecording
                                                 ? "Grabando audio..."
                                                 : attachment
-                                                  ? "Añade un comentario..."
-                                                  : "Pregunta a NSG..."
+                                                    ? "Añade un comentario..."
+                                                    : "Pregunta a NSG..."
                                         }
                                     />
 
@@ -2039,36 +2039,36 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                                                     }
                                                     className={clsx(
                                                         "flex items-center gap-2 px-4 py-2 rounded-xl text-[13px] font-semibold transition-all duration-300 border shadow-sm group",
-                                                        "bg-blue-50/80 border-blue-200 text-blue-600 ring-2 ring-blue-100/50",
+                                                        "bg-blue-500/10 border-blue-500/20 text-blue-400 ring-2 ring-blue-500/10",
                                                     )}
                                                 >
                                                     {intelligenceMode ===
                                                         "pulse" && (
-                                                        <Zap className="w-4 h-4 transition-colors text-blue-500" />
-                                                    )}
+                                                            <Zap className="w-4 h-4 transition-colors text-blue-400" />
+                                                        )}
                                                     {intelligenceMode ===
                                                         "compare" && (
-                                                        <Layers className="w-4 h-4 text-blue-500" />
-                                                    )}
+                                                            <Layers className="w-4 h-4 text-blue-400" />
+                                                        )}
                                                     {intelligenceMode ===
                                                         "fusion" && (
-                                                        <Scale className="w-4 h-4 text-blue-500" />
-                                                    )}
+                                                            <Scale className="w-4 h-4 text-blue-400" />
+                                                        )}
 
                                                     <span className="font-display tracking-tight">
                                                         {intelligenceMode ===
-                                                        "pulse"
+                                                            "pulse"
                                                             ? "Pulso"
                                                             : intelligenceMode ===
                                                                 "compare"
-                                                              ? "Comparar"
-                                                              : "Fusión"}
+                                                                ? "Comparar"
+                                                                : "Fusión"}
                                                     </span>
                                                     <ChevronDown
                                                         className={clsx(
                                                             "w-3.5 h-3.5 opacity-40 transition-transform duration-300",
                                                             isModeOpen &&
-                                                                "rotate-180",
+                                                            "rotate-180",
                                                         )}
                                                     />
                                                 </button>
@@ -2099,7 +2099,7 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                                                                 stiffness: 400,
                                                                 damping: 35,
                                                             }}
-                                                            className="absolute bottom-full left-0 mb-3 w-64 p-2 bg-white/95 backdrop-blur-xl rounded-[20px] shadow-[0_20px_40px_-10px_rgba(0,0,0,0.15)] border border-white/60 flex flex-col gap-1 z-50 ring-1 ring-slate-900/5"
+                                                            className="absolute bottom-full left-0 mb-3 w-64 p-2 bg-navy-900/95 backdrop-blur-xl rounded-[20px] shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] border border-white/10 flex flex-col gap-1 z-50 ring-1 ring-white/5"
                                                         >
                                                             {[
                                                                 {
@@ -2137,17 +2137,17 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                                                                         "group relative flex items-start gap-3.5 p-3 rounded-2xl transition-all duration-200 text-left",
                                                                         intelligenceMode ===
                                                                             m.id
-                                                                            ? "bg-blue-50/80"
-                                                                            : "hover:bg-slate-50",
+                                                                            ? "bg-white/5"
+                                                                            : "hover:bg-white/5",
                                                                     )}
                                                                 >
                                                                     <div
                                                                         className={clsx(
-                                                                            "relative z-10 p-2 rounded-xl border shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-all duration-300 group-hover:scale-105 group-hover:shadow-md bg-white",
+                                                                            "relative z-10 p-2 rounded-xl border shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-all duration-300 group-hover:scale-105 group-hover:shadow-md bg-white/5",
                                                                             intelligenceMode ===
                                                                                 m.id
-                                                                                ? "border-blue-100 text-blue-500 ring-2 ring-blue-50"
-                                                                                : "border-slate-100 text-slate-400 group-hover:text-slate-600 group-hover:border-slate-200",
+                                                                                ? "border-blue-500/30 text-blue-400 ring-2 ring-blue-500/10"
+                                                                                : "border-white/10 text-slate-500 group-hover:text-slate-300 group-hover:border-white/20",
                                                                         )}
                                                                     >
                                                                         <m.icon className="w-4 h-4" />
@@ -2158,8 +2158,8 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                                                                                 "text-[14px] font-bold tracking-tight font-display transition-colors",
                                                                                 intelligenceMode ===
                                                                                     m.id
-                                                                                    ? "text-blue-700"
-                                                                                    : "text-slate-600 group-hover:text-slate-800",
+                                                                                    ? "text-blue-400"
+                                                                                    : "text-slate-400 group-hover:text-slate-200",
                                                                             )}
                                                                         >
                                                                             {
@@ -2174,11 +2174,11 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                                                                     </div>
                                                                     {intelligenceMode ===
                                                                         m.id && (
-                                                                        <motion.div
-                                                                            layoutId="activeCheck"
-                                                                            className="absolute right-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]"
-                                                                        />
-                                                                    )}
+                                                                            <motion.div
+                                                                                layoutId="activeCheck"
+                                                                                className="absolute right-3 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]"
+                                                                            />
+                                                                        )}
                                                                 </button>
                                                             ))}
                                                         </motion.div>
@@ -2194,7 +2194,7 @@ Tu obstáculo declarado es la 'Ambigüedad' con Duke y el 'Scroll' personal. Amb
                                             }
                                             className={`
                                     w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300
-                                    ${input.trim() || attachment ? "bg-[#007AFF] text-white hover:bg-blue-600 cursor-pointer shadow-md" : "bg-slate-100 text-slate-400 cursor-default"}
+                                    ${input.trim() || attachment ? "bg-blue-600 text-white hover:bg-blue-500 cursor-pointer shadow-md" : "bg-white/5 text-slate-600 cursor-default"}
                                 `}
                                         >
                                             <ArrowUp className="w-5 h-5" />

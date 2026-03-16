@@ -48,10 +48,10 @@ export const Banner: React.FC<BannerProps> = ({
                     </span>
                 </div>
 
-                <h2 className="font-display font-medium text-3xl lg:text-4xl tracking-tighter mb-5 text-white">
-                    {title}{" "}
+                <h2 className="font-display font-black text-4xl lg:text-5xl tracking-tighter mb-5 text-white flex items-center gap-4 dropshadow-sm">
+                    {title}
                     {titleSuffix && (
-                        <span className="text-slate-600 font-extralight opacity-70 ml-2">
+                        <span className="px-3 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 font-black text-xl tracking-widest uppercase shadow-[0_0_20px_rgba(59,130,246,0.1)]">
                             {titleSuffix}
                         </span>
                     )}
@@ -59,7 +59,7 @@ export const Banner: React.FC<BannerProps> = ({
 
                 {/* Description with Vertical Line */}
                 <div className="relative pl-6 border-l-2 border-white/10 max-w-3xl group-hover:border-blue-500/40 transition-all duration-1000">
-                    <div className="text-slate-400 text-base sm:text-lg leading-relaxed font-light">
+                    <div className="text-slate-300 text-base sm:text-lg leading-relaxed font-normal">
                         {description}
                     </div>
                 </div>

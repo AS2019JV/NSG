@@ -602,7 +602,7 @@ export default function StrategyWidget({
                                     Protocolo Estratégico
                                 </h2>
                                 <div className="flex items-center gap-2 mt-2">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
                                     <p className="text-slate-500 text-xs md:text-sm font-medium tracking-wide uppercase">
                                         NSG Diplomatic Intelligence
                                     </p>

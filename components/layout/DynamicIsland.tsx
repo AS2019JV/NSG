@@ -78,12 +78,12 @@ export default function DynamicIsland({
                 className={clsx(
                     "flex items-center gap-1.5 xs:gap-2 px-2 xs:px-3 py-1 rounded-lg backdrop-blur-md shadow-sm animate-fade-in group transition-all duration-300",
                     intelligenceMode === "fusion"
-                        ? "cursor-pointer hover:bg-white/80"
-                        : "cursor-default bg-white/50 border border-white/60",
+                        ? "cursor-pointer hover:bg-white/10"
+                        : "cursor-default bg-white/5 border border-white/10",
                     intelligenceMode === "fusion" &&
                         selectedModel === "BS Fusion"
-                        ? "bg-blue-50 border border-blue-200 ring-1 ring-blue-100"
-                        : "bg-white/50 border border-white/60",
+                        ? "bg-blue-500/10 border border-blue-500/20 ring-1 ring-blue-500/10"
+                        : "bg-white/5 border border-white/10",
                 )}
             >
                 <div
@@ -92,16 +92,16 @@ export default function DynamicIsland({
                         intelligenceMode === "fusion" &&
                             selectedModel === "BS Fusion"
                             ? "bg-blue-500 shadow-blue-500/50"
-                            : "bg-emerald-500",
+                            : "bg-blue-500",
                     )}
                 ></div>
                 <span
                     className={clsx(
                         "text-[9px] xs:text-[10px] font-bold tracking-[0.15em] uppercase font-display transition-colors",
                         intelligenceMode === "fusion" &&
-                            selectedModel === "BS AI"
-                            ? "text-blue-700"
-                            : "text-navy-900/70 group-hover:text-navy-900",
+                            selectedModel === "BS Fusion"
+                            ? "text-blue-400"
+                            : "text-white/70 group-hover:text-white",
                     )}
                 >
                     {intelligenceMode === "fusion"
@@ -136,8 +136,8 @@ export default function DynamicIsland({
                                         ? "bg-blue-600/20 text-blue-100 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] ring-1 ring-blue-500/30"
                                         : "text-slate-400 hover:text-white hover:bg-white/5",
                                     isActive &&
-                                        isSpecial &&
-                                        "bg-blue-600/30 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)] border border-blue-400/30",
+                                    isSpecial &&
+                                    "bg-blue-600/30 text-white shadow-[0_0_20px_rgba(16,185,129,0.4)] border border-blue-400/30",
                                 )}
                             >
                                 <Icon
@@ -190,7 +190,7 @@ export default function DynamicIsland({
                         }}
                         className="flex items-center justify-center mt-2.5 z-40"
                     >
-                        <div className="flex items-center justify-center p-1 gap-1 md:p-1.5 md:gap-1.5 mx-auto rounded-2xl bg-white/40 backdrop-blur-2xl border border-white/20 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.1)]">
+                        <div className="flex items-center justify-center p-1 gap-1 md:p-1.5 md:gap-1.5 mx-auto rounded-2xl bg-white/5 backdrop-blur-3xl border border-white/10 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.4)]">
                             {(intelligenceMode === "fusion"
                                 ? ["Chat GPT", "Gemini", "NSG AI", "Claude"]
                                 : ["Chat GPT", "Gemini", "Claude"]
@@ -222,7 +222,7 @@ export default function DynamicIsland({
                                         {isSelected && (
                                             <m.div
                                                 layoutId="active-model-pill"
-                                                className="absolute inset-0 bg-white rounded-xl shadow-[0_0_20px_rgba(255,255,255,0.6)] ring-1 ring-white/80 -z-10"
+                                                className="absolute inset-0 bg-blue-600 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.4)] ring-1 ring-blue-500/50 -z-10"
                                                 transition={{
                                                     type: "spring",
                                                     stiffness: 350,
@@ -236,10 +236,8 @@ export default function DynamicIsland({
                                             className={clsx(
                                                 "w-1.5 h-1.5 rounded-full transition-all duration-500 ease-out shadow-sm",
                                                 activeState
-                                                    ? model === "NSG AI"
-                                                        ? "bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)] scale-110"
-                                                        : "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)] scale-110"
-                                                    : "bg-slate-300/50 scale-100 group-hover:bg-slate-400",
+                                                    ? "bg-blue-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] scale-110"
+                                                    : "bg-slate-500/50 scale-100 group-hover:bg-slate-400",
                                                 isBlinking && "animate-pulse",
                                             )}
                                         />
@@ -248,10 +246,8 @@ export default function DynamicIsland({
                                             className={clsx(
                                                 "relative z-10 transition-colors duration-300 text-[11px] md:text-[13px] font-semibold",
                                                 isSelected
-                                                    ? model === "NSG AI"
-                                                        ? "text-blue-600"
-                                                        : "text-navy-900"
-                                                    : "text-slate-500/80 group-hover:text-slate-700",
+                                                    ? "text-white"
+                                                    : "text-slate-400 group-hover:text-slate-200",
                                             )}
                                         >
                                             {model}

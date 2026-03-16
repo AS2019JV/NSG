@@ -23,7 +23,7 @@ export default function ProcessingState() {
     <div className="flex flex-col items-center justify-center mt-8 animate-fade-in-up gap-6 w-full">
       {/* Atom Container */}
       <AtomEffect className="w-16 h-16" />
-      
+
       {/* Animated Text */}
       <p className="text-xs font-bold text-blue-500 tracking-widest uppercase animate-text-glow transition-all duration-500">
         {PHRASES[phraseIndex]}

@@ -33,7 +33,7 @@ const slides = [
         subtitle: "Ejecución Diaria de Alto Rendimiento",
         description:
             "Protocolo de precisión operativa y alineación estratégica. Sincroniza la ejecución táctica diaria con los objetivos macro-estratégicos.",
-        gradient: "from-emerald-400 to-teal-400",
+        gradient: "from-blue-400 to-teal-400",
         badge: "NSG SYSTEM OS - EXECUTION",
     },
     {
@@ -123,15 +123,15 @@ export default function ProjectSlider({ onSlideChange }: ProjectSliderProps) {
     const Icon = current.icon;
 
     return (
-        <div className="relative w-full min-h-[420px] bg-white rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] border border-slate-100/60 overflow-hidden group/slider transition-all duration-700 flex flex-col items-center justify-center p-8 xs:p-10 relative">
+        <div className="relative w-full min-h-[420px] bg-navy-900/60 backdrop-blur-3xl rounded-[2.5rem] shadow-2xl border border-white/5 overflow-hidden group/slider transition-all duration-700 flex flex-col items-center justify-center p-8 xs:p-10 relative">
             
             {/* Background Decor - Very subtle blur */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-slate-50 rounded-full blur-[100px] opacity-60 pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-blue-500/5 rounded-full blur-[100px] opacity-60 pointer-events-none" />
 
             {/* Navigation Buttons - Left/Right */}
             <button
                 onClick={prevSlide}
-                className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white border border-slate-100 shadow-lg shadow-slate-200/50 flex items-center justify-center hover:bg-slate-50 hover:scale-105 transition-all duration-300 z-30 group-hover/slider:opacity-100 opacity-60 md:opacity-0"
+                className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/5 border border-white/10 shadow-2xl flex items-center justify-center hover:bg-white/10 hover:scale-105 transition-all duration-300 z-30 group-hover/slider:opacity-100 opacity-60 md:opacity-0"
                 aria-label="Previous slide"
             >
                 <ChevronLeft className="w-5 h-5 text-slate-400" />
@@ -139,7 +139,7 @@ export default function ProjectSlider({ onSlideChange }: ProjectSliderProps) {
 
             <button
                 onClick={nextSlide}
-                className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white border border-slate-100 shadow-lg shadow-slate-200/50 flex items-center justify-center hover:bg-slate-50 hover:scale-105 transition-all duration-300 z-30 group-hover/slider:opacity-100 opacity-60 md:opacity-0"
+                className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/5 border border-white/10 shadow-2xl flex items-center justify-center hover:bg-white/10 hover:scale-105 transition-all duration-300 z-30 group-hover/slider:opacity-100 opacity-60 md:opacity-0"
                 aria-label="Next slide"
             >
                 <ChevronRight className="w-5 h-5 text-slate-400" />
@@ -151,20 +151,20 @@ export default function ProjectSlider({ onSlideChange }: ProjectSliderProps) {
                 {/* 1. Icon & Badge */}
                 <div className="flex flex-col items-center gap-4">
                     {/* Icon Circle */}
-                    <div className="w-20 h-20 rounded-full bg-white shadow-[0_10px_30px_-5px_rgba(59,130,246,0.15)] flex items-center justify-center border border-blue-50/50 relative">
-                        <div className="absolute inset-0 bg-blue-50/30 rounded-full animate-pulse-slow" />
-                        <Icon strokeWidth={1.5} className="w-9 h-9 text-blue-600" />
+                    <div className="w-20 h-20 rounded-full bg-navy-950/50 shadow-2xl flex items-center justify-center border border-white/5 relative">
+                        <div className="absolute inset-0 bg-blue-500/5 rounded-full animate-pulse-slow" />
+                        <Icon strokeWidth={1.5} className="w-9 h-9 text-blue-400" />
                     </div>
 
                     {/* Badge */}
-                    <span className="px-3 py-1 rounded-full bg-slate-50 text-slate-400 text-[9px] font-black uppercase tracking-[0.2em] border border-slate-100">
+                    <span className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-[9px] font-black uppercase tracking-[0.2em] border border-blue-500/20">
                         {current.badge}
                     </span>
                 </div>
 
                 {/* 2. Main Typography */}
                 <div className="space-y-3">
-                    <h2 className="text-4xl md:text-5xl lg:text-5xl font-bold tracking-tighter text-navy-950">
+                    <h2 className="text-4xl md:text-5xl lg:text-5xl font-bold tracking-tighter text-bright-white">
                         {current.title}
                     </h2>
                     <p className="text-base md:text-lg text-slate-400 font-medium tracking-tight">
@@ -173,15 +173,15 @@ export default function ProjectSlider({ onSlideChange }: ProjectSliderProps) {
                 </div>
 
                 {/* 3. Description with Blue Vertical Line */}
-                <div className="relative pl-6 py-1 max-w-xl mx-auto text-left border-l-4 border-blue-200">
-                    <p className="text-slate-500 leading-relaxed text-sm md:text-base">
+                <div className="relative pl-6 py-1 max-w-xl mx-auto text-left border-l-4 border-blue-500/30">
+                    <p className="text-slate-400 leading-relaxed text-sm md:text-base">
                         {current.description}
                     </p>
                 </div>
 
                 {/* 4. CTA and Pagination */}
                 <div className="flex flex-col md:flex-row items-center gap-6 pt-2">
-                    <button className="px-6 py-3 bg-navy-950 text-white rounded-xl font-bold text-xs tracking-wide shadow-xl shadow-navy-900/10 hover:shadow-navy-900/20 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2 group/btn">
+                    <button className="px-6 py-3 bg-blue-600 text-white rounded-xl font-bold text-xs tracking-wide shadow-xl shadow-blue-500/20 hover:shadow-blue-500/40 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2 group/btn">
                         Explorar Módulo
                         <ChevronRight className="w-3.5 h-3.5 text-white/50 group-hover/btn:translate-x-1 transition-transform" />
                     </button>
@@ -195,8 +195,8 @@ export default function ProjectSlider({ onSlideChange }: ProjectSliderProps) {
                                 className={clsx(
                                     "transition-all duration-500 rounded-full",
                                     index === currentSlide
-                                        ? "w-6 h-1 bg-blue-600"
-                                        : "w-1 h-1 bg-slate-200 hover:bg-slate-300"
+                                        ? "w-6 h-1 bg-blue-500"
+                                        : "w-1 h-1 bg-white/10 hover:bg-white/20"
                                 )}
                                 aria-label={`Go to slide ${index + 1}`}
                             />

@@ -61,7 +61,7 @@ export default function StreakCounter({ current, longest, isLoading = false }: S
                 </div>
             )}
 
-            <div className="bg-linear-to-br from-orange-50 via-red-50 to-orange-50 p-6 sm:p-8 rounded-3xl border border-orange-200/50 shadow-lg relative overflow-hidden group hover:shadow-xl transition-all duration-500">
+            <div className="bg-navy-900/60 p-10 sm:p-12 rounded-[2.5rem] border border-white/10 shadow-2xl relative overflow-hidden group hover:shadow-blue-500/10 transition-all duration-700 backdrop-blur-3xl">
                 {/* Decorative Background */}
                 <div className="absolute -right-10 -top-10 w-32 h-32 bg-orange-300/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
                 <div className="absolute -left-10 -bottom-10 w-32 h-32 bg-red-300/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
@@ -86,14 +86,14 @@ export default function StreakCounter({ current, longest, isLoading = false }: S
                             <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-slate-500 mb-1">
                                 Racha Actual
                             </p>
-                            <div className="flex items-baseline gap-2">
+                            <div className="flex items-baseline gap-3">
                                 <span className={clsx(
-                                    "font-display font-bold transition-all duration-500",
-                                    current > 0 ? "text-4xl sm:text-5xl text-orange-600" : "text-3xl sm:text-4xl text-slate-400"
+                                    "font-display font-black transition-all duration-500 text-bright-white",
+                                    current > 0 ? "text-6xl sm:text-7xl text-white" : "text-4xl sm:text-5xl text-slate-600"
                                 )}>
                                     {current}
                                 </span>
-                                <span className="text-sm sm:text-base font-bold text-slate-400">
+                                <span className="text-xl sm:text-2xl font-black text-slate-500 uppercase tracking-tighter">
                                     {current === 1 ? "día" : "días"}
                                 </span>
                             </div>
@@ -109,12 +109,12 @@ export default function StreakCounter({ current, longest, isLoading = false }: S
                             <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
                                 Tu Récord
                             </p>
-                            <div className="flex items-center justify-end gap-1.5">
-                                <Trophy className="w-4 h-4 text-amber-500" />
-                                <span className="font-bold text-lg sm:text-2xl text-amber-600">
+                            <div className="flex items-center justify-end gap-2">
+                                <Trophy className="w-5 h-5 text-amber-500" />
+                                <span className="font-black text-2xl sm:text-4xl text-bright-white text-white">
                                     {longest}
                                 </span>
-                                <span className="text-xs text-slate-400 font-medium">días</span>
+                                <span className="text-sm text-slate-500 font-bold uppercase tracking-tighter">días</span>
                             </div>
                         </div>
 

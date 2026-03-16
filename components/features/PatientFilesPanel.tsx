@@ -8,7 +8,7 @@ import { useState } from "react";
 // Mock Data (Replace with real API data later)
 const PATIENTS = [
   { id: 1, initials: "JM", name: "Javier M.", lastSession: "Hoy", active: true, color: "bg-blue-600 text-white" },
-  { id: 2, initials: "AR", name: "Ana R.", lastSession: "Ayer", active: false, color: "bg-emerald-100 text-emerald-700" },
+  { id: 2, initials: "AR", name: "Ana R.", lastSession: "Ayer", active: false, color: "bg-blue-100 text-blue-700" },
   { id: 3, initials: "CD", name: "Carlos D.", lastSession: "10 Nov", active: false, color: "bg-purple-100 text-purple-700" },
 ];
 

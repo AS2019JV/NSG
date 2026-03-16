@@ -14,8 +14,8 @@ export default function DashboardLayout({
   const { isDayDetailOpen, closeDayDetail } = useUIStore();
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden">
-      
+    <div className="flex h-screen bg-[#020617] overflow-hidden">
+
       {/* 1. Sidebar (Fixed or Slide-out) */}
       <Sidebar />
 
@@ -27,7 +27,7 @@ export default function DashboardLayout({
 
         {/* Dynamic Page Content */}
         <div id="workspace-content" className="flex-1 flex flex-col overflow-hidden w-full relative">
-           {children}
+          {children}
         </div>
 
       </main>

@@ -44,8 +44,8 @@ export default function ProposalView() {
                 {/* Column 3: Roadmap */}
                  <ColumnCard 
                     title="Plan 30/60/90" 
-                    icon={<Calendar className="w-5 h-5 text-emerald-500" />}
-                    color="bg-emerald-500/5 border-emerald-100"
+                    icon={<Calendar className="w-5 h-5 text-blue-500" />}
+                    color="bg-blue-500/5 border-blue-100"
                 >
                     <div className="space-y-6">
                         <RoadmapItem day="30" focus="Estabilizar" task="Implementar CRM y definir SOPs base." />
@@ -126,10 +126,10 @@ interface RoadmapItemProps {
 function RoadmapItem({ day, focus, task }: RoadmapItemProps) {
     return (
         <div className="relative pl-4 border-l-2 border-slate-100">
-            <div className="absolute -left-[5px] top-0 w-2.5 h-2.5 bg-white border-2 border-emerald-500 rounded-full" />
+            <div className="absolute -left-[5px] top-0 w-2.5 h-2.5 bg-white border-2 border-blue-500 rounded-full" />
             <div className="mb-1 flex items-baseline gap-2">
                 <span className="text-xl font-display font-semibold tracking-tight text-navy-900">Day {day}</span>
-                <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">{focus}</span>
+                <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">{focus}</span>
             </div>
             <p className="text-xs text-slate-500">{task}</p>
         </div>

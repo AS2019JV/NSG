@@ -299,19 +299,19 @@ export default function IHorizon() {
                             // Map Transcripts
                             transcripts: Array.isArray(tList)
                                 ? tList.map((t: any) => ({
-                                      // eslint-disable-line @typescript-eslint/no-explicit-any
-                                      speakerName:
-                                          t.speaker?.display_name ||
-                                          "Desconocido",
-                                      time: t.timestamp || "",
-                                      text: t.text || "",
-                                      // Robust check: Look at root OR inside speaker object
-                                      isUser: !!(
-                                          t.matched_calendar_invitee_email ||
-                                          t.speaker
-                                              ?.matched_calendar_invitee_email
-                                      ),
-                                  }))
+                                    // eslint-disable-line @typescript-eslint/no-explicit-any
+                                    speakerName:
+                                        t.speaker?.display_name ||
+                                        "Desconocido",
+                                    time: t.timestamp || "",
+                                    text: t.text || "",
+                                    // Robust check: Look at root OR inside speaker object
+                                    isUser: !!(
+                                        t.matched_calendar_invitee_email ||
+                                        t.speaker
+                                            ?.matched_calendar_invitee_email
+                                    ),
+                                }))
                                 : [],
 
                             // Map AI Info (Attempt to retrieve from backend)
@@ -545,14 +545,14 @@ export default function IHorizon() {
                 />
 
                 {/* TAB NAVIGATION - Clarity Style */}
-                <div className="flex p-1.5 bg-slate-100/50 backdrop-blur-md rounded-2xl w-full sm:w-fit mb-6 border border-slate-200/50 self-center">
+                <div className="flex p-1.5 bg-navy-900/40 backdrop-blur-md rounded-2xl w-full sm:w-fit mb-6 border border-white/5 self-center">
                     <button
                         onClick={() => setActiveTab("fathom")}
                         className={clsx(
                             "flex-1 flex items-center justify-center gap-2.5 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 sm:flex-none whitespace-nowrap",
                             activeTab === "fathom"
-                                ? "bg-white text-blue-600 shadow-sm ring-1 ring-slate-200"
-                                : "text-slate-400 hover:text-gray-700 hover:bg-white/50",
+                                ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                                : "text-slate-400 hover:text-white hover:bg-white/5",
                         )}
                     >
                         <Activity className="w-3.5 h-3.5" />
@@ -563,8 +563,8 @@ export default function IHorizon() {
                         className={clsx(
                             "flex-1 flex items-center justify-center gap-2.5 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-300 sm:flex-none whitespace-nowrap",
                             activeTab === "manual"
-                                ? "bg-white text-blue-600 shadow-sm ring-1 ring-slate-200"
-                                : "text-slate-400 hover:text-gray-700 hover:bg-white/50",
+                                ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                                : "text-slate-400 hover:text-white hover:bg-white/5",
                         )}
                     >
                         <Mic className="w-3.5 h-3.5" />
@@ -577,7 +577,7 @@ export default function IHorizon() {
                     <div className="flex flex-col gap-8 animate-fade-in">
                         {/* HERO: JOIN FATHOM - Compact */}
                         {!isConnected && (
-                            <div className="w-full bg-linear-to-r from-navy-900 via-navy-800 to-blue-900 rounded-3xl xs:rounded-4xl p-5 xs:p-8 sm:p-10 text-white relative overflow-hidden shadow-xl border border-navy-700/50">
+                            <div className="w-full bg-navy-900/40 backdrop-blur-3xl rounded-3xl xs:rounded-4xl p-5 xs:p-8 sm:p-10 text-white relative overflow-hidden shadow-2xl border border-white/5">
                                 {/* Decorational Elements */}
                                 <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
                                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3 pointer-events-none"></div>
@@ -594,7 +594,7 @@ export default function IHorizon() {
                                                 Fathom
                                             </span>
                                         </h2>
-                                        <p className="text-blue-100/80 text-base leading-relaxed max-w-xl mx-auto md:mx-0">
+                                        <p className="text-slate-400 text-base leading-relaxed max-w-xl mx-auto md:mx-0">
                                             Sincronización de inteligencia de
                                             reuniones. El sistema ingesta y
                                             procesa flujos de audio para
@@ -606,13 +606,13 @@ export default function IHorizon() {
                                                 onClick={() =>
                                                     setShowFathomModal(true)
                                                 }
-                                                className="px-8 py-4 rounded-2xl font-bold transition transform hover:-translate-y-0.5 shadow-lg flex items-center gap-3 group bg-white text-navy-900 hover:bg-blue-50 shadow-black/10 cursor-pointer"
+                                                className="px-8 py-4 rounded-2xl font-bold transition transform hover:-translate-y-0.5 shadow-lg flex items-center gap-3 group bg-blue-600 text-white hover:bg-blue-500 shadow-blue-900/20 cursor-pointer"
                                             >
-                                                <div className="w-6 h-6 bg-linear-to-tr from-orange-400 to-pink-500 rounded-lg flex items-center justify-center text-white font-bold">
+                                                <div className="w-6 h-6 bg-white/10 rounded-lg flex items-center justify-center text-white font-bold">
                                                     <Activity className="w-4 h-4" />
                                                 </div>
                                                 Conectar Fathom
-                                                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition" />
+                                                <ChevronRight className="w-4 h-4 text-white/50 group-hover:translate-x-1 transition" />
                                             </button>
                                         </div>
                                     </div>
@@ -623,7 +623,7 @@ export default function IHorizon() {
                                             <div className="flex gap-2 mb-4">
                                                 <div className="w-2 h-2 rounded-full bg-red-400"></div>
                                                 <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
-                                                <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                                                <div className="w-2 h-2 rounded-full bg-blue-400"></div>
                                             </div>
                                             <div className="space-y-3">
                                                 <div className="h-2 w-3/4 bg-white/20 rounded"></div>
@@ -640,16 +640,16 @@ export default function IHorizon() {
 
                         {/* Connection Status Banner */}
                         {isConnected && fathomToken && (
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 xs:p-5 bg-emerald-50 border border-emerald-200 rounded-2xl xs:rounded-3xl shadow-sm transition-all">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 xs:p-5 bg-blue-500/10 border border-blue-500/20 backdrop-blur-md rounded-2xl xs:rounded-3xl shadow-2xl transition-all">
                                 <div className="flex items-center gap-3 xs:gap-4 w-full sm:w-auto">
-                                    <div className="w-10 h-10 xs:w-12 xs:h-12 bg-emerald-500 rounded-xl xs:rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-200/50 shrink-0">
+                                    <div className="w-10 h-10 xs:w-12 xs:h-12 bg-blue-600 rounded-xl xs:rounded-2xl flex items-center justify-center shadow-lg shadow-blue-900/40 shrink-0">
                                         <CheckCircle className="w-5 h-5 xs:w-6 xs:h-6 text-white" />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm xs:text-base font-bold text-emerald-900 leading-tight">
+                                        <p className="text-sm xs:text-base font-bold text-white leading-tight">
                                             Conectado a Fathom Analytics
                                         </p>
-                                        <p className="text-[11px] xs:text-sm text-emerald-600 leading-relaxed mt-0.5">
+                                        <p className="text-[11px] xs:text-sm text-blue-400 leading-relaxed mt-0.5">
                                             Sincronización activa • Actualizado:{" "}
                                             {lastSync}
                                         </p>
@@ -657,7 +657,7 @@ export default function IHorizon() {
                                 </div>
                                 <button
                                     onClick={handleDisconnectFathom}
-                                    className="w-full sm:w-auto px-4 py-2.5 sm:py-2 bg-white border border-red-200 rounded-xl text-red-600 text-xs xs:text-sm font-bold hover:bg-red-50 transition flex items-center justify-center gap-2 shadow-sm shrink-0 active:scale-95"
+                                    className="w-full sm:w-auto px-4 py-2.5 sm:py-2 bg-white/5 border border-white/10 rounded-xl text-red-400 text-xs xs:text-sm font-bold hover:bg-red-500/10 transition flex items-center justify-center gap-2 shadow-sm shrink-0 active:scale-95"
                                     title="Desconectar y eliminar API key"
                                 >
                                     <Trash2 className="w-3.5 h-3.5 xs:w-4 xs:h-4" />
@@ -669,10 +669,10 @@ export default function IHorizon() {
                         {/* FATHOM FOLDERS GRID */}
                         <div className="flex flex-col gap-4 flex-1 min-h-0">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-lg font-bold text-navy-900 flex items-center gap-2">
-                                    <Folder className="w-4 h-4 text-blue-600" />
+                                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                                    <Folder className="w-4 h-4 text-blue-400" />
                                     Sesiones Sincronizadas
-                                    <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-lg text-xs font-bold">
+                                    <span className="ml-2 px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded-lg text-xs font-bold">
                                         {folders.length}
                                     </span>
                                 </h3>
@@ -685,12 +685,12 @@ export default function IHorizon() {
                                     ))}
                                 </div>
                             ) : folders.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center py-12 text-slate-400 border-2 border-dashed border-slate-200 rounded-3xl bg-slate-50/30">
-                                    <Folder className="w-12 h-12 mb-3 opacity-30" />
-                                    <p className="font-bold text-base text-slate-600 mb-1">
+                                <div className="flex flex-col items-center justify-center py-16 text-slate-400 border-2 border-dashed border-white/5 rounded-[3rem] bg-navy-900/40 backdrop-blur-3xl shadow-2xl">
+                                    <Folder className="w-12 h-12 mb-4 text-blue-400/30" />
+                                    <p className="font-black text-lg text-white text-bright-white mb-1 uppercase tracking-tight">
                                         No hay grabaciones disponibles
                                     </p>
-                                    <p className="text-xs text-slate-500">
+                                    <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">
                                         Conecta Fathom para sincronizar tus
                                         reuniones
                                     </p>
@@ -708,12 +708,12 @@ export default function IHorizon() {
                                                     setSelectedFolder(folder)
                                                 }
                                                 style={{ animationDelay }}
-                                                className="bg-white rounded-2xl xs:rounded-3xl p-4 xs:p-5 sm:p-6 border border-slate-200 hover:border-blue-300 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-500 cursor-pointer group flex flex-col h-full animate-fade-in-up relative overflow-hidden min-h-[170px]"
+                                                className="bg-navy-900/40 backdrop-blur-3xl rounded-2xl xs:rounded-3xl p-4 xs:p-5 sm:p-6 border border-white/5 hover:border-blue-500/50 shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer group flex flex-col h-full animate-fade-in-up relative overflow-hidden min-h-[170px]"
                                             >
                                                 {/* Status Badge */}
                                                 {hasAnalysis && (
                                                     <div className="absolute top-3 xs:top-4 right-3 xs:right-4">
-                                                        <div className="px-1.5 xs:px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-[9px] xs:text-[10px] font-black uppercase flex items-center gap-1">
+                                                        <div className="px-1.5 xs:px-2 py-1 bg-blue-500/20 text-blue-400 rounded-lg text-[9px] xs:text-[10px] font-black uppercase flex items-center gap-1">
                                                             <BrandAtom
                                                                 className="w-2.5 h-2.5 xs:w-3 xs:h-3"
                                                                 variant="colored"
@@ -724,26 +724,26 @@ export default function IHorizon() {
                                                 )}
 
                                                 <div className="flex justify-between items-start mb-3 xs:mb-4">
-                                                    <div className="w-12 h-12 xs:w-14 xs:h-14 rounded-2xl bg-linear-to-br from-blue-50 to-indigo-50 text-blue-600 flex items-center justify-center group-hover:from-blue-600 group-hover:to-indigo-600 group-hover:text-white transition-all duration-300 shadow-md group-hover:shadow-lg group-hover:scale-110">
+                                                    <div className="w-12 h-12 xs:w-14 xs:h-14 rounded-2xl bg-blue-600/10 text-blue-400 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-lg group-hover:shadow-blue-900/40 group-hover:scale-110 border border-blue-500/20">
                                                         <Headphones className="w-6 h-6 xs:w-7 xs:h-7" />
                                                     </div>
                                                 </div>
 
-                                                <h4 className="font-bold text-navy-900 text-base xs:text-lg mb-2 group-hover:text-blue-600 transition line-clamp-2">
+                                                <h4 className="font-bold text-bright-white text-base xs:text-lg mb-2 group-hover:text-blue-400 transition line-clamp-2">
                                                     {folder.title}
                                                 </h4>
 
-                                                <p className="text-xs xs:text-sm text-slate-500 mb-3 xs:mb-4 line-clamp-2 flex-1 font-medium leading-relaxed">
+                                                <p className="text-xs xs:text-sm text-slate-400 mb-3 xs:mb-4 line-clamp-2 flex-1 font-medium leading-relaxed">
                                                     {folder.description}
                                                 </p>
 
-                                                <div className="pt-3 xs:pt-4 border-t border-slate-100 space-y-2 xs:space-y-3">
+                                                <div className="pt-3 xs:pt-4 border-t border-white/5 space-y-2 xs:space-y-3">
                                                     {/* Progress indicator */}
                                                     {hasAnalysis && (
                                                         <div className="flex items-center gap-2 mb-2">
-                                                            <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                                                <div
-                                                                    className="h-full bg-linear-to-r from-blue-500 to-indigo-600 rounded-full"
+                                                            <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                                                 <div
+                                                                    className="h-full bg-linear-to-r from-blue-500 to-blue-600 rounded-full"
                                                                     style={{
                                                                         width: "75%",
                                                                     }}
@@ -755,12 +755,12 @@ export default function IHorizon() {
                                                         </div>
                                                     )}
 
-                                                    <div className="flex items-center justify-between text-[10px] xs:text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                                    <div className="flex items-center justify-between text-[10px] xs:text-xs font-bold text-slate-500 uppercase tracking-wider">
                                                         <span className="flex items-center gap-1 xs:gap-1.5">
                                                             <Calendar className="w-3 h-3 xs:w-3.5 xs:h-3.5" />
                                                             {folder.date}
                                                         </span>
-                                                        <span className="flex items-center gap-1 xs:gap-1.5 text-blue-600 font-bold">
+                                                        <span className="flex items-center gap-1 xs:gap-1.5 text-blue-400 font-bold">
                                                             <Clock className="w-3 h-3 xs:w-3.5 xs:h-3.5" />
                                                             {folder.timeStr}
                                                         </span>
@@ -781,16 +781,16 @@ export default function IHorizon() {
                     <div className="flex flex-col gap-6 animate-fade-in">
                         {/* Step-by-Step Guide */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                            <div className="bg-navy-900/40 backdrop-blur-3xl rounded-2xl p-6 border border-white/5 shadow-2xl">
                                 <div className="flex items-start gap-3">
-                                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0">
+                                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-black text-sm shrink-0 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
                                         1
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-navy-900 mb-1">
+                                        <h4 className="font-black text-bright-white mb-1 uppercase tracking-tight text-sm">
                                             Selecciona Tipo
                                         </h4>
-                                        <p className="text-xs text-slate-500">
+                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
                                             Ingesta de audio o texto
                                             estructurado
                                         </p>
@@ -798,32 +798,32 @@ export default function IHorizon() {
                                 </div>
                             </div>
 
-                            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                            <div className="bg-navy-900/40 backdrop-blur-3xl rounded-2xl p-6 border border-white/5 shadow-2xl">
                                 <div className="flex items-start gap-3">
-                                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0">
+                                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-black text-sm shrink-0 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
                                         2
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-navy-900 mb-1">
+                                        <h4 className="font-black text-bright-white mb-1 uppercase tracking-tight text-sm">
                                             Sube tu Contenido
                                         </h4>
-                                        <p className="text-xs text-slate-500">
+                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
                                             Integración segura de archivos
                                         </p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+                            <div className="bg-navy-900/40 backdrop-blur-3xl rounded-2xl p-6 border border-white/5 shadow-2xl">
                                 <div className="flex items-start gap-3">
-                                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0">
+                                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-black text-sm shrink-0 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
                                         3
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-navy-900 mb-1">
+                                        <h4 className="font-black text-bright-white mb-1 uppercase tracking-tight text-sm">
                                             Recibe Análisis
                                         </h4>
-                                        <p className="text-xs text-slate-500">
+                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
                                             Extracción de insights estratégicos
                                         </p>
                                     </div>
@@ -832,24 +832,24 @@ export default function IHorizon() {
                         </div>
 
                         {/* Main Upload Area */}
-                        <div className="bg-white rounded-3xl p-4 xs:p-6 sm:p-8 border border-slate-200 shadow-sm">
+                        <div className="bg-navy-900/40 backdrop-blur-3xl rounded-3xl p-4 xs:p-6 sm:p-8 border border-white/5 shadow-2xl">
                             <div className="flex flex-col lg:flex-row gap-8">
                                 {/* Left: Instructions & Mode */}
                                 <div className="flex-1 space-y-6">
                                     <div>
                                         <div className="flex items-center gap-3 mb-4">
-                                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-50 border border-blue-100">
-                                                <Mic className="w-4 h-4 text-blue-600" />
-                                                <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">
-                                                    Neural Studio
+                                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20">
+                                                <Mic className="w-4 h-4 text-blue-400" />
+                                                <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">
+                                                    Neural Intake
                                                 </span>
                                             </div>
                                         </div>
 
-                                        <h3 className="text-2xl font-display font-bold text-navy-900 mb-2">
+                                        <h3 className="text-2xl font-display font-bold text-white mb-2">
                                             Análisis Manual de Contenido
                                         </h3>
-                                        <p className="text-slate-600 leading-relaxed">
+                                        <p className="text-slate-400 leading-relaxed font-medium">
                                             Módulo de procesamiento de lenguaje
                                             natural. Transforma activos de audio
                                             y texto no estructurado en
@@ -861,11 +861,11 @@ export default function IHorizon() {
 
                                     {/* MODE SWITCHER - More Prominent */}
                                     <div>
-                                        <label className="text-sm font-bold text-slate-700 mb-3 block">
+                                        <label className="text-sm font-bold text-slate-300 mb-3 block uppercase tracking-widest text-[10px]">
                                             Paso 1: Selecciona el tipo de
                                             contenido
                                         </label>
-                                        <div className="flex p-1.5 bg-slate-50 rounded-xl border border-slate-200">
+                                        <div className="flex p-1.5 bg-navy-950/50 rounded-xl border border-white/5">
                                             <button
                                                 onClick={() =>
                                                     setManualInputType("audio")
@@ -873,8 +873,8 @@ export default function IHorizon() {
                                                 className={clsx(
                                                     "flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-bold transition-all",
                                                     manualInputType === "audio"
-                                                        ? "bg-white text-blue-600 shadow-md"
-                                                        : "text-slate-500 hover:text-slate-700",
+                                                        ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                                                        : "text-slate-500 hover:text-slate-300",
                                                 )}
                                             >
                                                 <Mic className="w-4 h-4" />
@@ -887,8 +887,8 @@ export default function IHorizon() {
                                                 className={clsx(
                                                     "flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-bold transition-all",
                                                     manualInputType === "text"
-                                                        ? "bg-white text-blue-600 shadow-md"
-                                                        : "text-slate-500 hover:text-slate-700",
+                                                        ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                                                        : "text-slate-500 hover:text-slate-300",
                                                 )}
                                             >
                                                 <FileText className="w-4 h-4" />
@@ -901,14 +901,14 @@ export default function IHorizon() {
                                     <div className="flex flex-wrap gap-2">
                                         {manualInputType === "audio" ? (
                                             <>
-                                                <div className="px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg">
-                                                    <p className="text-xs font-bold text-blue-700 flex items-center gap-1.5">
+                                                <div className="px-3 py-2 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                                                    <p className="text-xs font-bold text-blue-400 flex items-center gap-1.5">
                                                         <FolderOpen className="w-3.5 h-3.5" />
                                                         Formatos: MP3, WAV, M4A
                                                     </p>
                                                 </div>
-                                                <div className="px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg">
-                                                    <p className="text-xs font-bold text-blue-700 flex items-center gap-1.5">
+                                                <div className="px-3 py-2 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                                                    <p className="text-xs font-bold text-blue-400 flex items-center gap-1.5">
                                                         <Timer className="w-3.5 h-3.5" />
                                                         Duración: Hasta 2 horas
                                                     </p>
@@ -916,14 +916,14 @@ export default function IHorizon() {
                                             </>
                                         ) : (
                                             <>
-                                                <div className="px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg">
-                                                    <p className="text-xs font-bold text-blue-700 flex items-center gap-1.5">
+                                                <div className="px-3 py-2 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                                                    <p className="text-xs font-bold text-blue-400 flex items-center gap-1.5">
                                                         <FileType className="w-3.5 h-3.5" />
                                                         Sin límite de caracteres
                                                     </p>
                                                 </div>
-                                                <div className="px-3 py-2 bg-blue-50 border border-blue-100 rounded-lg">
-                                                    <p className="text-xs font-bold text-blue-700 flex items-center gap-1.5">
+                                                <div className="px-3 py-2 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+                                                    <p className="text-xs font-bold text-blue-400 flex items-center gap-1.5">
                                                         <Activity className="w-3.5 h-3.5" />
                                                         Análisis instantáneo
                                                     </p>
@@ -935,7 +935,7 @@ export default function IHorizon() {
 
                                 {/* Right: Upload Area */}
                                 <div className="lg:w-[450px]">
-                                    <label className="text-sm font-bold text-slate-700 mb-3 block">
+                                    <label className="text-sm font-bold text-slate-300 mb-3 block uppercase tracking-widest text-[10px]">
                                         Paso 2:{" "}
                                         {manualInputType === "audio"
                                             ? "Sube tu archivo de audio"
@@ -962,7 +962,7 @@ export default function IHorizon() {
                                                 onChange={(e) =>
                                                     setSelectedFile(
                                                         e.target.files?.[0] ||
-                                                            null,
+                                                        null,
                                                     )
                                                 }
                                             />
@@ -1016,7 +1016,7 @@ export default function IHorizon() {
                                                                     formData.append(
                                                                         "userId",
                                                                         userId ||
-                                                                            "",
+                                                                        "",
                                                                     );
                                                                     formData.append(
                                                                         "fileName",
@@ -1030,10 +1030,10 @@ export default function IHorizon() {
                                                                             formData,
                                                                             {
                                                                                 headers:
-                                                                                    {
-                                                                                        "Content-Type":
-                                                                                            "multipart/form-data",
-                                                                                    },
+                                                                                {
+                                                                                    "Content-Type":
+                                                                                        "multipart/form-data",
+                                                                                },
                                                                             },
                                                                         );
 
@@ -1050,33 +1050,33 @@ export default function IHorizon() {
                                                                             (
                                                                                 prev,
                                                                             ) => [
-                                                                                {
-                                                                                    id: savedDoc._id,
-                                                                                    title:
-                                                                                        savedDoc.content.substring(
-                                                                                            0,
-                                                                                            30,
-                                                                                        ) +
-                                                                                        "...",
-                                                                                    fullContent:
-                                                                                        savedDoc.content,
-                                                                                    date: new Date(
-                                                                                        savedDoc.createdAt,
-                                                                                    ).toLocaleDateString(),
-                                                                                    type: "audio",
-                                                                                    size:
-                                                                                        (
-                                                                                            savedDoc
-                                                                                                .content
-                                                                                                .length /
-                                                                                            1000
-                                                                                        ).toFixed(
-                                                                                            1,
-                                                                                        ) +
-                                                                                        "k chars",
-                                                                                },
-                                                                                ...prev,
-                                                                            ],
+                                                                                    {
+                                                                                        id: savedDoc._id,
+                                                                                        title:
+                                                                                            savedDoc.content.substring(
+                                                                                                0,
+                                                                                                30,
+                                                                                            ) +
+                                                                                            "...",
+                                                                                        fullContent:
+                                                                                            savedDoc.content,
+                                                                                        date: new Date(
+                                                                                            savedDoc.createdAt,
+                                                                                        ).toLocaleDateString(),
+                                                                                        type: "audio",
+                                                                                        size:
+                                                                                            (
+                                                                                                savedDoc
+                                                                                                    .content
+                                                                                                    .length /
+                                                                                                1000
+                                                                                            ).toFixed(
+                                                                                                1,
+                                                                                            ) +
+                                                                                            "k chars",
+                                                                                    },
+                                                                                    ...prev,
+                                                                                ],
                                                                         );
 
                                                                         showToast(
@@ -1116,14 +1116,14 @@ export default function IHorizon() {
                                                 </>
                                             ) : (
                                                 <>
-                                                    <div className="w-20 h-20 bg-white rounded-4xl flex items-center justify-center text-blue-600 shadow-xl border border-slate-100 group-hover/drop:scale-110 group-hover/drop:rotate-6 transition-all duration-500">
+                                                    <div className="w-20 h-20 bg-navy-900 rounded-4xl flex items-center justify-center text-blue-400 shadow-xl border border-white/10 group-hover/drop:scale-110 group-hover/drop:rotate-6 transition-all duration-500">
                                                         <UploadCloud className="w-10 h-10" />
                                                     </div>
                                                     <div>
-                                                        <p className="text-navy-950 font-bold text-xl">
+                                                        <p className="text-white font-bold text-xl">
                                                             Suelta tu audio aquí
                                                         </p>
-                                                        <p className="text-slate-400 text-sm mt-1">
+                                                        <p className="text-slate-500 text-sm mt-1">
                                                             O haz clic para
                                                             explorar tus
                                                             archivos
@@ -1146,7 +1146,7 @@ export default function IHorizon() {
                                                         )
                                                     }
                                                     placeholder="Pega aquí el texto de la transcripción..."
-                                                    className="w-full h-[220px] p-6 bg-slate-50 border-2 border-slate-100 rounded-4xl focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-50 outline-none transition-all resize-none text-navy-950 font-medium placeholder:text-slate-400"
+                                                    className="w-full h-[220px] p-6 bg-navy-950/50 border-2 border-white/5 rounded-4xl focus:border-blue-500/50 focus:bg-navy-950 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all resize-none text-white font-medium placeholder:text-slate-600"
                                                 />
                                                 <div className="absolute top-4 right-4 opacity-0 group-focus-within/text:opacity-100 transition-opacity">
                                                     <div className="px-2 py-1 bg-blue-600 text-white text-[8px] font-black uppercase rounded shadow-lg">
@@ -1269,11 +1269,11 @@ export default function IHorizon() {
                         {/* GALLERY LIST */}
                         <div className="flex flex-col gap-6">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-xl font-bold text-navy-900 flex items-center gap-2">
-                                    <Layers className="w-5 h-5 text-blue-600" />
+                                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                                    <Layers className="w-5 h-5 text-blue-400" />
                                     Biblioteca de Análisis Manual
                                 </h3>
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
                                     {manualRecordings.length} Elementos
                                 </span>
                             </div>
@@ -1300,38 +1300,38 @@ export default function IHorizon() {
                                             onClick={() => {
                                                 // Map manual recording to MeetingFolder structure to reuse the Detail View
                                                 const manualFolder: MeetingFolder =
-                                                    {
-                                                        id: rec.id,
-                                                        title: "Análisis Manual", // Or rec.title if it wasn't truncated
-                                                        description: rec.title, // Use the content snippet as description
-                                                        date: rec.date,
-                                                        timeStr: "N/A",
-                                                        shareUrl: "#",
-                                                        type: "Manual",
-                                                        insights: 0,
-                                                        source: "manual",
-                                                        transcripts: [
-                                                            {
-                                                                speakerName:
-                                                                    "Texto Original",
-                                                                time: "",
-                                                                text:
-                                                                    rec.fullContent ||
-                                                                    rec.title,
-                                                            },
-                                                        ],
-                                                    };
+                                                {
+                                                    id: rec.id,
+                                                    title: "Análisis Manual", // Or rec.title if it wasn't truncated
+                                                    description: rec.title, // Use the content snippet as description
+                                                    date: rec.date,
+                                                    timeStr: "N/A",
+                                                    shareUrl: "#",
+                                                    type: "Manual",
+                                                    insights: 0,
+                                                    source: "manual",
+                                                    transcripts: [
+                                                        {
+                                                            speakerName:
+                                                                "Texto Original",
+                                                            time: "",
+                                                            text:
+                                                                rec.fullContent ||
+                                                                rec.title,
+                                                        },
+                                                    ],
+                                                };
                                                 setSelectedFolder(manualFolder);
                                             }}
-                                            className="bg-white p-6 rounded-4xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group cursor-pointer"
+                                            className="bg-navy-900/40 backdrop-blur-3xl p-6 rounded-4xl border border-white/5 shadow-2xl hover:border-blue-500/50 hover:shadow-blue-900/40 hover:-translate-y-1 transition-all group cursor-pointer"
                                         >
                                             <div className="flex items-center gap-4 mb-4">
                                                 <div
                                                     className={clsx(
                                                         "w-12 h-12 rounded-2xl flex items-center justify-center transition-all",
                                                         rec.type === "audio"
-                                                            ? "bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white"
-                                                            : "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white",
+                                                            ? "bg-blue-600/10 text-blue-400 group-hover:bg-blue-600 group-hover:text-white"
+                                                            : "bg-blue-600/10 text-blue-400 group-hover:bg-blue-600 group-hover:text-white",
                                                     )}
                                                 >
                                                     {rec.type === "audio" ? (
@@ -1341,25 +1341,25 @@ export default function IHorizon() {
                                                     )}
                                                 </div>
                                                 <div className="flex-1 overflow-hidden">
-                                                    <h4 className="font-bold text-navy-950 truncate">
+                                                    <h4 className="font-bold text-bright-white truncate">
                                                         {rec.title}
                                                     </h4>
-                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                                                         {rec.date}
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center justify-between pt-4 border-t border-slate-50">
+                                            <div className="flex items-center justify-between pt-4 border-t border-white/5">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="px-2 py-1 bg-slate-50 rounded text-[9px] font-bold text-slate-500 uppercase">
+                                                    <span className="px-2 py-1 bg-white/5 rounded text-[9px] font-bold text-slate-400 uppercase">
                                                         {rec.size}
                                                     </span>
                                                     <span
                                                         className={clsx(
                                                             "px-2 py-1 rounded text-[9px] font-bold uppercase",
                                                             rec.type === "audio"
-                                                                ? "bg-blue-50 text-blue-700"
-                                                                : "bg-emerald-50 text-emerald-700",
+                                                                ? "bg-blue-500/10 text-blue-400"
+                                                                : "bg-blue-500/10 text-blue-400",
                                                         )}
                                                     >
                                                         {rec.type}
@@ -1408,11 +1408,11 @@ export default function IHorizon() {
                                                                 }
                                                             }
                                                         }}
-                                                        className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                                        className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
                                                     >
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
-                                                    <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-navy-900 transition-colors" />
+                                                    <ChevronRight className="w-5 h-5 text-slate-600 group-hover:text-blue-400 transition-colors" />
                                                 </div>
                                             </div>
                                         </div>
@@ -1433,28 +1433,28 @@ export default function IHorizon() {
             className="flex flex-col h-full gap-4 xs:gap-6 animate-fade-in-up overflow-y-auto px-2 xs:px-4 sm:px-0"
         >
             {/* 1. HEADER */}
-            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white p-4 xs:p-5 sm:p-6 rounded-2xl sm:rounded-4xl border border-slate-200 shadow-sm shrink-0">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-navy-900/40 backdrop-blur-3xl p-4 xs:p-5 sm:p-6 rounded-2xl sm:rounded-4xl border border-white/5 shadow-2xl shrink-0">
                 <div className="flex items-center gap-3 sm:gap-4 w-full lg:w-auto">
                     <button
                         onClick={() => setSelectedFolder(null)}
-                        className="w-10 h-10 sm:w-14 sm:h-14 bg-slate-50 rounded-xl sm:rounded-2xl flex items-center justify-center text-slate-600 hover:bg-slate-100 hover:text-navy-900 transition shrink-0"
+                        className="w-10 h-10 sm:w-14 sm:h-14 bg-white/5 rounded-xl sm:rounded-2xl flex items-center justify-center text-slate-400 hover:bg-white/10 hover:text-white transition shrink-0"
                     >
                         <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
                     </button>
 
-                    <div className="w-px h-8 sm:h-10 bg-slate-200 mx-1 sm:mx-2 hidden xs:block"></div>
+                    <div className="w-px h-8 sm:h-10 bg-white/10 mx-1 sm:mx-2 hidden xs:block"></div>
 
-                    <div className="w-14 h-14 bg-slate-50 rounded-2xl hidden sm:flex items-center justify-center text-slate-900 shrink-0 shadow-lg">
+                    <div className="w-14 h-14 bg-navy-900 rounded-2xl hidden sm:flex items-center justify-center text-blue-400 shrink-0 shadow-lg border border-white/5">
                         <Layers className="w-7 h-7" />
                     </div>
                     <div className="overflow-hidden">
-                        <h3 className="font-display font-bold text-lg sm:text-2xl text-navy-900 truncate">
+                        <h3 className="font-display font-bold text-lg sm:text-2xl text-bright-white truncate">
                             {selectedFolder.title}
                         </h3>
-                        <p className="text-[0.65rem] sm:text-sm text-slate-500 font-medium flex items-center gap-2 truncate">
+                        <p className="text-[0.65rem] sm:text-sm text-slate-400 font-medium flex items-center gap-2 truncate">
                             <Calendar className="w-3 h-3 shrink-0" />{" "}
                             {selectedFolder.date} •{" "}
-                            <span className="text-blue-600 font-bold shrink-0">
+                            <span className="text-blue-400 font-bold shrink-0">
                                 {selectedFolder.type}
                             </span>
                         </p>
@@ -1463,7 +1463,7 @@ export default function IHorizon() {
                 <div className="flex flex-wrap xs:flex-row gap-2 sm:gap-3 w-full lg:w-auto mt-2 lg:mt-0">
                     <button
                         onClick={() => setShowTranscription(true)}
-                        className="px-3 sm:px-6 py-2.5 sm:py-3 bg-slate-50 text-navy-900 text-xs sm:text-sm font-bold rounded-xl hover:bg-slate-100 transition border border-slate-200 flex items-center justify-center gap-2 cursor-pointer no-underline"
+                        className="px-3 sm:px-6 py-2.5 sm:py-3 bg-white/5 text-white text-xs sm:text-sm font-bold rounded-xl hover:bg-white/10 transition border border-white/10 flex items-center justify-center gap-2 cursor-pointer no-underline"
                     >
                         <FileText className="w-5 h-5 sm:w-6" />{" "}
                         <span className="hidden md:inline">Ver</span> Transc.
@@ -1484,10 +1484,10 @@ export default function IHorizon() {
                             );
                         }}
                         disabled={!selectedFolder.aiInfo}
-                        className="px-3 sm:px-6 py-2.5 sm:py-3 bg-white text-navy-900 text-xs sm:text-sm font-bold rounded-xl hover:bg-slate-50 transition border border-slate-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                        className="px-3 sm:px-6 py-2.5 sm:py-3 bg-white/5 text-white text-xs sm:text-sm font-bold rounded-xl hover:bg-white/10 transition border border-white/10 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                     >
                         <BrandAtom
-                            className="w-4 h-4 text-blue-500"
+                            className="w-4 h-4 text-blue-400"
                             variant="colored"
                         />{" "}
                         <span className="hidden md:inline">Copiar</span> Reporte
@@ -1497,7 +1497,7 @@ export default function IHorizon() {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() => showToast("Abriendo sesión...", "info")}
-                        className="px-3 sm:px-6 py-2.5 sm:py-3 bg-slate-50 text-navy-900 text-xs sm:text-sm font-bold rounded-xl hover:bg-slate-100 transition border border-slate-200 flex items-center justify-center gap-2 cursor-pointer no-underline"
+                        className="px-3 sm:px-6 py-2.5 sm:py-3 bg-white/5 text-white text-xs sm:text-sm font-bold rounded-xl hover:bg-white/10 transition border border-white/10 flex items-center justify-center gap-2 cursor-pointer no-underline"
                     >
                         <Play className="w-4 h-4" />{" "}
                         <span className="hidden md:inline">Ver</span> Sesión
@@ -1520,7 +1520,7 @@ export default function IHorizon() {
                             a.click();
                             showToast("Iniciando descarga...", "info");
                         }}
-                        className="px-3 sm:px-6 py-2.5 sm:py-3 bg-slate-50 text-navy-900 text-xs sm:text-sm font-bold rounded-xl hover:bg-slate-100 transition border border-slate-200 flex items-center justify-center gap-2 cursor-pointer no-underline"
+                        className="px-3 sm:px-6 py-2.5 sm:py-3 bg-white/5 text-white text-xs sm:text-sm font-bold rounded-xl hover:bg-white/10 transition border border-white/10 flex items-center justify-center gap-2 cursor-pointer no-underline"
                     >
                         <DownloadCloud className="w-4 h-4" />{" "}
                         <span className="hidden md:inline">Bajar</span> TXT
@@ -1546,7 +1546,7 @@ export default function IHorizon() {
                     <div className="bg-navy-950 text-white rounded-[2.5rem] relative overflow-hidden shadow-2xl shrink-0 animate-fade-in-up border border-white/5">
                         <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none"></div>
                         <div className="absolute right-0 top-0 w-96 h-96 bg-blue-600/20 rounded-full blur-[100px] pointer-events-none"></div>
-                        <div className="absolute left-0 bottom-0 w-64 h-64 bg-emerald-600/10 rounded-full blur-[80px] pointer-events-none"></div>
+                        <div className="absolute left-0 bottom-0 w-64 h-64 bg-blue-600/10 rounded-full blur-[80px] pointer-events-none"></div>
 
                         <div className="relative z-10 p-6 sm:p-10">
                             {/* Header */}
@@ -1593,7 +1593,7 @@ export default function IHorizon() {
 
                                     {selectedFolder.description &&
                                         selectedFolder.description.length >
-                                            200 && (
+                                        200 && (
                                             <button
                                                 onClick={() =>
                                                     setIsSummaryExpanded(
@@ -1629,8 +1629,8 @@ export default function IHorizon() {
                                             ?.titulo || "Analizando..."}
                                     </p>
                                 </div>
-                                <div className="bg-emerald-500/10 p-5 rounded-2xl border border-emerald-500/20 backdrop-blur-sm group hover:bg-emerald-500/15 transition-all">
-                                    <p className="text-[10px] font-black text-emerald-400 uppercase mb-2 tracking-widest">
+                                <div className="bg-blue-500/10 p-5 rounded-2xl border border-blue-500/20 backdrop-blur-sm group hover:bg-blue-500/15 transition-all">
+                                    <p className="text-[10px] font-black text-blue-400 uppercase mb-2 tracking-widest">
                                         Factor 2
                                     </p>
                                     <p className="text-sm font-bold text-white leading-snug">
@@ -1695,9 +1695,9 @@ export default function IHorizon() {
                             {/* 2. OPPORTUNITY */}
                             {selectedFolder.aiInfo.oportunidad && (
                                 <div className="bg-white p-6 sm:p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-md transition-all group relative overflow-hidden animate-fade-in-up delay-75">
-                                    <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-50 rounded-full blur-3xl -mr-24 -mt-24 opacity-60"></div>
+                                    <div className="absolute top-0 right-0 w-48 h-48 bg-blue-50 rounded-full blur-3xl -mr-24 -mt-24 opacity-60"></div>
                                     <div className="flex items-center gap-5 mb-6 relative z-10">
-                                        <div className="w-14 h-14 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 shadow-inner">
+                                        <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 shadow-inner">
                                             <Activity className="w-7 h-7" />
                                         </div>
                                         <div>
@@ -1715,14 +1715,14 @@ export default function IHorizon() {
                                                 .descripcion
                                         }
                                     </p>
-                                    <div className="p-6 bg-emerald-50/50 rounded-4xl border border-emerald-100 relative z-10 flex gap-4 items-center">
+                                    <div className="p-6 bg-blue-50/50 rounded-4xl border border-blue-100 relative z-10 flex gap-4 items-center">
                                         <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center shrink-0">
                                             <BrandAtom
-                                                className="w-6 h-6 text-emerald-500"
+                                                className="w-6 h-6 text-blue-500"
                                                 variant="colored"
                                             />
                                         </div>
-                                        <p className="text-sm text-emerald-900 italic font-bold leading-relaxed">
+                                        <p className="text-sm text-blue-900 italic font-bold leading-relaxed">
                                             &quot;
                                             {
                                                 selectedFolder.aiInfo
@@ -1779,7 +1779,7 @@ export default function IHorizon() {
                                                         checkedItems.includes(
                                                             idx,
                                                         )
-                                                            ? "bg-emerald-50 border-emerald-200 shadow-sm"
+                                                            ? "bg-blue-50 border-blue-200 shadow-sm"
                                                             : "bg-slate-50 border-slate-50 hover:bg-white hover:border-blue-200 hover:shadow-xl",
                                                     )}
                                                     onClick={() =>
@@ -1793,7 +1793,7 @@ export default function IHorizon() {
                                                             checkedItems.includes(
                                                                 idx,
                                                             )
-                                                                ? "bg-emerald-500 text-slate-900"
+                                                                ? "bg-blue-500 text-slate-900"
                                                                 : "bg-white text-blue-600 border border-blue-100",
                                                         )}
                                                     >
@@ -1807,7 +1807,7 @@ export default function IHorizon() {
                                                                 checkedItems.includes(
                                                                     idx,
                                                                 )
-                                                                    ? "text-emerald-900"
+                                                                    ? "text-blue-900"
                                                                     : "text-navy-900",
                                                             )}
                                                         >
@@ -1824,7 +1824,7 @@ export default function IHorizon() {
                                                             checkedItems.includes(
                                                                 idx,
                                                             )
-                                                                ? "bg-emerald-100 border-emerald-500 text-emerald-600"
+                                                                ? "bg-blue-100 border-blue-500 text-blue-600"
                                                                 : "bg-white border-slate-200 text-transparent",
                                                         )}
                                                     >
@@ -1924,7 +1924,7 @@ export default function IHorizon() {
                             <div>
                                 <h4 className="font-display font-bold text-xl text-navy-900 flex items-center gap-3">
                                     <div className="p-2 bg-blue-50 rounded-xl text-blue-600">
-                                        <FileText className="w-6 h-6" />
+                                        <CheckCircle className="w-6 h-6" />
                                     </div>
                                     Transcripción de la Sesión
                                 </h4>
@@ -2018,11 +2018,10 @@ export default function IHorizon() {
                                             <div
                                                 className={`
                            group relative max-w-[85%] px-5 py-4 shadow-sm transition-all duration-300
-                           ${
-                               isMe
-                                   ? "bg-white text-slate-900 rounded-2xl rounded-tr-none"
-                                   : "bg-white text-slate-800 rounded-2xl rounded-tl-none border border-slate-200"
-                           }
+                           ${isMe
+                                                        ? "bg-white text-slate-900 rounded-2xl rounded-tr-none"
+                                                        : "bg-white text-slate-800 rounded-2xl rounded-tl-none border border-slate-200"
+                                                    }
                         `}
                                             >
                                                 {!isMe && (

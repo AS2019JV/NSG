@@ -56,7 +56,7 @@ export default function Metrics() {
       <div className="max-w-7xl mx-auto flex flex-col gap-4 xs:gap-5 sm:gap-6 animate-fade-in-up pb-10 px-3 xs:px-4 sm:px-0">
         {/* Stat Cards Grid */}
         <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 xs:gap-4 sm:gap-6">
-          <StatCard title="Revenue YTD" value="$2.4M" icon={DollarSign} colorClass="text-emerald-600" bgClass="bg-white" />
+          <StatCard title="Revenue YTD" value="$2.4M" icon={DollarSign} colorClass="text-blue-600" bgClass="bg-white" />
           <StatCard title="EBITDA" value="32%" icon={Percent} colorClass="text-blue-600" bgClass="bg-white" />
           <StatCard title="Burn Rate" value="$45k" icon={Flame} colorClass="text-orange-500" bgClass="bg-white" />
           <StatCard title="Runway" value="18m" icon={Calendar} colorClass="text-indigo-600" bgClass="bg-white" />
@@ -100,7 +100,7 @@ function TransactionItem({ name, amount, type }: { name: string, amount: string,
           <p className="text-[10px] xs:text-xs text-slate-400">{type}</p>
         </div>
       </div>
-      <div className={`font-bold text-xs xs:text-sm ${isIncome ? 'text-emerald-600' : 'text-slate-600'}`}>
+      <div className={`font-bold text-xs xs:text-sm ${isIncome ? 'text-blue-600' : 'text-slate-600'}`}>
         {amount}
       </div>
     </div>

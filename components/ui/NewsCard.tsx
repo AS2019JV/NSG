@@ -16,17 +16,17 @@ interface NewsCardProps {
 
 export function NewsCard({ source, title, tag, color, description, time, isAnalyzed, isAnalyzing, onAnalyze }: NewsCardProps) {
   const colorMap: Record<string, string> = {
-    blue: "bg-blue-50 text-blue-600 border-blue-100",
-    purple: "bg-purple-50 text-purple-600 border-purple-100",
-    emerald: "bg-emerald-50 text-emerald-600 border-emerald-100",
-    orange: "bg-orange-50 text-orange-600 border-orange-100",
-    sky: "bg-sky-50 text-sky-600 border-sky-100",
+    blue: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    purple: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+    emerald: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    orange: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+    sky: "bg-sky-500/10 text-sky-400 border-sky-500/20",
   };
 
   const accentColor: Record<string, string> = {
     blue: "bg-blue-600",
     purple: "bg-purple-600",
-    emerald: "bg-emerald-600",
+    emerald: "bg-blue-600",
     orange: "bg-orange-600",
     sky: "bg-sky-600",
   };
@@ -34,7 +34,7 @@ export function NewsCard({ source, title, tag, color, description, time, isAnaly
   return (
     <div
       onClick={isAnalyzing ? undefined : onAnalyze}
-      className="group relative bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg transition-all duration-500 cursor-pointer overflow-hidden flex flex-col"
+      className="group relative bg-navy-900/40 backdrop-blur-3xl rounded-2xl border border-white/5 shadow-2xl hover:border-blue-500/50 transition-all duration-500 cursor-pointer overflow-hidden flex flex-col"
     >
       <div className={clsx("w-1 h-full absolute left-0 top-0 z-20 opacity-50", accentColor[color] || accentColor['blue'])}></div>
 
@@ -55,23 +55,23 @@ export function NewsCard({ source, title, tag, color, description, time, isAnaly
           </div>
 
           {isAnalyzed && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 border border-emerald-100 rounded-full animate-in fade-in zoom-in-95 duration-500">
-              <BrandAtom className="w-3 h-3 text-emerald-600" variant="colored" />
-              <span className="text-[0.6rem] font-bold text-emerald-700 uppercase tracking-wider">Analizado</span>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-500/10 border border-blue-500/20 rounded-full animate-in fade-in zoom-in-95 duration-500">
+              <BrandAtom className="w-3 h-3 text-blue-400" variant="colored" />
+              <span className="text-[0.6rem] font-bold text-blue-400 uppercase tracking-wider">Analizado</span>
             </div>
           )}
         </div>
 
-        <h4 className="font-display font-bold text-lg md:text-xl text-navy-900 mb-2 group-hover:text-blue-700 transition-colors leading-snug">
+        <h4 className="font-display font-bold text-lg md:text-xl text-bright-white mb-2 group-hover:text-blue-400 transition-colors leading-snug">
           {title}
         </h4>
 
-        <p className="text-slate-500 text-xs md:text-sm leading-relaxed line-clamp-2 pr-10">
+        <p className="text-slate-400 text-xs md:text-sm leading-relaxed line-clamp-2 pr-10">
           {description}
         </p>
 
-        <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-50">
-          <div className="flex items-center gap-2 text-[0.6rem] font-bold text-slate-400">
+        <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/5">
+          <div className="flex items-center gap-2 text-[0.6rem] font-bold text-slate-500">
             <Clock className="w-3 h-3" />
             <span>{time}</span>
           </div>
@@ -85,8 +85,8 @@ export function NewsCard({ source, title, tag, color, description, time, isAnaly
             className={clsx(
               "px-4 py-1.5 rounded-lg text-[0.6rem] font-bold uppercase tracking-widest transition-all duration-300 flex items-center gap-2",
               isAnalyzed
-                ? "bg-emerald-600 text-white shadow-md shadow-emerald-500/20"
-                : "bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white"
+                ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                : "bg-white/5 text-slate-400 border border-white/10 hover:bg-blue-600 hover:text-white hover:border-transparent"
             )}
           >
             {isAnalyzing ? (

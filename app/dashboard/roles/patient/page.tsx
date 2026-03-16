@@ -59,7 +59,7 @@ export default function Dashboard() {
               <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                 <div className="bg-blue-500 w-[85%] h-full rounded-full transition-all duration-1000"></div>
               </div>
-              <div className="flex items-center gap-2 text-xs text-emerald-600 font-bold">
+              <div className="flex items-center gap-2 text-xs text-blue-600 font-bold">
                 <TrendingUp className="w-3 h-3" />
                 <span>Improving</span>
               </div>
@@ -70,8 +70,8 @@ export default function Dashboard() {
             title="Next Appointment"
             subtitle="Schedule"
             icon={Users}
-            iconColor="text-emerald-600"
-            iconBg="bg-emerald-50"
+            iconColor="text-blue-600"
+            iconBg="bg-blue-50"
           >
             <div className="space-y-3">
               <div className="flex items-center justify-between">
@@ -149,11 +149,11 @@ export default function Dashboard() {
                 </span>
                 <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <button className="w-full flex items-center justify-between p-3 bg-slate-50 hover:bg-emerald-50 rounded-xl transition-all border border-transparent hover:border-emerald-200 group">
-                <span className="font-medium text-slate-700 group-hover:text-emerald-600">
+              <button className="w-full flex items-center justify-between p-3 bg-slate-50 hover:bg-blue-50 rounded-xl transition-all border border-transparent hover:border-blue-200 group">
+                <span className="font-medium text-slate-700 group-hover:text-blue-600">
                   Log Mood
                 </span>
-                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           </DashboardCard>
