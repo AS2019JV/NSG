@@ -253,7 +253,7 @@ export default function DiscoveryStudio() {
   const currentPains = PAINS_BY_ROLE[answers.role || 'default'];
   const currentProcesses = PROCESS_BY_ROLE[answers.role || 'default'];
 
-  const containerVariants = {
+  const containerVariants: any = {
     hidden: { opacity: 0, x: 10 },
     visible: { opacity: 1, x: 0, transition: { duration: 0.4, ease: "circOut" } },
     exit: { opacity: 0, x: -10, transition: { duration: 0.2 } }
